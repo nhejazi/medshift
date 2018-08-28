@@ -1,0 +1,49 @@
+branches:
+  only:
+  - master
+  - devel
+
+env:
+  global:
+  - RGL_USE_NULL=TRUE
+
+language: r
+sudo: required
+cache: packages
+
+warnings_are_errors: true
+r_build_args: '--no-manual'
+r_check_args: '--no-vignettes --no-manual'
+
+r:
+  - release
+  - devel
+
+before_install:
+  - Rscript -e 'update.packages(ask = FALSE)'
+
+r_packages:
+  - devtools
+  - covr
+
+r_github_packages:
+  - r-lib/devtools
+  - r-lib/sessioninfo
+  - Rdatatable/data.table
+  - jimhester/covr
+  - jeremyrcoyle/hal9001
+  - osofr/condensier
+  - tlverse/sl3@devel
+
+after_success:
+  ## coverage
+  - travis_wait 30 Rscript -e "covr::codecov(line_exclusions = list('R/plots.R', 'R/utils.R'))"
+
+on_failure:
+  - "./travis-tool.sh dump_logs"
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change
+
