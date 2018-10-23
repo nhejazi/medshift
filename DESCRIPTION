@@ -7,6 +7,9 @@ Authors@R: c(
            comment = c(ORCID = "0000-0002-7127-2789")),
     person("Iván", "Díaz", email = "ild2005@med.cornell.edu",
            role = c("aut")),
+    person("Jeremy", "Coyle", email = "jeremy.coyle@gmail.com",
+           role = c("ctb"),
+           comment = c(ORCID = "0000-0002-9874-6649")),
     person("Mark", "van der Laan", email = "laan@berkeley.edu",
            role = c("ctb", "ths"),
            comment = c(ORCID = "0000-0002-7127-2789"))
@@ -23,6 +26,7 @@ Imports:
     data.table,
     condensier,
     sl3,
+    tmle3,
     hal9001
 Suggests:
     testthat,
@@ -33,9 +37,10 @@ Suggests:
     nnls,
     ranger
 Remotes:
-    github::jeremyrcoyle/hal9001@master,
     github::osofr/condensier@master,
-    github::tlverse/sl3@devel
+    github::tlverse/hal9001@master,
+    github::tlverse/sl3@master,
+    github::tlverse/tmle3@master
 License: MIT + file LICENSE
 URL: https://github.com/nhejazi/medshift
 BugReports: https://github.com/nhejazi/medshift/issues
