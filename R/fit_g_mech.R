@@ -7,7 +7,6 @@
 #' @importFrom data.table as.data.table
 #
 fit_g_mech <- function(task, delta_shift, lrnr_stack) {
-
   # make task for propensity score regression
   g_task <- task$get_regression_task("A")
 
@@ -17,11 +16,12 @@ fit_g_mech <- function(task, delta_shift, lrnr_stack) {
 
   # directly computed the shifted propensity score
   g_pred_shifted <- (delta_shift * g_pred_natural) /
-      (delta_shift * g_pred_natural + (1 - g_pred_natural))
+    (delta_shift * g_pred_natural + (1 - g_pred_natural))
 
   # output
-  out <- data.table::data.table(cbind(g_natural = g_pred_natural,
-                                      g_shifted = g_pred_shifted))
+  out <- data.table::data.table(cbind(
+    g_natural = g_pred_natural,
+    g_shifted = g_pred_shifted
+  ))
   return(out)
 }
-

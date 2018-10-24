@@ -6,8 +6,10 @@
 #
 estim_reweighted <- function(task, delta_shift, lrnr_stack) {
   # fit propensity score
-  g_est <- fit_g_mech(task = task, delta_shift = delta_shift,
-                      lrnr_stack = lrnr_stack)
+  g_est <- fit_g_mech(
+    task = task, delta_shift = delta_shift,
+    lrnr_stack = lrnr_stack
+  )
   g_pred_shifted <- g_est$g_shifted
 
   # compute the clever intervention density for the mediator
@@ -18,4 +20,3 @@ estim_reweighted <- function(task, delta_shift, lrnr_stack) {
   theta_re <- mean((g_pred_shifted / e_pred) * task$data$Y)
   return(theta_re)
 }
-

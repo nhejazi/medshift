@@ -4,7 +4,7 @@
 \alias{medshift}
 \title{Nonparametric estimation of direct effects under mediation}
 \usage{
-medshift(W, A, Z, Y, g_lrnrs, e_lrnrs, Q_lrnrs)
+medshift(W, A, Z, Y, g_lrnrs, e_lrnrs, m_lrnrs)
 }
 \arguments{
 \item{W}{...}

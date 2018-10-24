@@ -25,9 +25,11 @@ Díaz](https://idiaz.xyz)
 ## What’s `medshift`?
 
 The `medshift` R package is designed to provide facilities for
-estimating causal direct and indirect effects in settings involving
-mediation and stochastic interventions. It is an accompaniment to the
-manuscript Díaz and others (n.d.).
+estimating direct and indirect effects of stochastic interventions in
+settings in which causal mediation analysis is of interest. `medshift`
+is designed as an implementation to accompany the methods described in
+“Causal mediation analysis for stochastic interventions” (Díaz and
+others, n.d.).
 
 -----
 
@@ -80,12 +82,11 @@ After using the `medshift` R package, please cite the following:
       publisher={}
     }
 
-    @manual{hejazi2018medshift,
-      author = {Hejazi, Nima S and {van der Laan}, Mark J and D{\'\i}az,
-        Iv{\'a}n},
-      title = {medshift: Efficient Estimation of the Causal Mediation
-        Effects of Stochastic Interventions in {R}},
-      year  = {2018},
+    @manual{hejazi2018+medshift,
+      author = {Hejazi, Nima S and D{\'\i}az, Iv{\'a}n},
+      title = {{medshift}: Causal mediation analysis for stochastic
+        interventions in {R}},
+      year  = {2018+},
       url = {https://github.com/nhejazi/medshift},
       note = {R package version 0.0.1}
     }

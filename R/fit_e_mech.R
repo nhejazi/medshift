@@ -7,15 +7,8 @@
 #' @importFrom sl3 sl3_Task
 #
 fit_e_mech <- function(task, lrnr_stack) {
-  # extract NPSEM from task
-  npsem <- task$npsem
-
   # create clever task for mediation regression
-  e_task <- sl3::sl3_Task$new(
-    data = task$data,
-    outcome = "A",
-    covariates = c(npsem$Z$variables, npsem$W$variables)
-  )
+  e_task <- task$get_regression_task("E")
 
   # fit and predict
   e_fit_stack <- lrnr_stack$train(e_task)
@@ -29,4 +22,3 @@ fit_e_mech <- function(task, lrnr_stack) {
   out <- data.table::data.table(cbind(e_pred = e_pred))
   return(out)
 }
-

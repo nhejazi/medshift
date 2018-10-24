@@ -8,14 +8,15 @@ output:
 ---
 
 ```{r prelim, echo=FALSE, message=FALSE}
-# plotting and scientific notation
-options(scipen = 999)  ## has scientific notation ever annoyed you?
-
-# packages
+# tidyverse
 #library(tidyverse)  # pandoc can't deal with the startup message
 library(tibble)
 library(stringr)
 library(ggplot2)
+
+# packages
+library(here)
+library(latex2exp)
 library(data.table)
 library(condensier)
 library(SuperLearner)
@@ -23,13 +24,13 @@ library(sl3)
 library(tmle3)
 library(txshift)
 library(npcausal)
-library(future)
-library(here)
 load_all()
 
 # parallelization and prng
+library(future)
 plan(multiprocess)
 set.seed(429153)
+options(scipen = 999)  # has scientific notation ever annoyed you? me too.
 ```
 
 ```{r make_learners}
@@ -113,6 +114,7 @@ w_names <- colnames(data)[str_detect(colnames(data), "W")]
 npsem <- list(define_node("W", w_names),
               define_node("A", "A", c("W")),
               define_node("Z", z_names, c("A", "W")),
+              define_node("E", "A", c("Z", "W")),
               define_node("Y", "Y", c("Z", "A", "W"))
              )
 tmle_task <- tmle3_Task$new(data, npsem = npsem)
@@ -257,11 +259,17 @@ Let's take a quick look at our predictions, to check stability:
 
 ```{r plot_stability_g, out.width = '75%'}
 p_hist_g_natural <- ggplot(as_tibble(g_est$g_natural), aes(x = value)) +
-  geom_histogram() + theme_bw() + xlab("est. g(a | w)")
+  geom_histogram(fill = "red", alpha = 0.3) +
+  xlab(TeX("$\\hat{g}(a | w)$")) +
+  ggtitle(TeX("Histogram of $\\hat{g}(a | w)$")) +
+  theme_bw()
 p_hist_g_natural
 
 p_hist_g_shifted <- ggplot(as_tibble(g_est$g_shifted), aes(x = value)) +
-  geom_histogram() + theme_bw() + xlab("est. g(a + shift | w)")
+  geom_histogram(fill = "red", alpha = 0.3) +
+  xlab(TeX("$\\hat{g}_{\\delta}(a + \\delta | w)$")) +
+  ggtitle(TeX("Histogram of $\\hat{g}_{\\delta}(a + \\delta | w)$")) +
+  theme_bw()
 p_hist_g_shifted
 ```
 
@@ -277,8 +285,11 @@ e_est
 Let's take a quick look at our predictions, to check stability:
 
 ```{r plot_stability_e, out.width = '75%'}
-p_hist_e <- ggplot(as_tibble(e_est$e_mech), aes(x = value)) +
-  geom_histogram() + theme_bw() + xlab("est. e(a | z, w)")
+p_hist_e <- ggplot(as_tibble(e_est$e_pred), aes(x = value)) +
+  geom_histogram(fill = "blue", alpha = 0.3) +
+  xlab(TeX("$\\hat{e}(a | z, w)$")) +
+  ggtitle(TeX("Histogram of $\\hat{e}(a | z, w)$")) +
+  theme_bw()
 p_hist_e
 ```
 
@@ -293,7 +304,10 @@ Let's take a quick look at our predictions, to check stability:
 
 ```{r plot_stability_m, out.width = '75%'}
 p_hist_m <- ggplot(as_tibble(m_est$m_pred), aes(x = value)) +
-  geom_histogram() + theme_bw() + xlab("est. m(a, z, w)")
+  geom_histogram(fill = "darkgreen", alpha = 0.3) +
+  xlab(TeX("$\\hat{m}(a, z, w)$")) +
+  ggtitle(TeX("Histogram of $\\hat{m}(a, z, w)$")) +
+  theme_bw()
 p_hist_m
 ```
 

@@ -610,7 +610,7 @@ body {
 <p><strong>Authors:</strong> <a href="https://nimahejazi.org">Nima Hejazi</a> and <a href="https://idiaz.xyz">Iván Díaz</a></p>
 <hr />
 <h2 id="whats-medshift">What’s <code>medshift</code>?</h2>
-<p>The <code>medshift</code> R package is designed to provide facilities for estimating causal direct and indirect effects in settings involving mediation and stochastic interventions. It is an accompaniment to the manuscript Díaz and others (n.d.).</p>
+<p>The <code>medshift</code> R package is designed to provide facilities for estimating direct and indirect effects of stochastic interventions in settings in which causal mediation analysis is of interest. <code>medshift</code> is designed as an implementation to accompany the methods described in “Causal mediation analysis for stochastic interventions” (Díaz and others, n.d.).</p>
 <hr />
 <h2 id="installation">Installation</h2>
 <p>Install the most recent <em>stable release</em> from GitHub via <a href="https://www.rstudio.com/products/rpackages/devtools/"><code>devtools</code></a>:</p>
@@ -638,12 +638,11 @@ body {
       publisher={}
     }
 
-    @manual{hejazi2018medshift,
-      author = {Hejazi, Nima S and {van der Laan}, Mark J and D{\'\i}az,
-        Iv{\'a}n},
-      title = {medshift: Efficient Estimation of the Causal Mediation
-        Effects of Stochastic Interventions in {R}},
-      year  = {2018},
+    @manual{hejazi2018+medshift,
+      author = {Hejazi, Nima S and D{\'\i}az, Iv{\'a}n},
+      title = {{medshift}: Causal mediation analysis for stochastic
+        interventions in {R}},
+      year  = {2018+},
       url = {https://github.com/nhejazi/medshift},
       note = {R package version 0.0.1}
     }

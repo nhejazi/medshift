@@ -18,4 +18,3 @@ fit_m_mech <- function(task, lrnr_stack) {
   out <- data.table::data.table(cbind(m_pred = m_pred))
   return(out)
 }
-
