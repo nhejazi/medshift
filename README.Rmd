@@ -25,14 +25,16 @@ knitr::opts_chunk$set(
 
 > Targeted Learning of the Causal Effects of Stochastic Interventions
 
-__Authors:__ [Nima Hejazi](https://nimahejazi.org) and [Ivan
-Diaz]()
+__Authors:__ [Nima Hejazi](https://nimahejazi.org) and [Iván
+Díaz](https://idiaz.xyz)
 
 ---
 
 ## What's `medshift`?
 
-The `medshift` R package is designed to provide facilities to...
+The `medshift` R package is designed to provide facilities for estimating causal
+direct and indirect effects in settings involving mediation and stochastic
+interventions. It is an accompaniment to the manuscript @diaz2018+causal.
 
 ---
 
@@ -49,44 +51,7 @@ devtools::install_github("nhejazi/medshift", build_vignettes = FALSE)
 
 ## Example
 
-To illustrate how `medshift` may be used to ascertain the effect of a treatment,
-consider the following example:
-
-```{r example, message=FALSE, warning=FALSE, eval=FALSE}
-library(medshift)
-library(condensier)
-set.seed(429153)
-
-# simulate simple data for tmle-shift sketch
-n_obs <- 1000  # number of observations
-n_w <- 1  # number of baseline covariates
-p_w <- 0.5  # probability of a success ("1") in the baseline variables
-tx_mult <- 2  # multiplier for the effect of W = 1 on the treatment
-
-## baseline covariate -- simple, binary
-W <- as.numeric(replicate(n_w, rbinom(n_obs, 1, p_w)))
-
-## create treatment based on baseline W
-A <- as.numeric(rnorm(n_obs, mean = tx_mult * W, sd = 1))
-
-# create outcome as a linear function of A, W + white noise
-Y <- A + W + rnorm(n_obs, mean = 0, sd = 1)
-
-# fit the TMLE
-tmle_shift <- tmle_medshift(W = W, A = A, Y = Y, delta = 0.5,
-                           g_fit_args = list(fit_type = "glm",
-                                             nbins = 25,
-                                             bin_method = "dhist",
-                                             bin_estimator =
-                                               speedglmR6$new(),
-                                             parfit = FALSE),
-                           Q_fit_args = list(fit_type = "glm",
-                                             glm_formula = "Y ~ .")
-                          )
-
-# conveniently summarize the results
-summary(tmle_shift)
-```
+Forthcoming...
 
 ---
 
@@ -109,6 +74,17 @@ prior to submitting a pull request.
 ## Citation
 
 After using the `medshift` R package, please cite the following:
+
+        @article{diaz2018+causal,
+          title={Causal mediation analysis for stochastic interventions},
+          author={D{\'\i}az, Iv{\'a}n and others},
+          journal={},
+          volume={},
+          number={},
+          pages={},
+          year={2018+},
+          publisher={}
+        }
 
         @manual{hejazi2018medshift,
           author = {Hejazi, Nima S and {van der Laan}, Mark J and D{\'\i}az,

@@ -1,8 +1,6 @@
-#' Parameter for Linear Working Marginal Structural Model
+#' Parameter for efficient estimation equation-based estimator
 #'
-#' Parameter definition for targeting the parameters of a linear working
-#' marginal structural model (MSM): EY = beta0 + beta1 delta, to
-#' summarize the variable importance results of a grid of shift interventions.
+#' Parameter definition...
 #'
 #' @importFrom R6 R6Class
 #' @importFrom uuid UUIDgenerate
@@ -16,7 +14,7 @@
 #' @format \code{\link{R6Class}} object.
 #'
 #' @section Constructor:
-#'   \code{define_param(Param_MSM_linear, observed_likelihood, intervention_list, ..., outcome_node)}
+#'   \code{define_param(Param_esteqn_medshift, observed_likelihood, intervention_list, ..., outcome_node)}
 #'
 #'   \describe{
 #'     \item{\code{observed_likelihood}}{A \code{\link{Likelihood}} corresponding to the observed likelihood
@@ -37,6 +35,7 @@
 #'     }
 #' }
 #' @export
+#
 Param_esteqn_medshift <- R6::R6Class(
   classname = "Param_esteqn_medshift",
   portable = TRUE,

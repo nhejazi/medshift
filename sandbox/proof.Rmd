@@ -126,7 +126,7 @@ NOTE: need this as a component of the decomposition
 
 ```{r compute_EY}
 # just the population mean of the outcome
-EY <- mean(Y)
+EY <- mean(data$Y)
 ```
 
 
@@ -142,9 +142,9 @@ theta_ipsi <- ipsi(y = data$Y, a = data$A, x.trt = W, x.out = W,
                    time = rep(1, nrow(data)), id = seq_along(Y),
                    delta.seq = delta_shift)
 
-# print return object and extract point estimate
-theta_ipsi$res
+# print extracted point estimate
 theta_ipsi_est <- theta_ipsi$res$est
+theta_ipsi_est
 ```
 
 
@@ -163,58 +163,6 @@ m(z, a, w)\right),$$ and
 $$D_{Z,W,\eta,\beta}(o) = \int m(z, a, w) g_{\delta}(a \mid w)d\nu(a) −
 \beta,$$ and $D_{A,\eta}(O)$ is the efficient influence function in the
 nonparametric model for $g_{\delta,0}$.
-
-First, let compute an estimate of the treatment mechanism $g(A \mid W)$:
-
-```{r compute_g}
-g_est <- fit_g_mech(task = tmle_task, delta_shift = 0.5,
-                    lrnr_stack = sl_lrn)
-g_est
-```
-
-Let's take a quick look at our predictions, to check stability:
-
-```{r plot_stability_g, out.width = '75%'}
-p_hist_g_natural <- ggplot(as_tibble(g_est$g_natural), aes(x = value)) +
-  geom_histogram() + theme_bw() + xlab("est. g(a | w)")
-p_hist_g_natural
-
-p_hist_g_shifted <- ggplot(as_tibble(g_est$g_shifted), aes(x = value)) +
-  geom_histogram() + theme_bw() + xlab("est. g(a + shift | w)")
-p_hist_g_shifted
-```
-
-Let's now compute an estimate of the treatment mechanism, conditional on both
-the baseline covariates and mediators $\hat{e}(A \mid Z, W)$:
-
-```{r compute_e}
-# make task for treatment mechanism, conditional on mediators
-e_est <- fit_e_mech(task = tmle_task, lrnr_stack = sl_lrn)
-e_est
-```
-
-Let's take a quick look at our predictions, to check stability:
-
-```{r plot_stability_e, out.width = '75%'}
-p_hist_e <- ggplot(as_tibble(e_est$e_mech), aes(x = value)) +
-  geom_histogram() + theme_bw() + xlab("est. e(a | z, w)")
-p_hist_e
-```
-
-Next, let's compute an estimate of the outcome regression $m(a, z, w)$:
-
-```{r compute_m}
-m_est <- fit_m_mech(task = tmle_task, lrnr_stack = sl_lrn)
-m_est
-```
-
-Let's take a quick look at our predictions, to check stability:
-
-```{r plot_stability_m, out.width = '75%'}
-p_hist_m <- ggplot(as_tibble(m_est$m_pred), aes(x = value)) +
-  geom_histogram() + theme_bw() + xlab("est. m(a, z, w)")
-p_hist_m
-```
 
 **Fitting the substitution estimator $\hat{\theta}_{\text{sub}}(\delta)$**
 
@@ -292,5 +240,61 @@ construct an estimator of the NIE from the quantities already computed.
 ```{r comp_nie_binary}
 beta_nie <- theta_sub - theta_ipsi_est
 beta_nie
+```
+
+---
+
+## Diagnostics for likelihood components
+
+First, let compute an estimate of the treatment mechanism $g(A \mid W)$:
+
+```{r compute_g}
+g_est <- fit_g_mech(task = tmle_task, delta_shift = 0.5,
+                    lrnr_stack = sl_lrn)
+g_est
+```
+
+Let's take a quick look at our predictions, to check stability:
+
+```{r plot_stability_g, out.width = '75%'}
+p_hist_g_natural <- ggplot(as_tibble(g_est$g_natural), aes(x = value)) +
+  geom_histogram() + theme_bw() + xlab("est. g(a | w)")
+p_hist_g_natural
+
+p_hist_g_shifted <- ggplot(as_tibble(g_est$g_shifted), aes(x = value)) +
+  geom_histogram() + theme_bw() + xlab("est. g(a + shift | w)")
+p_hist_g_shifted
+```
+
+Let's now compute an estimate of the treatment mechanism, conditional on both
+the baseline covariates and mediators $\hat{e}(A \mid Z, W)$:
+
+```{r compute_e}
+# make task for treatment mechanism, conditional on mediators
+e_est <- fit_e_mech(task = tmle_task, lrnr_stack = sl_lrn)
+e_est
+```
+
+Let's take a quick look at our predictions, to check stability:
+
+```{r plot_stability_e, out.width = '75%'}
+p_hist_e <- ggplot(as_tibble(e_est$e_mech), aes(x = value)) +
+  geom_histogram() + theme_bw() + xlab("est. e(a | z, w)")
+p_hist_e
+```
+
+Next, let's compute an estimate of the outcome regression $m(a, z, w)$:
+
+```{r compute_m}
+m_est <- fit_m_mech(task = tmle_task, lrnr_stack = sl_lrn)
+m_est
+```
+
+Let's take a quick look at our predictions, to check stability:
+
+```{r plot_stability_m, out.width = '75%'}
+p_hist_m <- ggplot(as_tibble(m_est$m_pred), aes(x = value)) +
+  geom_histogram() + theme_bw() + xlab("est. m(a, z, w)")
+p_hist_m
 ```
 

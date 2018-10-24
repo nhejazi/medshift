@@ -3,7 +3,7 @@
 \docType{data}
 \name{Param_esteqn_medshift}
 \alias{Param_esteqn_medshift}
-\title{Parameter for Linear Working Marginal Structural Model}
+\title{Parameter for efficient estimation equation-based estimator}
 \format{\code{\link{R6Class}} object.}
 \usage{
 Param_esteqn_medshift
@@ -12,13 +12,11 @@ Param_esteqn_medshift
 \code{Param_base} object
 }
 \description{
-Parameter definition for targeting the parameters of a linear working
-marginal structural model (MSM): EY = beta0 + beta1 delta, to
-summarize the variable importance results of a grid of shift interventions.
+Parameter definition...
 }
 \section{Constructor}{
 
-  \code{define_param(Param_MSM_linear, observed_likelihood, intervention_list, ..., outcome_node)}
+  \code{define_param(Param_esteqn_medshift, observed_likelihood, intervention_list, ..., outcome_node)}
 
   \describe{
     \item{\code{observed_likelihood}}{A \code{\link{Likelihood}} corresponding to the observed likelihood

@@ -1,4 +1,18 @@
-^medshift\.Rproj$
+^.*\.Rproj$
 ^\.Rproj\.user$
-^sandbox$
+^Makefile$
+^README\.Rmd$
+^README\.html$
+^README-norefs\.Rmd$
+^README-refs\.bib$
+^README-.*\.png$
+^\.travis\.yml$
+^appveyor\.yml$
+^codecov\.yml$
+^_pkgdown\.yml$
 
+# Extra miscellaneous support files/directories.
+^cran-comments\.md$
+^CONTRIBUTING\.md$
+^sandbox$
+^docs$

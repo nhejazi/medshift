@@ -20,6 +20,9 @@ Description: Tools for efficiently estimating parameters of a decomposition of
     analysis.
 Depends: R (>= 3.2.0)
 Imports:
+    R6,
+    uuid,
+    methods,
     stats,
     dplyr,
     stringr,
