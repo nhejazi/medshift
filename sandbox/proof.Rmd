@@ -9,7 +9,6 @@ output:
 
 ```{r prelim, echo=FALSE, message=FALSE}
 # plotting and scientific notation
-#options(repr.plot.width = 4, repr.plot.height = 3)  ## resizing plots
 options(scipen = 999)  ## has scientific notation ever annoyed you?
 
 # packages

@@ -1,5 +1,5 @@
 Package: medshift
-Title: Causal mediation analysis with stochastic shift interventions
+Title: Causal mediation analysis for stochastic interventions
 Version: 0.0.1
 Authors@R: c(
     person("Nima", "Hejazi", email = "nhejazi@berkeley.edu",
@@ -17,7 +17,8 @@ Authors@R: c(
 Maintainer: Nima Hejazi <nh@nimahejazi.org>
 Description: Tools for efficiently estimating parameters of a decomposition of
     the population intervention effect when performing causal mediation
-    analysis.
+    analysis. An implementation accompanying the manuscript "Causal mediation
+    analysis for stochastic interventions" (Diaz et al, 2018+).
 Depends: R (>= 3.2.0)
 Imports:
     R6,
