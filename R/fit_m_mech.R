@@ -15,6 +15,7 @@ fit_m_mech <- function(task, lrnr_stack) {
   m_pred <- m_fit_stack$predict()
 
   # output
-  out <- data.table::data.table(cbind(m_pred = m_pred))
+  out <- list(m_pred = data.table::data.table(cbind(m_pred = m_pred)),
+              m_fit_sl = m_fit_stack)
   return(out)
 }

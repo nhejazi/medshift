@@ -19,9 +19,11 @@ fit_g_mech <- function(task, delta_shift, lrnr_stack) {
     (delta_shift * g_pred_natural + (1 - g_pred_natural))
 
   # output
-  out <- data.table::data.table(cbind(
+  out <- list(
+    g_est = data.table::data.table(cbind(
     g_natural = g_pred_natural,
     g_shifted = g_pred_shifted
-  ))
+    )),
+    g_fit = g_fit_stack)
   return(out)
 }

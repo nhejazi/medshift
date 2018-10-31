@@ -2,19 +2,20 @@
 #'
 #' @param task ...
 #' @param delta_shift ...
-#' @param lrnr_stack ...
+#' @param lrnr_stack_g ...
+#' @param lrnr_stack_m ...
 #
-estim_sub <- function(task, delta_shift, lrnr_stack) {
+estim_sub <- function(task, delta_shift, lrnr_stack_g, lrnr_stack_m) {
   # fit propensity score
   g_est <- fit_g_mech(
     task = task, delta_shift = delta_shift,
-    lrnr_stack = lrnr_stack
+    lrnr_stack = lrnr_stack_g
   )
   g_pred_shifted <- g_est$g_shifted
 
   # compute estimator for the outcome regression
-  m_est <- fit_m_mech(task = task, lrnr_stack = lrnr_stack)
-  m_pred <- m_est$m_pred
+  m_out <- fit_m_mech(task = task, lrnr_stack = lrnr_stack_m)
+  m_pred <- m_out$m_pred
 
   # loop over levels of intervention
   # TODO: FIX THIS, VERY BAD

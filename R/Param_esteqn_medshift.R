@@ -55,24 +55,8 @@ Param_esteqn_medshift <- R6::R6Class(
         tmle_task <- self$observed_likelihood$training_task
       }
       intervention_nodes <- names(self$intervention_list)
-      pA <- self$observed_likelihood$get_likelihoods(
-        tmle_task,
-        intervention_nodes,
-        cv_fold
-      )
-      cf_pA <- self$cf_likelihood$get_likelihoods(
-        tmle_task, intervention_nodes,
-        cv_fold
-      )
 
-      HA <- cf_pA / pA
-
-      # collapse across multiple intervention nodes
-      if (!is.null(ncol(HA)) && ncol(HA) > 1) {
-        HA <- apply(HA, 1, prod)
-      }
-
-      # empty list to avoid TMLE updates
+      # NOTE: empty list to avoid TMLE updates (trick)
       return(list())
     },
     estimates = function(tmle_task = NULL, cv_fold = -1) {

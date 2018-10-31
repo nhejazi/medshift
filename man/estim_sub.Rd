@@ -4,14 +4,16 @@
 \alias{estim_sub}
 \title{Substitution estimator}
 \usage{
-estim_sub(task, delta_shift, lrnr_stack)
+estim_sub(task, delta_shift, lrnr_stack_g, lrnr_stack_m)
 }
 \arguments{
 \item{task}{...}
 
 \item{delta_shift}{...}
 
-\item{lrnr_stack}{...}
+\item{lrnr_stack_g}{...}
+
+\item{lrnr_stack_m}{...}
 }
 \description{
 Substitution estimator
