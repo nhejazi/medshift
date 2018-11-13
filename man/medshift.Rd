@@ -4,7 +4,11 @@
 \alias{medshift}
 \title{Nonparametric estimation of direct effects under mediation}
 \usage{
-medshift(W, A, Z, Y, g_lrnrs, e_lrnrs, m_lrnrs)
+medshift(W, A, Z, Y, shift_value = 0.5,
+  g_lrnrs = Lrnr_glm_fast$new(family = binomial()),
+  e_lrnrs = Lrnr_glm_fast$new(family = binomial()),
+  m_lrnrs = Lrnr_glm_fast$new(), estimator = c("est_eqn", "sub",
+  "reweighted"))
 }
 \arguments{
 \item{W}{...}
@@ -15,9 +19,13 @@ medshift(W, A, Z, Y, g_lrnrs, e_lrnrs, m_lrnrs)
 
 \item{Y}{...}
 
+\item{shift_value}{...}
+
 \item{g_lrnrs}{...}
 
 \item{e_lrnrs}{...}
+
+\item{estimator}{...}
 
 \item{Q_lrnrs}{...}
 }

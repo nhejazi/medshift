@@ -4,35 +4,33 @@
 #' @param A ...
 #' @param Z ...
 #' @param Y ...
+#' @param shift_value ...
 #' @param g_lrnrs ...
 #' @param e_lrnrs ...
 #' @param Q_lrnrs ...
+#' @param estimator ...
 #'
-#' @importFrom data.table as.data.table
-#' @importFrom tmle3 define_node tmle3_Task
+#' @importFrom data.table as.data.table setnames
 #
 medshift <- function(W,
                      A,
                      Z,
                      Y,
-                     g_lrnrs,
-                     e_lrnrs,
-                     m_lrnrs) {
+                     shift_value = 0.5,
+                     g_lrnrs = Lrnr_glm_fast$new(family = binomial()),
+                     e_lrnrs = Lrnr_glm_fast$new(family = binomial()),
+                     m_lrnrs = Lrnr_glm_fast$new(),
+                     estimator = c("est_eqn", "sub", "reweighted")) {
 
   # construct input data structure
   data <- data.table::as.data.table(cbind(Y, Z, A, W))
-  w_names <- names(W)
-  z_names <- names(Z)
+  w_names <- paste("W", seq_len(dim(W)[2]), sep = "_")
+  z_names <- paste("Z", seq_len(dim(Z)[2]), sep = "_")
+  data.table::setnames(data, c("Y", z_names, "A", w_names))
 
-  # construct NPSEM and TMLE task
-  npsem <- list(
-    tmle3::define_node("W", w_names),
-    tmle3::define_node("A", "A", c("W")),
-    tmle3::define_node("Z", z_names, c("A", "W")),
-    tmle3::define_node("E", "A", c(z_names, "W")),
-    tmle3::define_node("Y", "Y", c("Z", "A", "W"))
-  )
-  tmle_task <- tmle3::tmle3_Task$new(data, npsem = npsem)
+  # fit regression for incremental propensity score intervention
+  g_out <- fit_g_mech(data, delta_shift = shift_value, lrnr_stack = g_lrnrs)
+
 
   # TODO: functions for estimating likelihood components
 }

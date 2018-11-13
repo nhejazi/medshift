@@ -1,4 +1,4 @@
-context("Simple propensity score shift appears to work")
+context("Simple propensity score shift works")
 
 library(uuid)
 library(assertthat)

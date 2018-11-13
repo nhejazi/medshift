@@ -2,17 +2,17 @@
 % Please edit documentation in R/fit_g_mech.R
 \name{fit_g_mech}
 \alias{fit_g_mech}
-\title{Fit propensity score or intervention density}
+\title{Fit propensity score with incremental shift}
 \usage{
-fit_g_mech(task, delta_shift, lrnr_stack)
+fit_g_mech(data, delta_shift, lrnr_stack)
 }
 \arguments{
-\item{task}{...}
+\item{data}{...}
 
 \item{delta_shift}{...}
 
 \item{lrnr_stack}{...}
 }
 \description{
-Fit propensity score or intervention density
+Fit propensity score with incremental shift
 }
