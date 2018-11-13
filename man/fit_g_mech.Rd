@@ -4,7 +4,7 @@
 \alias{fit_g_mech}
 \title{Fit propensity score with incremental shift}
 \usage{
-fit_g_mech(data, delta_shift, lrnr_stack)
+fit_g_mech(data, delta_shift, lrnr_stack, w_names)
 }
 \arguments{
 \item{data}{...}
@@ -12,6 +12,8 @@ fit_g_mech(data, delta_shift, lrnr_stack)
 \item{delta_shift}{...}
 
 \item{lrnr_stack}{...}
+
+\item{w_names}{...}
 }
 \description{
 Fit propensity score with incremental shift

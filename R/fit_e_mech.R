@@ -1,14 +1,18 @@
-#' Fit clever propensity score or intervention density for mediators
+#' Fit clever propensity score regression for mediators
 #'
-#' @param task ...
+#' @param data ...
 #' @param lrnr_stack ...
+#' @param z_names ...
+#' @param w_names ...
 #'
 #' @importFrom data.table as.data.table
 #' @importFrom sl3 sl3_Task
 #
-fit_e_mech <- function(task, lrnr_stack) {
-  # create clever task for mediation regression
-  e_task <- task$get_regression_task("E")
+fit_e_mech <- function(data, lrnr_stack, z_names, w_names) {
+  #  construct task for propensity score fit
+  e_task <- sl3::sl3_Task$new(data = data,
+                              covariates = c(z_names, w_names),
+                              outcome = "A")
 
   # fit and predict
   e_fit_stack <- lrnr_stack$train(e_task)

@@ -3,14 +3,17 @@
 #' @param data ...
 #' @param delta_shift ...
 #' @param lrnr_stack ...
+#' @param w_names ...
 #'
 #' @importFrom data.table as.data.table
+#' @importFrom sl3 sl3_Task
 #
-fit_g_mech <- function(data, delta_shift, lrnr_stack) {
+fit_g_mech <- function(data, delta_shift, lrnr_stack, w_names) {
   #  construct task for propensity score fit
-  g_task <- sl3_Task$new(data = data,
-                         covariates = w_names,
-                         outcome = "A")
+  g_task <- sl3::sl3_Task$new(data = data,
+                              covariates = w_names,
+                              outcome = "A")
+
   # fit and predict
   g_fit_stack <- lrnr_stack$train(g_task)
 

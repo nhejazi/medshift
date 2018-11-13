@@ -2,15 +2,19 @@
 % Please edit documentation in R/fit_e_mech.R
 \name{fit_e_mech}
 \alias{fit_e_mech}
-\title{Fit clever propensity score or intervention density for mediators}
+\title{Fit clever propensity score regression for mediators}
 \usage{
-fit_e_mech(task, lrnr_stack)
+fit_e_mech(data, lrnr_stack, z_names, w_names)
 }
 \arguments{
-\item{task}{...}
+\item{data}{...}
 
 \item{lrnr_stack}{...}
+
+\item{z_names}{...}
+
+\item{w_names}{...}
 }
 \description{
-Fit clever propensity score or intervention density for mediators
+Fit clever propensity score regression for mediators
 }

@@ -4,12 +4,16 @@
 \alias{fit_m_mech}
 \title{Fit outcome regression}
 \usage{
-fit_m_mech(task, lrnr_stack)
+fit_m_mech(data, lrnr_stack, z_names, w_names)
 }
 \arguments{
-\item{task}{...}
+\item{data}{...}
 
 \item{lrnr_stack}{...}
+
+\item{z_names}{...}
+
+\item{w_names}{...}
 }
 \description{
 Fit outcome regression

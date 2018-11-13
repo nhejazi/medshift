@@ -20,7 +20,10 @@ medshift <- function(W,
                      g_lrnrs = Lrnr_glm_fast$new(family = binomial()),
                      e_lrnrs = Lrnr_glm_fast$new(family = binomial()),
                      m_lrnrs = Lrnr_glm_fast$new(),
-                     estimator = c("est_eqn", "sub", "reweighted")) {
+                     estimator = c("efficient", "substitution",
+                                   "reweighted")) {
+  # set defaults
+  estimator <- match.arg(estimator)
 
   # construct input data structure
   data <- data.table::as.data.table(cbind(Y, Z, A, W))
@@ -28,9 +31,38 @@ medshift <- function(W,
   z_names <- paste("Z", seq_len(dim(Z)[2]), sep = "_")
   data.table::setnames(data, c("Y", z_names, "A", w_names))
 
-  # fit regression for incremental propensity score intervention
-  g_out <- fit_g_mech(data, delta_shift = shift_value, lrnr_stack = g_lrnrs)
+  # SUBSTITUTION ESTIMATOR TEMPLATE
+  if (estimator == "substitution") {
+    # fit regression for incremental propensity score intervention
+    g_out <- fit_g_mech(data = data, delta_shift = shift_value,
+                        lrnr_stack = g_lrnrs)
 
+    # fit regression for incremental propensity score intervention
+    m_out <- fit_m_mech(data = data, lrnr_stack = m_lrnrs,
+                        z_names = z_names, w_names = w_names)
 
-  # TODO: functions for estimating likelihood components
+    # build estimate
+
+  # REWEIGHTED ESTIMATOR TEMPLATE
+  } else if (estimator == "reweighted") {
+    # fit regression for incremental propensity score intervention
+    g_out <- fit_g_mech(data = data, delta_shift = shift_value,
+                        lrnr_stack = g_lrnrs)
+
+    # fit clever regression for treatment, conditional on mediators
+    e_out <- fit_e_mech(data = data, lrnr_stack = e_lrnrs,
+                        z_names = z_names, w_names = w_names)
+
+    # build estimate
+    g_shifted <- g_out$g_est$g_pred_shifted
+    e_pred <- e_out$e_pred
+    estim <- mean((g_shifted / e_pred) * data$Y)
+
+  # EFFICIENT ESTIMATOR TEMPLATE
+  } else if (estimator == "efficient") {
+    # TODO: use origami to perform CV-SL, fitting each EIF component per fold
+  }
+
+  # TODO: output
+
 }
