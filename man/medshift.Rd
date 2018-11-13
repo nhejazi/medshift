@@ -7,8 +7,8 @@
 medshift(W, A, Z, Y, shift_value = 0.5,
   g_lrnrs = Lrnr_glm_fast$new(family = binomial()),
   e_lrnrs = Lrnr_glm_fast$new(family = binomial()),
-  m_lrnrs = Lrnr_glm_fast$new(), estimator = c("est_eqn", "sub",
-  "reweighted"))
+  m_lrnrs = Lrnr_glm_fast$new(), estimator = c("efficient",
+  "substitution", "reweighted"))
 }
 \arguments{
 \item{W}{...}
