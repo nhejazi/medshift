@@ -12,7 +12,7 @@ Maintainer: Nima Hejazi <nh@nimahejazi.org>
 Description: Tools for efficiently estimating parameters of a decomposition of
     the population intervention effect when performing causal mediation
     analysis. An implementation accompanying the manuscript "Causal mediation
-    analysis for stochastic interventions" (Diaz et al, 2018+).
+    analysis for stochastic interventions" (Díaz & Hejazi, 2018+).
 Depends: R (>= 3.2.0)
 Imports:
     R6,
@@ -25,7 +25,6 @@ Imports:
     origami,
     condensier,
     sl3,
-    tmle3,
     hal9001
 Suggests:
     testthat,
@@ -39,8 +38,7 @@ Remotes:
     github::osofr/condensier@master,
     github::tlverse/hal9001@master,
     github::tlverse/origami@master,
-    github::tlverse/sl3@master,
-    github::tlverse/tmle3@master
+    github::tlverse/sl3@master
 License: MIT + file LICENSE
 URL: https://github.com/nhejazi/medshift
 BugReports: https://github.com/nhejazi/medshift/issues

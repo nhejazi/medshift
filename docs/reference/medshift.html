@@ -109,9 +109,9 @@
     </div>
 
     <pre class="usage"><span class='fu'>medshift</span>(<span class='no'>W</span>, <span class='no'>A</span>, <span class='no'>Z</span>, <span class='no'>Y</span>, <span class='kw'>shift_value</span> <span class='kw'>=</span> <span class='fl'>0.5</span>,
-  <span class='kw'>g_lrnrs</span> <span class='kw'>=</span> <span class='no'>Lrnr_glm_fast</span>$<span class='fu'>new</span>(<span class='kw'>family</span> <span class='kw'>=</span> <span class='fu'>binomial</span>()),
-  <span class='kw'>e_lrnrs</span> <span class='kw'>=</span> <span class='no'>Lrnr_glm_fast</span>$<span class='fu'>new</span>(<span class='kw'>family</span> <span class='kw'>=</span> <span class='fu'>binomial</span>()),
-  <span class='kw'>m_lrnrs</span> <span class='kw'>=</span> <span class='no'>Lrnr_glm_fast</span>$<span class='fu'>new</span>(), <span class='kw'>estimator</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"efficient"</span>,
+  <span class='kw'>g_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='http://www.rdocumentation.org/packages/sl3/topics/Lrnr_glm_fast'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(<span class='kw'>family</span> <span class='kw'>=</span> <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/stats/topics/family'>binomial</a></span>()),
+  <span class='kw'>e_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='http://www.rdocumentation.org/packages/sl3/topics/Lrnr_glm_fast'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(<span class='kw'>family</span> <span class='kw'>=</span> <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/stats/topics/family'>binomial</a></span>()),
+  <span class='kw'>m_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='http://www.rdocumentation.org/packages/sl3/topics/Lrnr_glm_fast'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(), <span class='kw'>estimator</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"efficient"</span>,
   <span class='st'>"substitution"</span>, <span class='st'>"reweighted"</span>))</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -146,11 +146,11 @@
       <td><p>...</p></td>
     </tr>
     <tr>
-      <th>estimator</th>
+      <th>m_lrnrs</th>
       <td><p>...</p></td>
     </tr>
     <tr>
-      <th>Q_lrnrs</th>
+      <th>estimator</th>
       <td><p>...</p></td>
     </tr>
     </table>

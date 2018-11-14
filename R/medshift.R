@@ -16,6 +16,8 @@ utils::globalVariables(c("..eif_component_names"))
 #' @importFrom origami make_folds cross_validate
 #' @importFrom sl3 Lrnr_glm_fast
 #' @importFrom stats binomial
+#'
+#' @export
 #
 medshift <- function(W,
                      A,
