@@ -3,6 +3,7 @@ context("Estimators work for simple incremental propensity score interventions")
 library(data.table)
 library(future)
 library(sl3)
+load_all()
 set.seed(429153)
 
 ################################################################################
@@ -90,24 +91,27 @@ w_names <- colnames(data)[str_detect(colnames(data), "W")]
 ################################################################################
 # test different estimators
 ################################################################################
-theta_sub <- medshift(W = W, A = A, Z = Z, Y = Y, shift_value = delta_shift,
-                      g_lrnrs = Lrnr_glm_fast$new(family = binomial()),
-                      e_lrnrs = Lrnr_glm_fast$new(family = binomial()),
-                      m_lrnrs = Lrnr_glm_fast$new(),
+theta_sub <- medshift(W = W, A = A, Z = Z, Y = Y,
+                      shift_value = delta_shift,
+                      g_lrnrs = sl_lrn_g,
+                      e_lrnrs = sl_lrn_g,
+                      m_lrnrs = sl_lrn_m,
                       estimator = "substitution")
 theta_sub
 
-theta_re <- medshift(W = W, A = A, Z = Z, Y = Y, shift_value = delta_shift,
-                     g_lrnrs = Lrnr_glm_fast$new(family = binomial()),
-                     e_lrnrs = Lrnr_glm_fast$new(family = binomial()),
-                     m_lrnrs = Lrnr_glm_fast$new(),
+theta_re <- medshift(W = W, A = A, Z = Z, Y = Y,
+                     shift_value = delta_shift,
+                     g_lrnrs = sl_lrn_g,
+                     e_lrnrs = sl_lrn_g,
+                     m_lrnrs = sl_lrn_m,
                      estimator = "reweighted")
 theta_re
 
-theta_eff <- medshift(W = W, A = A, Z = Z, Y = Y, shift_value = delta_shift,
-                      g_lrnrs = Lrnr_glm_fast$new(family = binomial()),
-                      e_lrnrs = Lrnr_glm_fast$new(family = binomial()),
-                      m_lrnrs = Lrnr_glm_fast$new(),
+theta_eff <- medshift(W = W, A = A, Z = Z, Y = Y,
+                      shift_value = delta_shift,
+                      g_lrnrs = sl_lrn_g,
+                      e_lrnrs = sl_lrn_g,
+                      m_lrnrs = sl_lrn_m,
                       estimator = "efficient")
 theta_eff
 
