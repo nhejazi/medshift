@@ -6,13 +6,7 @@ Authors@R: c(
            role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0000-0002-7127-2789")),
     person("Iván", "Díaz", email = "ild2005@med.cornell.edu",
-           role = c("aut")),
-    person("Jeremy", "Coyle", email = "jeremy.coyle@gmail.com",
-           role = c("ctb"),
-           comment = c(ORCID = "0000-0002-9874-6649")),
-    person("Mark", "van der Laan", email = "laan@berkeley.edu",
-           role = c("ctb", "ths"),
-           comment = c(ORCID = "0000-0002-7127-2789"))
+           role = c("aut"))
   )
 Maintainer: Nima Hejazi <nh@nimahejazi.org>
 Description: Tools for efficiently estimating parameters of a decomposition of

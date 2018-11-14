@@ -29,7 +29,7 @@ estimating direct and indirect effects of stochastic interventions in
 settings in which causal mediation analysis is of interest. `medshift`
 is designed as an implementation to accompany the methods described in
 “Causal mediation analysis for stochastic interventions” (Díaz and
-others, n.d.).
+Hejazi, n.d.).
 
 -----
 
@@ -131,8 +131,8 @@ See below for details:
 
 <div id="ref-diaz2018+causal">
 
-Díaz, Iván, and others. n.d. “Causal Mediation Analysis for Stochastic
-Interventions.”
+Díaz, Iván, and Nima S Hejazi. n.d. “Causal Mediation Analysis for
+Stochastic Interventions.”
 
 </div>
 

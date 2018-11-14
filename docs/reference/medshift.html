@@ -108,7 +108,11 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>medshift</span>(<span class='no'>W</span>, <span class='no'>A</span>, <span class='no'>Z</span>, <span class='no'>Y</span>, <span class='no'>g_lrnrs</span>, <span class='no'>e_lrnrs</span>, <span class='no'>Q_lrnrs</span>)</pre>
+    <pre class="usage"><span class='fu'>medshift</span>(<span class='no'>W</span>, <span class='no'>A</span>, <span class='no'>Z</span>, <span class='no'>Y</span>, <span class='kw'>shift_value</span> <span class='kw'>=</span> <span class='fl'>0.5</span>,
+  <span class='kw'>g_lrnrs</span> <span class='kw'>=</span> <span class='no'>Lrnr_glm_fast</span>$<span class='fu'>new</span>(<span class='kw'>family</span> <span class='kw'>=</span> <span class='fu'>binomial</span>()),
+  <span class='kw'>e_lrnrs</span> <span class='kw'>=</span> <span class='no'>Lrnr_glm_fast</span>$<span class='fu'>new</span>(<span class='kw'>family</span> <span class='kw'>=</span> <span class='fu'>binomial</span>()),
+  <span class='kw'>m_lrnrs</span> <span class='kw'>=</span> <span class='no'>Lrnr_glm_fast</span>$<span class='fu'>new</span>(), <span class='kw'>estimator</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"efficient"</span>,
+  <span class='st'>"substitution"</span>, <span class='st'>"reweighted"</span>))</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -130,11 +134,19 @@
       <td><p>...</p></td>
     </tr>
     <tr>
+      <th>shift_value</th>
+      <td><p>...</p></td>
+    </tr>
+    <tr>
       <th>g_lrnrs</th>
       <td><p>...</p></td>
     </tr>
     <tr>
       <th>e_lrnrs</th>
+      <td><p>...</p></td>
+    </tr>
+    <tr>
+      <th>estimator</th>
       <td><p>...</p></td>
     </tr>
     <tr>

@@ -4,13 +4,7 @@
     <loc>https://code.nimahejazi.org/txshift/index.html</loc>
   </url>
   <url>
-    <loc>https://code.nimahejazi.org/txshift/reference/Param_esteqn_medshift.html</loc>
-  </url>
-  <url>
-    <loc>https://code.nimahejazi.org/txshift/reference/estim_reweighted.html</loc>
-  </url>
-  <url>
-    <loc>https://code.nimahejazi.org/txshift/reference/estim_sub.html</loc>
+    <loc>https://code.nimahejazi.org/txshift/reference/cv_eif.html</loc>
   </url>
   <url>
     <loc>https://code.nimahejazi.org/txshift/reference/fit_e_mech.html</loc>
@@ -23,11 +17,5 @@
   </url>
   <url>
     <loc>https://code.nimahejazi.org/txshift/reference/medshift.html</loc>
-  </url>
-  <url>
-    <loc>https://code.nimahejazi.org/txshift/reference/tmle3_Spec_medshift.html</loc>
-  </url>
-  <url>
-    <loc>https://code.nimahejazi.org/txshift/reference/tmle_shift.html</loc>
   </url>
 </urlset>

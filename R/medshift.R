@@ -11,6 +11,7 @@
 #' @param estimator ...
 #'
 #' @importFrom data.table as.data.table setnames
+#' @importFrom origami make_folds cross_validate
 #
 medshift <- function(W,
                      A,
@@ -49,6 +50,9 @@ medshift <- function(W,
     estim_sub <- mean(m_pred_A0 * g_shifted_A0) +
       mean(m_pred_A1 * g_shifted_A1)
 
+    # output
+    est_out <- estim_sub
+
   # REWEIGHTED ESTIMATOR TEMPLATE
   } else if (estimator == "reweighted") {
     # fit regression for incremental propensity score intervention
@@ -64,15 +68,32 @@ medshift <- function(W,
     e_pred <- e_out$e_pred
     estim_re <- mean((g_shifted / e_pred) * data$Y)
 
+    # output
+    est_out <- estim_re
+
   # EFFICIENT ESTIMATOR TEMPLATE
   } else if (estimator == "efficient") {
-    # TODO: use origami to perform CV-SL, fitting each EIF component per fold
-    # 1) fit Dzw
-    # 2) fit Da
-    # 3) fit Dy
-    # 4) mean
+    # use origami to perform CV-SL, fitting each EIF component per fold
+    # and evaluating only on the holdouts
+    eif_component_names <- c("Dy", "Da", "Dzw")
+    folds <- origami::make_folds(data)
+    cv_eif_results <- origami::cross_validate(cv_fun = cv_eif,
+                                              folds = folds,
+                                              data = data,
+                                              delta_shift = shift_value,
+                                              lrnr_stack_g = g_lrnrs,
+                                              lrnr_stack_e = e_lrnrs,
+                                              lrnr_stack_m = m_lrnrs,
+                                              use_future = FALSE,
+                                              .combine = FALSE)
+    D_obs <- lapply(cv_eif_results[[1]], function(x) {
+                      D_obs_fold <- rowSums(x[, ..eif_component_names])
+                    })
+    estim_eff <- mean(do.call(c, D_obs))
+
+    # output
+    est_out <- estim_eff
   }
-
-  # TODO: common output across all estimators
-
+  # final output
+  return(est_out)
 }

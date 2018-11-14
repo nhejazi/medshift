@@ -84,14 +84,14 @@
 <div id="whats-medshift" class="section level2">
 <h2 class="hasAnchor">
 <a href="#whats-medshift" class="anchor"></a>What’s <code>medshift</code>?</h2>
-<p>The <code>medshift</code> R package is designed to provide facilities for estimating causal direct and indirect effects in settings involving mediation and stochastic interventions. It is an accompaniment to the manuscript <span class="citation">Díaz and others (n.d.)</span>.</p>
+<p>The <code>medshift</code> R package is designed to provide facilities for estimating direct and indirect effects of stochastic interventions in settings in which causal mediation analysis is of interest. <code>medshift</code> is designed as an implementation to accompany the methods described in “Causal mediation analysis for stochastic interventions” <span class="citation">(Díaz and Hejazi, n.d.)</span>.</p>
 <hr>
 </div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>Install the most recent <em>stable release</em> from GitHub via <a href="https://www.rstudio.com/products/rpackages/devtools/"><code>devtools</code></a>:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"nhejazi/medshift"</span>, <span class="dt">build_vignettes =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"nhejazi/medshift"</span>, <span class="dt">build_vignettes =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 <hr>
 </div>
 <div id="example" class="section level2">
@@ -127,12 +127,11 @@
       publisher={}
     }
 
-    @manual{hejazi2018medshift,
-      author = {Hejazi, Nima S and {van der Laan}, Mark J and D{\'\i}az,
-        Iv{\'a}n},
-      title = {medshift: Efficient Estimation of the Causal Mediation
-        Effects of Stochastic Interventions in {R}},
-      year  = {2018},
+    @manual{hejazi2018+medshift,
+      author = {Hejazi, Nima S and D{\'\i}az, Iv{\'a}n},
+      title = {{medshift}: Causal mediation analysis for stochastic
+        interventions in {R}},
+      year  = {2018+},
       url = {https://github.com/nhejazi/medshift},
       note = {R package version 0.0.1}
     }</code></pre>
@@ -171,7 +170,7 @@ SOFTWARE.</code></pre>
 <a href="#references" class="anchor"></a>References</h2>
 <div id="refs" class="references">
 <div id="ref-diaz2018+causal">
-<p>Díaz, Iván, and others. n.d. “Causal Mediation Analysis for Stochastic Interventions.”</p>
+<p>Díaz, Iván, and Nima S Hejazi. n.d. “Causal Mediation Analysis for Stochastic Interventions.”</p>
 </div>
 </div>
 </div>
@@ -201,7 +200,6 @@ SOFTWARE.</code></pre>
 <ul class="list-unstyled">
 <li>Nima Hejazi <br><small class="roles"> Author, maintainer, copyright holder </small> <a href="https://orcid.org/0000-0002-7127-2789" target="orcid.widget"><img src="https://members.orcid.org/sites/default/files/vector_iD_icon.svg" class="orcid" height="16"></a> </li>
 <li>Iván Díaz <br><small class="roles"> Author </small>  </li>
-<li><a href="authors.html">All authors...</a></li>
 </ul>
 </div>
 

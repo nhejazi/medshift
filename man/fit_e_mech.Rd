@@ -4,10 +4,12 @@
 \alias{fit_e_mech}
 \title{Fit clever propensity score regression for mediators}
 \usage{
-fit_e_mech(data, lrnr_stack, z_names, w_names)
+fit_e_mech(data, valid_data = NULL, lrnr_stack, z_names, w_names)
 }
 \arguments{
 \item{data}{...}
+
+\item{valid_data}{A validation/holdout data set (optional).}
 
 \item{lrnr_stack}{...}
 

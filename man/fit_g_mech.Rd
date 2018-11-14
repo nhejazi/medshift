@@ -4,10 +4,12 @@
 \alias{fit_g_mech}
 \title{Fit propensity score with incremental shift}
 \usage{
-fit_g_mech(data, delta_shift, lrnr_stack, w_names)
+fit_g_mech(data, valid_data = NULL, delta_shift, lrnr_stack, w_names)
 }
 \arguments{
 \item{data}{...}
+
+\item{valid_data}{A holdout set for evaluation (optional)}
 
 \item{delta_shift}{...}
 

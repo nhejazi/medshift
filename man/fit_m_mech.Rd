@@ -4,10 +4,12 @@
 \alias{fit_m_mech}
 \title{Fit outcome regression}
 \usage{
-fit_m_mech(data, lrnr_stack, z_names, w_names)
+fit_m_mech(data, valid_data = NULL, lrnr_stack, z_names, w_names)
 }
 \arguments{
 \item{data}{...}
+
+\item{valid_data}{A validation/holdout data set (optional).}
 
 \item{lrnr_stack}{...}
 
