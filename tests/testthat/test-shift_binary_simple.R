@@ -1,9 +1,9 @@
 context("Estimators work for simple incremental propensity score interventions")
 
 library(data.table)
+library(stringr)
 library(future)
 library(sl3)
-load_all()
 set.seed(429153)
 
 ################################################################################
@@ -93,25 +93,25 @@ w_names <- colnames(data)[str_detect(colnames(data), "W")]
 ################################################################################
 theta_sub <- medshift(W = W, A = A, Z = Z, Y = Y,
                       shift_value = delta_shift,
-                      g_lrnrs = sl_lrn_g,
-                      e_lrnrs = sl_lrn_g,
-                      m_lrnrs = sl_lrn_m,
+                      #g_lrnrs = sl_lrn_g,
+                      #e_lrnrs = sl_lrn_g,
+                      #m_lrnrs = sl_lrn_m,
                       estimator = "substitution")
 theta_sub
 
 theta_re <- medshift(W = W, A = A, Z = Z, Y = Y,
                      shift_value = delta_shift,
-                     g_lrnrs = sl_lrn_g,
-                     e_lrnrs = sl_lrn_g,
-                     m_lrnrs = sl_lrn_m,
+                     #g_lrnrs = sl_lrn_g,
+                     #e_lrnrs = sl_lrn_g,
+                     #m_lrnrs = sl_lrn_m,
                      estimator = "reweighted")
 theta_re
 
 theta_eff <- medshift(W = W, A = A, Z = Z, Y = Y,
                       shift_value = delta_shift,
-                      g_lrnrs = sl_lrn_g,
-                      e_lrnrs = sl_lrn_g,
-                      m_lrnrs = sl_lrn_m,
+                      #g_lrnrs = sl_lrn_g,
+                      #e_lrnrs = sl_lrn_g,
+                      #m_lrnrs = sl_lrn_m,
                       estimator = "efficient")
 theta_eff
 

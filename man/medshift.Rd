@@ -5,9 +5,9 @@
 \title{Nonparametric estimation of direct effects under mediation}
 \usage{
 medshift(W, A, Z, Y, shift_value = 0.5,
-  g_lrnrs = Lrnr_glm_fast$new(family = binomial()),
-  e_lrnrs = Lrnr_glm_fast$new(family = binomial()),
-  m_lrnrs = Lrnr_glm_fast$new(), estimator = c("efficient",
+  g_lrnrs = sl3::Lrnr_glm_fast$new(family = stats::binomial()),
+  e_lrnrs = sl3::Lrnr_glm_fast$new(family = stats::binomial()),
+  m_lrnrs = sl3::Lrnr_glm_fast$new(), estimator = c("efficient",
   "substitution", "reweighted"))
 }
 \arguments{
@@ -25,9 +25,9 @@ medshift(W, A, Z, Y, shift_value = 0.5,
 
 \item{e_lrnrs}{...}
 
-\item{estimator}{...}
+\item{m_lrnrs}{...}
 
-\item{Q_lrnrs}{...}
+\item{estimator}{...}
 }
 \description{
 Nonparametric estimation of direct effects under mediation

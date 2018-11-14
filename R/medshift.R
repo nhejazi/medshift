@@ -1,3 +1,5 @@
+utils::globalVariables(c("..eif_component_names"))
+
 #' Nonparametric estimation of direct effects under mediation
 #'
 #' @param W ...
@@ -7,20 +9,24 @@
 #' @param shift_value ...
 #' @param g_lrnrs ...
 #' @param e_lrnrs ...
-#' @param Q_lrnrs ...
+#' @param m_lrnrs ...
 #' @param estimator ...
 #'
 #' @importFrom data.table as.data.table setnames
 #' @importFrom origami make_folds cross_validate
+#' @importFrom sl3 Lrnr_glm_fast
+#' @importFrom stats binomial
 #
 medshift <- function(W,
                      A,
                      Z,
                      Y,
                      shift_value = 0.5,
-                     g_lrnrs = Lrnr_glm_fast$new(family = binomial()),
-                     e_lrnrs = Lrnr_glm_fast$new(family = binomial()),
-                     m_lrnrs = Lrnr_glm_fast$new(),
+                     g_lrnrs =
+                       sl3::Lrnr_glm_fast$new(family = stats::binomial()),
+                     e_lrnrs =
+                       sl3::Lrnr_glm_fast$new(family = stats::binomial()),
+                     m_lrnrs = sl3::Lrnr_glm_fast$new(),
                      estimator = c("efficient", "substitution",
                                    "reweighted")) {
   # set defaults
@@ -84,6 +90,8 @@ medshift <- function(W,
                                               lrnr_stack_g = g_lrnrs,
                                               lrnr_stack_e = e_lrnrs,
                                               lrnr_stack_m = m_lrnrs,
+                                              z_names = z_names,
+                                              w_names = w_names,
                                               use_future = FALSE,
                                               .combine = FALSE)
     D_obs <- lapply(cv_eif_results[[1]], function(x) {

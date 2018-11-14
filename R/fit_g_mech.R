@@ -1,3 +1,5 @@
+utils::globalVariables(c("A", ".N"))
+
 #' Fit propensity score with incremental shift
 #'
 #' @param data ...
@@ -6,7 +8,7 @@
 #' @param lrnr_stack ...
 #' @param w_names ...
 #'
-#' @importFrom data.table as.data.table
+#' @importFrom data.table as.data.table copy ":="
 #' @importFrom sl3 sl3_Task
 #
 fit_g_mech <- function(data, valid_data = NULL,
@@ -21,10 +23,10 @@ fit_g_mech <- function(data, valid_data = NULL,
 
   if (is.null(valid_data)) {
     # copy full data
-    data_A1 <- copy(data)
+    data_A1 <- data.table::copy(data)
   } else {
     # copy only validation data
-    data_A1 <- copy(valid_data)
+    data_A1 <- data.table::copy(valid_data)
   }
 
   # set intervention A = 1

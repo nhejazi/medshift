@@ -22,6 +22,7 @@ Imports:
     dplyr,
     stringr,
     data.table,
+    origami,
     condensier,
     sl3,
     tmle3,
@@ -37,6 +38,7 @@ Suggests:
 Remotes:
     github::osofr/condensier@master,
     github::tlverse/hal9001@master,
+    github::tlverse/origami@master,
     github::tlverse/sl3@master,
     github::tlverse/tmle3@master
 License: MIT + file LICENSE
