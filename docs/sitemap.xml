@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://code.nimahejazi.org/txshift/index.html</loc>
+    <loc>https://code.nimahejazi.org/medshift/index.html</loc>
   </url>
   <url>
-    <loc>https://code.nimahejazi.org/txshift/reference/cv_eif.html</loc>
+    <loc>https://code.nimahejazi.org/medshift/reference/cv_eif.html</loc>
   </url>
   <url>
-    <loc>https://code.nimahejazi.org/txshift/reference/fit_e_mech.html</loc>
+    <loc>https://code.nimahejazi.org/medshift/reference/fit_e_mech.html</loc>
   </url>
   <url>
-    <loc>https://code.nimahejazi.org/txshift/reference/fit_g_mech.html</loc>
+    <loc>https://code.nimahejazi.org/medshift/reference/fit_g_mech.html</loc>
   </url>
   <url>
-    <loc>https://code.nimahejazi.org/txshift/reference/fit_m_mech.html</loc>
+    <loc>https://code.nimahejazi.org/medshift/reference/fit_m_mech.html</loc>
   </url>
   <url>
-    <loc>https://code.nimahejazi.org/txshift/reference/medshift.html</loc>
+    <loc>https://code.nimahejazi.org/medshift/reference/medshift.html</loc>
   </url>
 </urlset>

@@ -3,6 +3,6 @@ pkgdown: 1.1.0
 pkgdown_sha: ~
 articles: {}
 urls:
-  reference: https://code.nimahejazi.org/txshift/reference
-  article: https://code.nimahejazi.org/txshift/articles
+  reference: https://code.nimahejazi.org/medshift/reference
+  article: https://code.nimahejazi.org/medshift/articles
 

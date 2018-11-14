@@ -73,7 +73,7 @@ After using the `medshift` R package, please cite the following:
 ``` 
     @article{diaz2018+causal,
       title={Causal mediation analysis for stochastic interventions},
-      author={D{\'\i}az, Iv{\'a}n and others},
+      author={D{\'\i}az, Iv{\'a}n and Hejazi, Nima S},
       journal={},
       volume={},
       number={},
