@@ -10,34 +10,41 @@ set.seed(429153)
 # setup learners for the nuisance parameters
 ################################################################################
 
-# learners used for propensity score G
-glm_lrnr_g <- Lrnr_glm_fast$new(family = binomial())
-rf_lrnr_g <- Lrnr_ranger$new(family = "binomial")
-xgb_lrnr_g <- Lrnr_xgboost$new(nrounds = 10, objective = "reg:logistic")
+# instantiate some learners
+mean_lrnr <- Lrnr_mean$new()
+fglm_contin_lrnr <- Lrnr_glm_fast$new()
+fglm_binary_lrnr <- Lrnr_glm_fast$new(family = binomial())
+rf_contin_lrnr <- Lrnr_ranger$new()
+rf_binary_lrnr <- Lrnr_ranger$new(family = "binomial")
+xgb_contin_lrnr <- Lrnr_xgboost$new(nrounds = 10)
+xgb_binary_lrnr <- Lrnr_xgboost$new(nrounds = 10, objective = "reg:logistic")
+hal_contin_lrnr <- Lrnr_hal9001$new(fit_type = "glmnet", n_folds = 5)
+hal_binary_lrnr <- Lrnr_hal9001$new(fit_type = "glmnet", n_folds = 5,
+                                    family = "binomial")
+
+# learner stack for the propensity score
 sl_lrn_g <- Lrnr_sl$new(
-  learners = list(glm_lrnr_g, rf_lrnr_g, xgb_lrnr_g),
+  learners = list(fglm_binary_lrnr, rf_binary_lrnr, hal_binary_lrnr),
   metalearner = Lrnr_nnls$new()
 )
 
-# learners used for conditional expectation/density regression E
-glm_lrnr_e <- Lrnr_glm_fast$new(family = binomial())
-rf_lrnr_e <- Lrnr_ranger$new(family = "binomial")
-xgb_lrnr_e <- Lrnr_xgboost$new(nrounds = 10, objective = "reg:logistic")
+# learner stack for the clever conditional regression e
 sl_lrn_e <- Lrnr_sl$new(
-  learners = list(glm_lrnr_e, rf_lrnr_e, xgb_lrnr_e),
+  learners = list(fglm_binary_lrnr, rf_binary_lrnr, hal_binary_lrnr),
   metalearner = Lrnr_nnls$new()
 )
 
-# learners used for conditional expectation regression M
-mean_lrnr_m <- Lrnr_mean$new()
-fglm_lrnr_m <- Lrnr_glm_fast$new()
-rf_lrnr_m <- Lrnr_ranger$new()
-xgb_lrnr_m <- Lrnr_xgboost$new(nrounds = 10)
+# learner stack for the outcome regression m
 sl_lrn_m <- Lrnr_sl$new(
-  learners = list(mean_lrnr_m, fglm_lrnr_m, rf_lrnr_m, xgb_lrnr_m),
+  learners = list(mean_lrnr, fglm_contin_lrnr, rf_contin_lrnr, hal_contin_lrnr),
   metalearner = Lrnr_nnls$new()
 )
 
+# learner stack for reduced-dimension regression phi
+sl_lrn_phi <- Lrnr_sl$new(
+  learners = list(mean_lrnr, fglm_contin_lrnr, rf_contin_lrnr, hal_contin_lrnr),
+  metalearner = Lrnr_nnls$new()
+)
 
 
 ################################################################################
@@ -96,6 +103,7 @@ theta_sub <- medshift(W = W, A = A, Z = Z, Y = Y,
                       #g_lrnrs = sl_lrn_g,
                       #e_lrnrs = sl_lrn_g,
                       #m_lrnrs = sl_lrn_m,
+                      #phi_lrnrs = sl_lrn_phi,
                       estimator = "substitution")
 theta_sub
 
@@ -104,6 +112,7 @@ theta_re <- medshift(W = W, A = A, Z = Z, Y = Y,
                      #g_lrnrs = sl_lrn_g,
                      #e_lrnrs = sl_lrn_g,
                      #m_lrnrs = sl_lrn_m,
+                     #phi_lrnrs = sl_lrn_phi,
                      estimator = "reweighted")
 theta_re
 
@@ -112,6 +121,7 @@ theta_eff <- medshift(W = W, A = A, Z = Z, Y = Y,
                       #g_lrnrs = sl_lrn_g,
                       #e_lrnrs = sl_lrn_g,
                       #m_lrnrs = sl_lrn_m,
+                      #phi_lrnrs = sl_lrn_phi,
                       estimator = "efficient")
 theta_eff
 

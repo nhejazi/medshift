@@ -9,6 +9,7 @@ utils::globalVariables(c("..w_names"))
 #' @param lrnr_stack_g ...
 #' @param lrnr_stack_e ...
 #' @param lrnr_stack_m ...
+#' @param lrnr_stack_phi ...
 #' @param z_names ...
 #' @param w_names ...
 #'
@@ -23,6 +24,7 @@ cv_eif <- function(fold,
                    lrnr_stack_g,
                    lrnr_stack_e,
                    lrnr_stack_m,
+                   lrnr_stack_phi,
                    z_names,
                    w_names) {
   # make training and validation data
@@ -49,16 +51,13 @@ cv_eif <- function(fold,
   m_pred_A1 <- m_out$m_pred$m_pred_A1
   m_pred_A0 <- m_out$m_pred$m_pred_A0
   m_pred_diff <- m_pred_A1 - m_pred_A0
-  #phi_hal <- hal9001::fit_hal(X = as.matrix(valid_data[, ..w_names]),
-                              #Y = as.numeric(m_pred_diff), yolo = FALSE)
-  #phi_est <- stats::predict(phi_hal, new_data = valid_data)
-  phi_glm <- stats::glm(stats::as.formula(paste("m_pred_diff ~",
-                                                paste(w_names,
-                                                      collapse = " + "))),
-                         data =
-                           data.table::data.table(m_pred_diff,
-                                                  valid_data[, ..w_names]))
-  phi_est <- as.numeric(stats::predict(phi_glm))
+  phi_data <- data.table(m_diff = m_pred_diff, valid_data[, ..w_names])
+  phi_task <- sl3::sl3_Task$new(data = phi_data,
+                                covariates = w_names,
+                                outcome = "m_diff",
+                                outcome_type = "continuous")
+  phi_fit <- lrnr_stack_phi$train(phi_task)
+  phi_est <- phi_fit$predict()
 
 
   # compute component Dzw from nuisance parameters

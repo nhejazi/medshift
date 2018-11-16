@@ -10,6 +10,7 @@ utils::globalVariables(c("..eif_component_names"))
 #' @param g_lrnrs ...
 #' @param e_lrnrs ...
 #' @param m_lrnrs ...
+#' @param phi_lrnrs ...
 #' @param estimator ...
 #'
 #' @importFrom data.table as.data.table setnames
@@ -29,6 +30,7 @@ medshift <- function(W,
                      e_lrnrs =
                        sl3::Lrnr_glm_fast$new(family = stats::binomial()),
                      m_lrnrs = sl3::Lrnr_glm_fast$new(),
+                     phi_lrnrs = sl3::Lrnr_glm_fast$new(),
                      estimator = c("efficient", "substitution",
                                    "reweighted")) {
   # set defaults
@@ -92,6 +94,7 @@ medshift <- function(W,
                                               lrnr_stack_g = g_lrnrs,
                                               lrnr_stack_e = e_lrnrs,
                                               lrnr_stack_m = m_lrnrs,
+                                              lrnr_stack_phi = phi_lrnrs,
                                               z_names = z_names,
                                               w_names = w_names,
                                               use_future = FALSE,
