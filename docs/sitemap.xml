@@ -4,6 +4,15 @@
     <loc>https://code.nimahejazi.org/medshift/index.html</loc>
   </url>
   <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/bound_precision.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/bound_propensity.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/confint.medshift.html</loc>
+  </url>
+  <url>
     <loc>https://code.nimahejazi.org/medshift/reference/cv_eif.html</loc>
   </url>
   <url>
@@ -17,5 +26,11 @@
   </url>
   <url>
     <loc>https://code.nimahejazi.org/medshift/reference/medshift.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/print.medshift.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/summary.medshift.html</loc>
   </url>
 </urlset>

@@ -68,9 +68,9 @@ fit_g_mech <- function(data, valid_data = NULL,
   g_pred_shifted <- bound_precision(g_pred_shifted)
 
   # bounding for potential positivity issues
-  g_pred_A1 <- bound_positivity(g_pred_A1)
-  g_pred_A0 <- bound_positivity(g_pred_A0)
-  g_pred_shifted <- bound_positivity(g_pred_shifted)
+  g_pred_A1 <- bound_propensity(g_pred_A1)
+  g_pred_A0 <- bound_propensity(g_pred_A0)
+  g_pred_shifted <- bound_propensity(g_pred_shifted)
 
   # output
   out <- list(

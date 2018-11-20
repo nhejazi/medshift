@@ -36,7 +36,7 @@ utils::globalVariables(c("..eif_component_names"))
 #' @param estimator The desired estimator of the natural direct effect to be
 #'  computed. Currently, choices are limited to a substitution estimator, a
 #'  re-weighted estimator, and an efficient one-step estimator. The interested
-#'  user should consider consulting Diaz & Hejazi (2018+) for a comparative
+#'  user should consider consulting Díaz & Hejazi (2018+) for a comparative
 #'  investigation of each of these estimators.
 #'
 #' @importFrom data.table as.data.table setnames

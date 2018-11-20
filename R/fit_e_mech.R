@@ -53,7 +53,7 @@ fit_e_mech <- function(data, valid_data = NULL,
   e_pred <- bound_precision(e_pred)
 
   # bounding for potential positivity issues
-  e_pred <- bound_positivity(e_pred)
+  e_pred <- bound_propensity(e_pred)
 
   # output
   out <- list(

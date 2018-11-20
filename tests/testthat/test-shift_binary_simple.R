@@ -104,7 +104,7 @@ w_names <- colnames(data)[str_detect(colnames(data), "W")]
 ################################################################################
 theta_sub <- medshift(
   W = W, A = A, Z = Z, Y = Y,
-  shift_value = delta_shift,
+  delta = delta_shift,
   # g_lrnrs = sl_lrn_g,
   # e_lrnrs = sl_lrn_g,
   # m_lrnrs = sl_lrn_m,
@@ -115,7 +115,7 @@ theta_sub
 
 theta_re <- medshift(
   W = W, A = A, Z = Z, Y = Y,
-  shift_value = delta_shift,
+  delta = delta_shift,
   # g_lrnrs = sl_lrn_g,
   # e_lrnrs = sl_lrn_g,
   # m_lrnrs = sl_lrn_m,
@@ -126,7 +126,7 @@ theta_re
 
 theta_eff <- medshift(
   W = W, A = A, Z = Z, Y = Y,
-  shift_value = delta_shift,
+  delta = delta_shift,
   # g_lrnrs = sl_lrn_g,
   # e_lrnrs = sl_lrn_g,
   # m_lrnrs = sl_lrn_m,
