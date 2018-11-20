@@ -4,7 +4,7 @@
 \alias{medshift}
 \title{Nonparametric estimation of direct effects under mediation}
 \usage{
-medshift(W, A, Z, Y, shift_value = 0.5,
+medshift(W, A, Z, Y, delta = 0.5,
   g_lrnrs = sl3::Lrnr_glm_fast$new(family = stats::binomial()),
   e_lrnrs = sl3::Lrnr_glm_fast$new(family = stats::binomial()),
   m_lrnrs = sl3::Lrnr_glm_fast$new(),
@@ -12,25 +12,51 @@ medshift(W, A, Z, Y, shift_value = 0.5,
   "substitution", "reweighted"))
 }
 \arguments{
-\item{W}{...}
+\item{W}{A \code{matrix}, \code{data.frame}, or similar corresponding to a
+set of baseline covariates.}
 
-\item{A}{...}
+\item{A}{A \code{numeric} vector corresponding to a treatment variable. The
+parameter of interest is defined as a location shift of this quantity.}
 
-\item{Z}{...}
+\item{Z}{A \code{numeric} vector, \code{matrix}, \code{data.frame}, or
+similar corresponding to a set of mediators (on the causal pathway between
+the intervention A and the outcome Y).}
 
-\item{Y}{...}
+\item{Y}{A \code{numeric} vector corresponding to an outcome variable.}
 
-\item{shift_value}{...}
+\item{delta}{A \code{numeric} value indicating the degree of shift in the
+intervention to be used in defining the causal quantity of interest. In the
+case of binary interventions, this takes the form of an incremental
+propensity score shift, acting as a multiplier of the probability with which
+a given observational unit receives the intervention (EH Kennedy, 2018,
+JASA; <doi:10.1080/01621459.2017.1422737>).}
 
-\item{g_lrnrs}{...}
+\item{g_lrnrs}{A \code{Stack} object, or other learner class (inheriting from
+\code{Lrnr_base}), containing a single or set of instantiated learners from
+the \code{sl3} package, to be used in fitting a model for the propensity
+score, i.e., g = P(A | W).}
 
-\item{e_lrnrs}{...}
+\item{e_lrnrs}{A \code{Stack} object, or other learner class (inheriting from
+\code{Lrnr_base}), containing a single or set of instantiated learners from
+the \code{sl3} package, to be used in fitting a cleverly parameterized
+propensity score that includes the mediators, i.e., e = P(A | Z, W).}
 
-\item{m_lrnrs}{...}
+\item{m_lrnrs}{A \code{Stack} object, or other learner class (inheriting from
+\code{Lrnr_base}), containing a single or set of instantiated learners from
+the \code{sl3} package, to be used in fitting the outcome regression, i.e.,
+m(A, Z, W).}
 
-\item{phi_lrnrs}{...}
+\item{phi_lrnrs}{A \code{Stack} object, or other learner class (inheriting
+from \code{Lrnr_base}), containing a single or set of instantiated learners
+from the \code{sl3} package, to be used in fitting a reduced regression
+useful for computing the efficient one-step estimator, i.e., phi(W) =
+E[m(A = 1, Z, W) - m(A = 0, Z, W) | W).}
 
-\item{estimator}{...}
+\item{estimator}{The desired estimator of the natural direct effect to be
+computed. Currently, choices are limited to a substitution estimator, a
+re-weighted estimator, and an efficient one-step estimator. The interested
+user should consider consulting Diaz & Hejazi (2018+) for a comparative
+investigation of each of these estimators.}
 }
 \description{
 Nonparametric estimation of direct effects under mediation

@@ -2,11 +2,12 @@ Package: medshift
 Title: Causal mediation analysis for stochastic interventions
 Version: 0.0.3
 Authors@R: c(
-    person("Nima", "Hejazi", email = "nhejazi@berkeley.edu",
+    person("Nima", "Hejazi", email = "nh@nimahejazi.org",
            role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0000-0002-7127-2789")),
     person("Iván", "Díaz", email = "ild2005@med.cornell.edu",
-           role = c("aut")),
+           role = c("aut"),
+           comment = c(ORCID = "0000-XXXX-XXXX-XXXX")),
     person("Mark", "van der Laan", email = "laan@berkeley.edu",
            role = c("ctb", "ths"),
            comment = c(ORCID = "0000-0003-1432-5511")),
@@ -19,29 +20,30 @@ Description: Estimators of causal effects of stochastic interventions arising
     in the presence of mediation, including estimating equation, substitution,
     and re-weighting estimators of the natural direct effect under incremental
     propensity score interventions and modified treatment policies (Díaz and
-    Hejazi. In revision, 2018+. <doi:>).
+    Hejazi; 2018+ (submitted). <doi:>).
 Depends: R (>= 3.2.0)
 Imports:
     R6,
     uuid,
-    methods,
     stats,
+    methods,
+    data.table,
+    assertthat,
     dplyr,
     stringr,
-    data.table,
     origami,
-    condensier,
     sl3,
-    hal9001
+    hal9001,
+    simcausal,
+    condensier
 Suggests:
     testthat,
     knitr,
     rmarkdown,
-    tidyverse,
     Rsolnp,
-    nnls,
-    ranger
+    nnls
 Remotes:
+    github::osofr/simcausal@master,
     github::osofr/condensier@master,
     github::tlverse/hal9001@master,
     github::tlverse/origami@master,
