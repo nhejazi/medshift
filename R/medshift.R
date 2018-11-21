@@ -109,10 +109,13 @@ medshift <- function(W,
       z_names = z_names, w_names = w_names
     )
 
-    # build estimate
+    # stabilize weights in AIPW by dividing by sample average since E[g/e] = 1
     g_shifted <- g_out$g_est$g_pred_shifted
     e_pred <- e_out$e_est$e_pred
-    estim_re <- mean((g_shifted / e_pred) * data$Y)
+    mean_aipw <- mean(g_shifted / e_pred)
+
+    # build estimate
+    estim_re <- mean(((g_shifted / e_pred) / mean_aipw) * data$Y)
 
     # output
     est_out <- estim_re
