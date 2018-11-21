@@ -121,8 +121,13 @@ cv_eif <- function(fold,
   m_pred_A0_obs <- m_pred_A0[idx_A0]
   y_A1_obs <- valid_data$Y[idx_A1]
   y_A0_obs <- valid_data$Y[idx_A0]
-  Dy_A1 <- (g_shifted_A1_obs / e_pred_A1_obs) * (y_A1_obs - m_pred_A1_obs)
-  Dy_A0 <- (g_shifted_A0_obs / e_pred_A0_obs) * (y_A0_obs - m_pred_A0_obs)
+  # stabilize weights in AIPW by dividing by sample average since E[g/e] = 1
+  mean_aipw_A1 <- mean(g_shifted_A1_obs / e_pred_A1_obs)
+  mean_aipw_A0 <- mean(g_shifted_A0_obs / e_pred_A0_obs)
+  Dy_A1 <- ((g_shifted_A1_obs / e_pred_A1_obs) / mean_aipw_A1) *
+    (y_A1_obs - m_pred_A1_obs)
+  Dy_A0 <- ((g_shifted_A0_obs / e_pred_A0_obs) / mean_aipw_A0) *
+    (y_A0_obs - m_pred_A0_obs)
   Dy[idx_A1] <- Dy_A1
   Dy[idx_A0] <- Dy_A0
 
