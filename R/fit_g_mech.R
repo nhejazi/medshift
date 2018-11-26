@@ -62,7 +62,7 @@ fit_g_mech <- function(data, valid_data = NULL,
   g_pred_shifted <- (delta * g_pred_A1) /
     (delta * g_pred_A1 + (1 - g_pred_A1))
 
-  # bounding to numerical precision 
+  # bounding to numerical precision
   g_pred_A1 <- bound_precision(g_pred_A1)
   g_pred_A0 <- bound_precision(g_pred_A0)
   g_pred_shifted <- bound_precision(g_pred_shifted)

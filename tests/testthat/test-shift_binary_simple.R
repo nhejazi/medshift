@@ -108,4 +108,3 @@ theta_eff <- medshift(
   estimator = "efficient"
 )
 theta_eff
-

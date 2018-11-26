@@ -1,6 +1,4 @@
-utils::globalVariables(c("..eif_component_names"))
-
-#' Nonparametric estimation of direct effects under mediation
+#' Nonparametric estimation of (in)direct effects under stochastic interventions
 #'
 #' @param W A \code{matrix}, \code{data.frame}, or similar corresponding to a
 #'  set of baseline covariates.
@@ -50,7 +48,7 @@ medshift <- function(W,
                      A,
                      Z,
                      Y,
-                     delta = 0.5,
+                     delta,
                      g_lrnrs =
                        sl3::Lrnr_glm_fast$new(family = stats::binomial()),
                      e_lrnrs =
@@ -70,83 +68,29 @@ medshift <- function(W,
   z_names <- paste("Z", seq_len(dim(Z)[2]), sep = "_")
   data.table::setnames(data, c("Y", z_names, "A", w_names))
 
-  # SUBSTITUTION ESTIMATOR
   if (estimator == "substitution") {
-    # fit regression for incremental propensity score intervention
-    g_out <- fit_g_mech(
-      data = data, delta = delta,
-      lrnr_stack = g_lrnrs, w_names = w_names
+    # SUBSTITUTION ESTIMATOR
+    est_out <- est_sub(
+      data = data, delta = delta, g_lrnrs = g_lrnrs,
+      m_lrnrs = m_lrnrs, w_names = w_names, z_names = z_names
     )
-
-    # fit regression for incremental propensity score intervention
-    m_out <- fit_m_mech(
-      data = data, lrnr_stack = m_lrnrs,
-      z_names = z_names, w_names = w_names
-    )
-
-    # build estimate
-    g_shifted_A1 <- g_out$g_est$g_pred_shifted
-    g_shifted_A0 <- 1 - g_shifted_A1
-    m_pred_A1 <- m_out$m_pred$m_pred_A1
-    m_pred_A0 <- m_out$m_pred$m_pred_A0
-    estim_sub <- mean(m_pred_A0 * g_shifted_A0) +
-      mean(m_pred_A1 * g_shifted_A1)
-
-    # output
-    est_out <- estim_sub
-
-    # REWEIGHTED ESTIMATOR
   } else if (estimator == "reweighted") {
-    # fit regression for incremental propensity score intervention
-    g_out <- fit_g_mech(
-      data = data, delta = delta,
-      lrnr_stack = g_lrnrs, w_names = w_names
+    # RE-WEIGHTED ESTIMATOR
+    est_out <- est_re(
+      data = data, delta = delta, g_lrnrs = g_lrnrs,
+      e_lrnrs = e_lrnrs, w_names = w_names, z_names = z_names
     )
-
-    # fit clever regression for treatment, conditional on mediators
-    e_out <- fit_e_mech(
-      data = data, lrnr_stack = e_lrnrs,
-      z_names = z_names, w_names = w_names
-    )
-
-    # stabilize weights in AIPW by dividing by sample average since E[g/e] = 1
-    g_shifted <- g_out$g_est$g_pred_shifted
-    e_pred <- e_out$e_est$e_pred
-    mean_aipw <- mean(g_shifted / e_pred)
-
-    # build estimate
-    estim_re <- mean(((g_shifted / e_pred) / mean_aipw) * data$Y)
-
-    # output
-    est_out <- estim_re
 
     # EFFICIENT ESTIMATOR
   } else if (estimator == "efficient") {
-    # use origami to perform CV-SL, fitting each EIF component per fold
-    # and evaluating only on the holdouts
-    eif_component_names <- c("Dy", "Da", "Dzw")
-    folds <- origami::make_folds(data)
-    cv_eif_results <- origami::cross_validate(
-      cv_fun = cv_eif,
-      folds = folds,
-      data = data,
-      delta = delta,
-      lrnr_stack_g = g_lrnrs,
-      lrnr_stack_e = e_lrnrs,
-      lrnr_stack_m = m_lrnrs,
-      lrnr_stack_phi = phi_lrnrs,
-      z_names = z_names,
-      w_names = w_names,
-      use_future = FALSE,
-      .combine = FALSE
-    )
-    D_obs <- lapply(cv_eif_results[[1]], function(x) {
-      D_obs_fold <- rowSums(x[, ..eif_component_names])
-    })
-    estim_eff <- mean(do.call(c, D_obs))
 
     # output
-    est_out <- estim_eff
+    est_out <- est_eff(
+      data = data, delta = delta, g_lrnrs = g_lrnrs,
+      e_lrnrs = e_lrnrs, m_lrnrs = m_lrnrs,
+      phi_lrnrs = phi_lrnrs, w_names = w_names,
+      z_names = z_names
+    )
   }
   # final output
   return(est_out)

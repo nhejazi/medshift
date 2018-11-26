@@ -2,12 +2,11 @@
 % Please edit documentation in R/medshift.R
 \name{medshift}
 \alias{medshift}
-\title{Nonparametric estimation of direct effects under mediation}
+\title{Nonparametric estimation of (in)direct effects under stochastic interventions}
 \usage{
-medshift(W, A, Z, Y, delta = 0.5,
-  g_lrnrs = sl3::Lrnr_glm_fast$new(family = stats::binomial()),
-  e_lrnrs = sl3::Lrnr_glm_fast$new(family = stats::binomial()),
-  m_lrnrs = sl3::Lrnr_glm_fast$new(),
+medshift(W, A, Z, Y, delta, g_lrnrs = sl3::Lrnr_glm_fast$new(family =
+  stats::binomial()), e_lrnrs = sl3::Lrnr_glm_fast$new(family =
+  stats::binomial()), m_lrnrs = sl3::Lrnr_glm_fast$new(),
   phi_lrnrs = sl3::Lrnr_glm_fast$new(), estimator = c("efficient",
   "substitution", "reweighted"))
 }
@@ -59,5 +58,5 @@ user should consider consulting Díaz & Hejazi (2018+) for a comparative
 investigation of each of these estimators.}
 }
 \description{
-Nonparametric estimation of direct effects under mediation
+Nonparametric estimation of (in)direct effects under stochastic interventions
 }

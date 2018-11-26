@@ -49,7 +49,7 @@ fit_e_mech <- function(data, valid_data = NULL,
     e_pred <- e_fit_stack$predict(e_task_valid)
   }
 
-  # bounding to numerical precision 
+  # bounding to numerical precision
   e_pred <- bound_precision(e_pred)
 
   # bounding for potential positivity issues
