@@ -46,8 +46,8 @@ est_re <- function(data,
 
   # subset computed components based on observed treatment status for e
   e_pred_obs <- rep(NA, nrow(data))
-  e_pred_A1_obs <- e_out$e_est$e_pred[idx_A1]
-  e_pred_A0_obs <- e_out$e_est$e_pred[idx_A0]
+  e_pred_A1_obs <- e_pred_A1[idx_A1]
+  e_pred_A0_obs <- e_pred_A0[idx_A0]
   e_pred_obs[idx_A1] <- e_pred_A1_obs
   e_pred_obs[idx_A0] <- e_pred_A0_obs
 
