@@ -1,6 +1,6 @@
 Package: medshift
 Title: Causal mediation analysis for stochastic interventions
-Version: 0.0.3
+Version: 0.0.4
 Authors@R: c(
     person("Nima", "Hejazi", email = "nh@nimahejazi.org",
            role = c("aut", "cre", "cph"),
@@ -33,7 +33,6 @@ Imports:
     stringr,
     origami,
     sl3,
-    hal9001,
     simcausal,
     condensier
 Suggests:
@@ -41,7 +40,8 @@ Suggests:
     knitr,
     rmarkdown,
     Rsolnp,
-    nnls
+    nnls,
+    hal9001
 Remotes:
     github::osofr/simcausal@master,
     github::osofr/condensier@master,

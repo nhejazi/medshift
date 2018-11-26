@@ -32,9 +32,22 @@ est_sub <- function(data,
   g_shifted_A0 <- 1 - g_shifted_A1
   m_pred_A1 <- m_out$m_pred$m_pred_A1
   m_pred_A0 <- m_out$m_pred$m_pred_A0
-  estim_sub <- mean(m_pred_A0 * g_shifted_A0) +
-    mean(m_pred_A1 * g_shifted_A1)
+
+  # find indices of observed treatment and control
+  idx_A1 <- which(data$A == 1)
+  idx_A0 <- which(data$A == 0)
+
+  # subset predictions to evaluation under observed data
+  g_shifted_A1_obs <- g_shifted_A1[idx_A1]
+  g_shifted_A0_obs <- g_shifted_A0[idx_A0]
+  m_pred_A1_obs <- m_pred_A1[idx_A1]
+  m_pred_A0_obs <- m_pred_A0[idx_A0]
+
+  # compute estimator
+  estim_sub <- mean(m_pred_A0_obs * g_shifted_A0_obs) +
+    mean(m_pred_A1_obs * g_shifted_A1_obs)
 
   # output
   return(estim_sub)
 }
+

@@ -42,8 +42,6 @@ utils::globalVariables(c("..w_names"))
 #'
 #' @importFrom data.table data.table
 #' @importFrom origami training validation fold_index
-#' @importFrom stats predict as.formula glm
-#' @importFrom hal9001 fit_hal
 #
 cv_eif <- function(fold,
                    data,
