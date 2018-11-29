@@ -84,7 +84,8 @@ cv_eif <- function(fold,
 
 
   # compute component Dzw from nuisance parameters
-  Dzw <- make_Dzw(g_output = g_out, m_output = m_out)
+  Dzw_groupwise <- make_Dzw(g_output = g_out, m_output = m_out)
+  Dzw <- Dzw_groupwise$dzw_cntrl + Dzw_groupwise$dzw_treat
 
 
   # compute component Da from nuisance parameters

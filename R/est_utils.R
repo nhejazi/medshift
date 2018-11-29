@@ -11,8 +11,10 @@ make_Dzw <- function(g_output, m_output) {
   # compute component Dzw from nuisance parameters
   g_shifted_A1 <- g_output$g_est$g_pred_shifted_A1
   g_shifted_A0 <- g_output$g_est$g_pred_shifted_A0
-  Dzw <- (m_pred_A0 * g_shifted_A0) + (m_pred_A1 * g_shifted_A1)
-  return(Dzw)
+  Dzw_A0 <- m_pred_A0 * g_shifted_A0
+  Dzw_A1 <- m_pred_A1 * g_shifted_A1
+  return(list(dzw_cntrl = Dzw_A0,
+              dzw_treat = Dzw_A1))
 }
 
 ################################################################################
