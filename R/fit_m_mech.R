@@ -37,6 +37,7 @@ fit_m_mech <- function(data, valid_data = NULL,
   # fit and predict
   m_fit_stack <- lrnr_stack$train(m_task)
 
+  # use full data for counterfactual prediction if no validation data provided
   if (is.null(valid_data)) {
     # copy full data
     data_A1 <- copy(data)
