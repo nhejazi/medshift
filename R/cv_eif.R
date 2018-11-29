@@ -79,24 +79,12 @@ cv_eif <- function(fold,
   )
 
   ## 4) difference-reduced dimension regression for phi
-  m_pred_A1 <- m_out$m_pred$m_pred_A1
-  m_pred_A0 <- m_out$m_pred$m_pred_A0
-  m_pred_diff <- m_pred_A1 - m_pred_A0
-  phi_data <- data.table(m_diff = m_pred_diff, valid_data[, ..w_names])
-  phi_task <- sl3::sl3_Task$new(
-    data = phi_data,
-    covariates = w_names,
-    outcome = "m_diff",
-    outcome_type = "continuous"
-  )
-  phi_fit <- lrnr_stack_phi$train(phi_task)
-  phi_est <- phi_fit$predict()
+  phi_est <- fit_phi_mech(data = valid_data,  lrnr_stack = lrnr_stack_phi,
+                          m_output = m_out, w_names = w_names)
 
 
   # compute component Dzw from nuisance parameters
-  g_shifted_A1 <- g_out$g_est$g_pred_shifted
-  g_shifted_A0 <- 1 - g_shifted_A1
-  Dzw <- (m_pred_A0 * g_shifted_A0) + (m_pred_A1 * g_shifted_A1)
+  Dzw <- make_Dzw(g_output = g_out, m_output = m_out)
 
 
   # compute component Da from nuisance parameters
@@ -111,12 +99,12 @@ cv_eif <- function(fold,
   Dy <- rep(NA, nrow(valid_data))
   idx_A1 <- which(valid_data$A == 1)
   idx_A0 <- which(valid_data$A == 0)
-  g_shifted_A1_obs <- g_shifted_A1[idx_A1]
-  g_shifted_A0_obs <- g_shifted_A0[idx_A0]
+  g_shifted_A1_obs <- g_out$g_est$g_pred_shifted_A1[idx_A1]
+  g_shifted_A0_obs <- g_out$g_est$g_pred_shifted_A0[idx_A0]
   e_pred_A1_obs <- e_out$e_est$e_pred[idx_A1]
   e_pred_A0_obs <- e_out$e_est$e_pred[idx_A0]
-  m_pred_A1_obs <- m_pred_A1[idx_A1]
-  m_pred_A0_obs <- m_pred_A0[idx_A0]
+  m_pred_A1_obs <- m_out$m_pred$m_pred_A1[idx_A1]
+  m_pred_A0_obs <- m_out$m_pred$m_pred_A0[idx_A0]
   y_A1_obs <- valid_data$Y[idx_A1]
   y_A0_obs <- valid_data$Y[idx_A0]
   # stabilize weights in AIPW by dividing by sample average since E[g/e] = 1
