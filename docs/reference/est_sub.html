@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Summary for Stochastic Mediation Parameter Objects — summary.medshift • medshift</title>
+<title>Substitution estimator — est_sub • medshift</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="Summary for Stochastic Mediation Parameter Objects — summary.medshift" />
+<meta property="og:title" content="Substitution estimator — est_sub" />
 
-<meta property="og:description" content="Print a convenient summary for objects computed using tmle_medshift." />
+<meta property="og:description" content="Substitution estimator" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -97,37 +97,45 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Summary for Stochastic Mediation Parameter Objects</h1>
-    <small class="dont-index">Source: <a href='https://github.com/nhejazi/medshift/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
-    <div class="hidden name"><code>summary.medshift.Rd</code></div>
+    <h1>Substitution estimator</h1>
+    <small class="dont-index">Source: <a href='https://github.com/nhejazi/medshift/blob/master/R/est_sub.R'><code>R/est_sub.R</code></a></small>
+    <div class="hidden name"><code>est_sub.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Print a convenient summary for objects computed using <code>tmle_medshift</code>.</p>
+    <p>Substitution estimator</p>
     
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for medshift</span>
-<span class='fu'>summary</span>(<span class='no'>object</span>, <span class='no'>...</span>, <span class='kw'>ci_level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>)</pre>
+    <pre class="usage"><span class='fu'>est_sub</span>(<span class='no'>data</span>, <span class='no'>delta</span>, <span class='no'>g_lrnrs</span>, <span class='no'>m_lrnrs</span>, <span class='no'>w_names</span>, <span class='no'>z_names</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>object</th>
-      <td><p>An object of class <code>medshift</code>, as produced by invoking
-the function <code>tmle_medshift</code>, for which a confidence interval is to be
-computed.</p></td>
+      <th>data</th>
+      <td><p>...</p></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>Other arguments. Not currently used.</p></td>
+      <th>delta</th>
+      <td><p>...</p></td>
     </tr>
     <tr>
-      <th>ci_level</th>
-      <td><p>A <code>numeric</code> indicating the level of the confidence
-interval to be computed.</p></td>
+      <th>g_lrnrs</th>
+      <td><p>...</p></td>
+    </tr>
+    <tr>
+      <th>m_lrnrs</th>
+      <td><p>...</p></td>
+    </tr>
+    <tr>
+      <th>w_names</th>
+      <td><p>...</p></td>
+    </tr>
+    <tr>
+      <th>z_names</th>
+      <td><p>...</p></td>
     </tr>
     </table>
     

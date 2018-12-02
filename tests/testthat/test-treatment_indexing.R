@@ -1,28 +1,9 @@
-context("Estimators work for simple incremental propensity score interventions")
+context("Indexing by treatment vector matches multiplicative indexing")
 
 library(data.table)
 library(stringr)
-library(future)
-library(hal9001)
-library(sl3)
 set.seed(429153)
 delta <- 0.5
-
-################################################################################
-# setup learners for the nuisance parameters
-################################################################################
-
-# instantiate some learners
-mean_lrnr <- Lrnr_mean$new()
-fglm_contin_lrnr <- Lrnr_glm_fast$new()
-fglm_binary_lrnr <- Lrnr_glm_fast$new(family = binomial())
-hal_contin_lrnr <- Lrnr_hal9001$new(
-  fit_type = "glmnet", n_folds = 5
-)
-hal_binary_lrnr <- Lrnr_hal9001$new(
-  fit_type = "glmnet", n_folds = 5,
-  family = "binomial"
-)
 
 ################################################################################
 # setup data and simulate to test with estimators
@@ -76,38 +57,31 @@ z_names <- colnames(data)[str_detect(colnames(data), "Z")]
 w_names <- colnames(data)[str_detect(colnames(data), "W")]
 
 
-################################################################################
-# test different estimators
-################################################################################
-theta_sub <- medshift(
-  W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
-  delta = delta,
-  g_lrnrs = hal_binary_lrnr,
-  e_lrnrs = hal_binary_lrnr,
-  m_lrnrs = hal_contin_lrnr,
-  phi_lrnrs = hal_contin_lrnr,
-  estimator = "substitution"
-)
-theta_sub
+# get indices of treatment and control units
+idx_treat <- which(data$A == 1)
+idx_cntrl <- which(data$A == 0)
 
-theta_re <- medshift(
-  W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
-  delta = delta,
-  g_lrnrs = hal_binary_lrnr,
-  e_lrnrs = hal_binary_lrnr,
-  m_lrnrs = hal_contin_lrnr,
-  phi_lrnrs = hal_contin_lrnr,
-  estimator = "reweighted"
-)
-theta_re
 
-theta_eff <- medshift(
-  W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
+# just try indexing by the treatment mechanism
+g_out <- fit_g_mech(
+  data = data,
   delta = delta,
-  g_lrnrs = hal_binary_lrnr,
-  e_lrnrs = hal_binary_lrnr,
-  m_lrnrs = hal_contin_lrnr,
-  phi_lrnrs = hal_contin_lrnr,
-  estimator = "efficient"
+  lrnr_stack = Lrnr_hal9001$new(fit_type = "glmnet", family = "binomial"),
+  w_names = w_names
 )
-theta_eff
+
+g_shifted_treat <- g_out$g_est$g_pred_A1
+g_shifted_cntrl <- g_out$g_est$g_pred_A0
+
+# construct shifted vector based on indexing
+g_shifted_idx <- rep(NA, length(g_shifted_treat))
+g_shifted_idx[idx_treat] <- g_shifted_treat[idx_treat]
+g_shifted_idx[idx_cntrl] <- g_shifted_cntrl[idx_cntrl]
+
+# construct shifted vector based on treatment vector  multiplication
+g_shifted_mult <- (g_shifted_treat * data$A) + g_shifted_cntrl * (1 - data$A)
+
+# test that indexing approaches produce identical results
+test_that("Different indexing approaches produce identical results", {
+  expect_identical(g_shifted_idx, g_shifted_mult)
+})

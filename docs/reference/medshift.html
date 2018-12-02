@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Nonparametric estimation of direct effects under mediation — medshift • medshift</title>
+<title>Nonparametric estimation of (in)direct effects under stochastic interventions — medshift • medshift</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="Nonparametric estimation of direct effects under mediation — medshift" />
+<meta property="og:title" content="Nonparametric estimation of (in)direct effects under stochastic interventions — medshift" />
 
-<meta property="og:description" content="Nonparametric estimation of direct effects under mediation" />
+<meta property="og:description" content="Nonparametric estimation of (in)direct effects under stochastic interventions" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -61,7 +61,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">medshift</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.3</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.5</span>
       </span>
     </div>
 
@@ -97,21 +97,20 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Nonparametric estimation of direct effects under mediation</h1>
+    <h1>Nonparametric estimation of (in)direct effects under stochastic interventions</h1>
     <small class="dont-index">Source: <a href='https://github.com/nhejazi/medshift/blob/master/R/medshift.R'><code>R/medshift.R</code></a></small>
     <div class="hidden name"><code>medshift.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Nonparametric estimation of direct effects under mediation</p>
+    <p>Nonparametric estimation of (in)direct effects under stochastic interventions</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>medshift</span>(<span class='no'>W</span>, <span class='no'>A</span>, <span class='no'>Z</span>, <span class='no'>Y</span>, <span class='kw'>delta</span> <span class='kw'>=</span> <span class='fl'>0.5</span>,
-  <span class='kw'>g_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='http://www.rdocumentation.org/packages/sl3/topics/Lrnr_glm_fast'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(<span class='kw'>family</span> <span class='kw'>=</span> <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/stats/topics/family'>binomial</a></span>()),
-  <span class='kw'>e_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='http://www.rdocumentation.org/packages/sl3/topics/Lrnr_glm_fast'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(<span class='kw'>family</span> <span class='kw'>=</span> <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/stats/topics/family'>binomial</a></span>()),
-  <span class='kw'>m_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='http://www.rdocumentation.org/packages/sl3/topics/Lrnr_glm_fast'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(),
+    <pre class="usage"><span class='fu'>medshift</span>(<span class='no'>W</span>, <span class='no'>A</span>, <span class='no'>Z</span>, <span class='no'>Y</span>, <span class='no'>delta</span>, <span class='kw'>g_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='http://www.rdocumentation.org/packages/sl3/topics/Lrnr_glm_fast'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(<span class='kw'>family</span> <span class='kw'>=</span>
+  <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/stats/topics/family'>binomial</a></span>()), <span class='kw'>e_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='http://www.rdocumentation.org/packages/sl3/topics/Lrnr_glm_fast'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(<span class='kw'>family</span> <span class='kw'>=</span>
+  <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/stats/topics/family'>binomial</a></span>()), <span class='kw'>m_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='http://www.rdocumentation.org/packages/sl3/topics/Lrnr_glm_fast'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(),
   <span class='kw'>phi_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='http://www.rdocumentation.org/packages/sl3/topics/Lrnr_glm_fast'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(), <span class='kw'>estimator</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"efficient"</span>,
   <span class='st'>"substitution"</span>, <span class='st'>"reweighted"</span>))</pre>
     

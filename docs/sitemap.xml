@@ -10,10 +10,25 @@
     <loc>https://code.nimahejazi.org/medshift/reference/bound_propensity.html</loc>
   </url>
   <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/compute_Dzw.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/compute_ipw.html</loc>
+  </url>
+  <url>
     <loc>https://code.nimahejazi.org/medshift/reference/confint.medshift.html</loc>
   </url>
   <url>
     <loc>https://code.nimahejazi.org/medshift/reference/cv_eif.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/est_eff.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/est_re.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/est_sub.html</loc>
   </url>
   <url>
     <loc>https://code.nimahejazi.org/medshift/reference/fit_e_mech.html</loc>
@@ -23,6 +38,9 @@
   </url>
   <url>
     <loc>https://code.nimahejazi.org/medshift/reference/fit_m_mech.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/fit_phi_mech.html</loc>
   </url>
   <url>
     <loc>https://code.nimahejazi.org/medshift/reference/medshift.html</loc>

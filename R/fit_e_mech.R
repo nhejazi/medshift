@@ -1,3 +1,5 @@
+utils::globalVariables(c(".N"))
+
 #' Fit clever propensity score regression for mediators
 #'
 #' @param data A \code{data.table} containing the observed data, with columns
@@ -35,29 +37,43 @@ fit_e_mech <- function(data, valid_data = NULL,
   # fit and predict
   e_fit_stack <- lrnr_stack$train(e_task)
 
+  # use full data for counterfactual prediction if no validation data provided
   if (is.null(valid_data)) {
-    # predict on full data
-    e_pred <- e_fit_stack$predict()
+    # copy full data
+    data_A1 <- data.table::copy(data)
   } else {
-    # construct task for nuisance parameter fit for validation data
-    e_task_valid <- sl3::sl3_Task$new(
-      data = valid_data,
-      covariates = c(z_names, w_names),
-      outcome = "A"
-    )
-    # predict on validation data
-    e_pred <- e_fit_stack$predict(e_task_valid)
+    # copy only validation data
+    data_A1 <- data.table::copy(valid_data)
   }
 
+  # set intervention A = 1 in validation data or full data
+  data_A1[, A := rep(1, .N)]
+  e_task_A1 <- sl3_Task$new(
+    data = data_A1,
+    covariates = c(z_names, w_names),
+    outcome = "A"
+  )
+
+  # predict from trained model on counterfactual data
+  e_pred_A1 <- e_fit_stack$predict(e_task_A1)
+
+  # get values of nuisance parameter E for A = 0 by symmetry with A = 1 case
+  e_pred_A0 <- 1 - e_pred_A1
+
   # bounding to numerical precision
-  e_pred <- bound_precision(e_pred)
+  e_pred_A1 <- bound_precision(e_pred_A1)
+  e_pred_A0 <- bound_precision(e_pred_A0)
 
   # bounding for potential positivity issues
-  e_pred <- bound_propensity(e_pred)
+  e_pred_A1 <- bound_propensity(e_pred_A1)
+  e_pred_A0 <- bound_propensity(e_pred_A0)
 
   # output
   out <- list(
-    e_est = data.table::data.table(cbind(e_pred = e_pred)),
+    e_est = data.table::data.table(cbind(
+      e_pred_A1 = e_pred_A1,
+      e_pred_A0 = e_pred_A0
+    )),
     e_fit = e_fit_stack
   )
   return(out)

@@ -40,6 +40,7 @@ fit_g_mech <- function(data, valid_data = NULL,
   # fit and predict
   g_fit_stack <- lrnr_stack$train(g_task)
 
+  # use full data for counterfactual prediction if no validation data provided
   if (is.null(valid_data)) {
     # copy full data
     data_A1 <- data.table::copy(data)
@@ -56,28 +57,36 @@ fit_g_mech <- function(data, valid_data = NULL,
     outcome = "A"
   )
   g_pred_A1 <- g_fit_stack$predict(g_task_A1)
+
+  # compute A = 0 case by symmetry
   g_pred_A0 <- 1 - g_pred_A1
 
   # directly computed the shifted propensity score
-  g_pred_shifted <- (delta * g_pred_A1) /
+  g_pred_shifted_A1 <- (delta * g_pred_A1) /
     (delta * g_pred_A1 + (1 - g_pred_A1))
+
+  # compute shifted propensity score for A = 0 by symmetry
+  g_pred_shifted_A0 <- 1 - g_pred_shifted_A1
 
   # bounding to numerical precision
   g_pred_A1 <- bound_precision(g_pred_A1)
   g_pred_A0 <- bound_precision(g_pred_A0)
-  g_pred_shifted <- bound_precision(g_pred_shifted)
+  g_pred_shifted_A1 <- bound_precision(g_pred_shifted_A1)
+  g_pred_shifted_A0 <- bound_precision(g_pred_shifted_A0)
 
   # bounding for potential positivity issues
   g_pred_A1 <- bound_propensity(g_pred_A1)
   g_pred_A0 <- bound_propensity(g_pred_A0)
-  g_pred_shifted <- bound_propensity(g_pred_shifted)
+  g_pred_shifted_A1 <- bound_propensity(g_pred_shifted_A1)
+  g_pred_shifted_A0 <- bound_propensity(g_pred_shifted_A0)
 
   # output
   out <- list(
     g_est = data.table::data.table(cbind(
       g_pred_A1 = g_pred_A1,
       g_pred_A0 = g_pred_A0,
-      g_pred_shifted = g_pred_shifted
+      g_pred_shifted_A1 = g_pred_shifted_A1,
+      g_pred_shifted_A0 = g_pred_shifted_A0
     )),
     g_fit = g_fit_stack
   )

@@ -27,27 +27,12 @@ est_sub <- function(data,
     z_names = z_names, w_names = w_names
   )
 
-  # build estimate
-  g_shifted_A1 <- g_out$g_est$g_pred_shifted
-  g_shifted_A0 <- 1 - g_shifted_A1
-  m_pred_A1 <- m_out$m_pred$m_pred_A1
-  m_pred_A0 <- m_out$m_pred$m_pred_A0
-
-  # find indices of observed treatment and control
-  idx_A1 <- which(data$A == 1)
-  idx_A0 <- which(data$A == 0)
-
-  # subset predictions to evaluation under observed data
-  g_shifted_A1_obs <- g_shifted_A1[idx_A1]
-  g_shifted_A0_obs <- g_shifted_A0[idx_A0]
-  m_pred_A1_obs <- m_pred_A1[idx_A1]
-  m_pred_A0_obs <- m_pred_A0[idx_A0]
+  # compute Dzw component of EIF using convenience function
+  Dzw_groupwise <- compute_Dzw(g_output = g_out, m_output = m_out)
 
   # compute estimator
-  estim_sub <- mean(m_pred_A0_obs * g_shifted_A0_obs) +
-    mean(m_pred_A1_obs * g_shifted_A1_obs)
+  estim_sub <- mean(Dzw_groupwise$dzw_cntrl) + mean(Dzw_groupwise$dzw_treat)
 
   # output
   return(estim_sub)
 }
-
