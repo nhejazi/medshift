@@ -17,8 +17,10 @@ compute_Dzw <- function(g_output, m_output) {
   Dzw_A0 <- g_shifted_A0 * m_pred_A0
 
   # output as simple list
-  return(list(dzw_cntrl = Dzw_A0,
-              dzw_treat = Dzw_A1))
+  return(list(
+    dzw_cntrl = Dzw_A0,
+    dzw_treat = Dzw_A1
+  ))
 }
 
 ################################################################################
@@ -55,8 +57,9 @@ compute_ipw <- function(g_output, e_output, idx_treat, idx_cntrl) {
   mean_aipw <- mean(g_shifted_obs / e_pred_obs)
 
   # output as simple list
-  return(list(g_shifted = g_shifted_obs,
-              e_pred = e_pred_obs,
-              mean_aipw = mean_aipw))
+  return(list(
+    g_shifted = g_shifted_obs,
+    e_pred = e_pred_obs,
+    mean_aipw = mean_aipw
+  ))
 }
-

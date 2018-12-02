@@ -80,7 +80,6 @@ medshift <- function(W,
       data = data, delta = delta, g_lrnrs = g_lrnrs,
       e_lrnrs = e_lrnrs, w_names = w_names, z_names = z_names
     )
-
   } else if (estimator == "efficient") {
     # EFFICIENT ESTIMATOR
     est_out <- est_eff(

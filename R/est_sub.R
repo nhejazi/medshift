@@ -36,4 +36,3 @@ est_sub <- function(data,
   # output
   return(estim_sub)
 }
-

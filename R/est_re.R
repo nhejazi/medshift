@@ -32,8 +32,10 @@ est_re <- function(data,
   idx_A0 <- which(data$A == 0)
 
   # compute IPW  estimator components from estimates of nuisance parameters
-  ipw_out <- compute_ipw(g_output = g_out, e_output = e_out,
-                         idx_treat = idx_A1, idx_cntrl = idx_A0)
+  ipw_out <- compute_ipw(
+    g_output = g_out, e_output = e_out,
+    idx_treat = idx_A1, idx_cntrl = idx_A0
+  )
   g_shifted <- ipw_out$g_shifted
   e_pred <- ipw_out$e_pred
   mean_aipw <- ipw_out$mean_aipw
@@ -44,4 +46,3 @@ est_re <- function(data,
   # output
   return(estim_re)
 }
-

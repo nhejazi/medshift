@@ -29,11 +29,11 @@ hal_binary_lrnr <- Lrnr_hal9001$new(
 ################################################################################
 
 # simulate simple data for simple simulation
-make_simulated_data <- function(n_obs = 1000,  # number of observations
-                                n_w = 3,  # number of baseline covariates
-                                p_w = 0.5,  # prob. of success in baseline vars
-                                delta_shift = delta  # posited shift parameter
-                               ) {
+make_simulated_data <- function(n_obs = 1000, # number of observations
+                                n_w = 3, # number of baseline covariates
+                                p_w = 0.5, # prob. of success in baseline vars
+                                delta_shift = delta # posited shift parameter
+) {
   # baseline covariate -- simple, binary
   W <- as.matrix(replicate(n_w, rbinom(n_obs, 1, prob = p_w)))
 

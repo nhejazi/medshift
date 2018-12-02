@@ -58,7 +58,7 @@ fit_e_mech <- function(data, valid_data = NULL,
   e_pred_A1 <- e_fit_stack$predict(e_task_A1)
 
   # get values of nuisance parameter E for A = 0 by symmetry with A = 1 case
-  e_pred_A0 <- 1 - e_pred_A1 
+  e_pred_A0 <- 1 - e_pred_A1
 
   # bounding to numerical precision
   e_pred_A1 <- bound_precision(e_pred_A1)
@@ -70,8 +70,10 @@ fit_e_mech <- function(data, valid_data = NULL,
 
   # output
   out <- list(
-    e_est = data.table::data.table(cbind(e_pred_A1 = e_pred_A1,
-                                         e_pred_A0 = e_pred_A0)),
+    e_est = data.table::data.table(cbind(
+      e_pred_A1 = e_pred_A1,
+      e_pred_A0 = e_pred_A0
+    )),
     e_fit = e_fit_stack
   )
   return(out)

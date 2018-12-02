@@ -79,8 +79,10 @@ cv_eif <- function(fold,
   )
 
   ## 4) difference-reduced dimension regression for phi
-  phi_est <- fit_phi_mech(data = valid_data,  lrnr_stack = lrnr_stack_phi,
-                          m_output = m_out, w_names = w_names)
+  phi_est <- fit_phi_mech(
+    data = valid_data, lrnr_stack = lrnr_stack_phi,
+    m_output = m_out, w_names = w_names
+  )
 
 
   # get indices of treated and control units in validation data
@@ -102,8 +104,10 @@ cv_eif <- function(fold,
 
 
   # compute component Dy from nuisance parameters
-  ipw_groupwise <- compute_ipw(g_output = g_out, e_output = e_out,
-                               idx_treat = idx_A1, idx_cntrl = idx_A0)
+  ipw_groupwise <- compute_ipw(
+    g_output = g_out, e_output = e_out,
+    idx_treat = idx_A1, idx_cntrl = idx_A0
+  )
   m_pred_obs <- rep(NA, nrow(valid_data))
   m_pred_A1_obs <- m_out$m_pred$m_pred_A1[idx_A1]
   m_pred_A0_obs <- m_out$m_pred$m_pred_A0[idx_A0]
