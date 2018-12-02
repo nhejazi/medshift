@@ -1,28 +1,9 @@
-context("Estimators work for simple incremental propensity score interventions")
+context("Indexing by treatment vector matches multiplicative indexing")
 
 library(data.table)
 library(stringr)
-library(future)
-library(hal9001)
-library(sl3)
 set.seed(429153)
 delta <- 0.5
-
-################################################################################
-# setup learners for the nuisance parameters
-################################################################################
-
-# instantiate some learners
-mean_lrnr <- Lrnr_mean$new()
-fglm_contin_lrnr <- Lrnr_glm_fast$new()
-fglm_binary_lrnr <- Lrnr_glm_fast$new(family = binomial())
-hal_contin_lrnr <- Lrnr_hal9001$new(
-  fit_type = "glmnet", n_folds = 5
-)
-hal_binary_lrnr <- Lrnr_hal9001$new(
-  fit_type = "glmnet", n_folds = 5,
-  family = "binomial"
-)
 
 ################################################################################
 # setup data and simulate to test with estimators
@@ -75,39 +56,3 @@ head(data)
 z_names <- colnames(data)[str_detect(colnames(data), "Z")]
 w_names <- colnames(data)[str_detect(colnames(data), "W")]
 
-
-################################################################################
-# test different estimators
-################################################################################
-theta_sub <- medshift(
-  W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
-  delta = delta,
-  g_lrnrs = hal_binary_lrnr,
-  e_lrnrs = hal_binary_lrnr,
-  m_lrnrs = hal_contin_lrnr,
-  phi_lrnrs = hal_contin_lrnr,
-  estimator = "substitution"
-)
-theta_sub
-
-theta_re <- medshift(
-  W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
-  delta = delta,
-  g_lrnrs = hal_binary_lrnr,
-  e_lrnrs = hal_binary_lrnr,
-  m_lrnrs = hal_contin_lrnr,
-  phi_lrnrs = hal_contin_lrnr,
-  estimator = "reweighted"
-)
-theta_re
-
-theta_eff <- medshift(
-  W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
-  delta = delta,
-  g_lrnrs = hal_binary_lrnr,
-  e_lrnrs = hal_binary_lrnr,
-  m_lrnrs = hal_contin_lrnr,
-  phi_lrnrs = hal_contin_lrnr,
-  estimator = "efficient"
-)
-theta_eff

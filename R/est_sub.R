@@ -28,7 +28,7 @@ est_sub <- function(data,
   )
 
   # compute Dzw component of EIF using convenience function
-  Dzw_groupwise <- make_Dzw(g_output = g_out, m_output = m_out)
+  Dzw_groupwise <- compute_Dzw(g_output = g_out, m_output = m_out)
 
   # compute estimator
   estim_sub <- mean(Dzw_groupwise$dzw_cntrl) + mean(Dzw_groupwise$dzw_treat)

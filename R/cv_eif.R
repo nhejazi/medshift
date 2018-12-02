@@ -83,8 +83,13 @@ cv_eif <- function(fold,
                           m_output = m_out, w_names = w_names)
 
 
+  # get indices of treated and control units in validation data
+  idx_A1 <- which(valid_data$A == 1)
+  idx_A0 <- which(valid_data$A == 0)
+
+
   # compute component Dzw from nuisance parameters
-  Dzw_groupwise <- make_Dzw(g_output = g_out, m_output = m_out)
+  Dzw_groupwise <- compute_Dzw(g_output = g_out, m_output = m_out)
   Dzw <- Dzw_groupwise$dzw_cntrl + Dzw_groupwise$dzw_treat
 
 
@@ -97,26 +102,18 @@ cv_eif <- function(fold,
 
 
   # compute component Dy from nuisance parameters
-  Dy <- rep(NA, nrow(valid_data))
-  idx_A1 <- which(valid_data$A == 1)
-  idx_A0 <- which(valid_data$A == 0)
-  g_shifted_A1_obs <- g_out$g_est$g_pred_shifted_A1[idx_A1]
-  g_shifted_A0_obs <- g_out$g_est$g_pred_shifted_A0[idx_A0]
-  e_pred_A1_obs <- e_out$e_est$e_pred[idx_A1]
-  e_pred_A0_obs <- e_out$e_est$e_pred[idx_A0]
+  ipw_groupwise <- compute_ipw(g_output = g_out, e_output = e_out,
+                               idx_treat = idx_A1, idx_cntrl = idx_A0)
+  m_pred_obs <- rep(NA, nrow(valid_data))
   m_pred_A1_obs <- m_out$m_pred$m_pred_A1[idx_A1]
   m_pred_A0_obs <- m_out$m_pred$m_pred_A0[idx_A0]
-  y_A1_obs <- valid_data$Y[idx_A1]
-  y_A0_obs <- valid_data$Y[idx_A0]
+  m_pred_obs[idx_A1] <- m_pred_A1_obs
+  m_pred_obs[idx_A0] <- m_pred_A0_obs
   # stabilize weights in AIPW by dividing by sample average since E[g/e] = 1
-  mean_aipw_A1 <- mean(g_shifted_A1_obs / e_pred_A1_obs)
-  mean_aipw_A0 <- mean(g_shifted_A0_obs / e_pred_A0_obs)
-  Dy_A1 <- ((g_shifted_A1_obs / e_pred_A1_obs) / mean_aipw_A1) *
-    (y_A1_obs - m_pred_A1_obs)
-  Dy_A0 <- ((g_shifted_A0_obs / e_pred_A0_obs) / mean_aipw_A0) *
-    (y_A0_obs - m_pred_A0_obs)
-  Dy[idx_A1] <- Dy_A1
-  Dy[idx_A0] <- Dy_A0
+  mean_aipw <- ipw_groupwise$mean_aipw
+  g_shifted <- ipw_groupwise$g_shifted
+  e_pred <- ipw_groupwise$e_pred
+  Dy <- ((g_shifted / e_pred) / mean_aipw) * (valid_data$Y - m_pred_obs)
 
 
   # output list
