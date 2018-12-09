@@ -56,7 +56,7 @@ medshift <- function(W,
                      m_lrnrs = sl3::Lrnr_glm_fast$new(),
                      phi_lrnrs = sl3::Lrnr_glm_fast$new(),
                      estimator = c(
-                       "efficient", "substitution",
+                       "onestep", "substitution",
                        "reweighted"
                      )) {
   # set defaults
@@ -70,19 +70,19 @@ medshift <- function(W,
 
   if (estimator == "substitution") {
     # SUBSTITUTION ESTIMATOR
-    est_out <- est_sub(
+    est_out <- est_substitution(
       data = data, delta = delta, g_lrnrs = g_lrnrs,
       m_lrnrs = m_lrnrs, w_names = w_names, z_names = z_names
     )
   } else if (estimator == "reweighted") {
-    # RE-WEIGHTED ESTIMATOR
-    est_out <- est_re(
+    # INVERSE PROBABILITY RE-WEIGHTED ESTIMATOR
+    est_out <- est_ipw(
       data = data, delta = delta, g_lrnrs = g_lrnrs,
       e_lrnrs = e_lrnrs, w_names = w_names, z_names = z_names
     )
-  } else if (estimator == "efficient") {
-    # EFFICIENT ESTIMATOR
-    est_out <- est_eff(
+  } else if (estimator == "onestep") {
+    # EFFICIENT ONE-STEP ESTIMATOR
+    est_out <- est_onestep(
       data = data, delta = delta, g_lrnrs = g_lrnrs,
       e_lrnrs = e_lrnrs, m_lrnrs = m_lrnrs,
       phi_lrnrs = phi_lrnrs, w_names = w_names,
