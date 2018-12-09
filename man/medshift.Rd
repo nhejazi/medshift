@@ -7,7 +7,7 @@
 medshift(W, A, Z, Y, delta, g_lrnrs = sl3::Lrnr_glm_fast$new(family =
   stats::binomial()), e_lrnrs = sl3::Lrnr_glm_fast$new(family =
   stats::binomial()), m_lrnrs = sl3::Lrnr_glm_fast$new(),
-  phi_lrnrs = sl3::Lrnr_glm_fast$new(), estimator = c("efficient",
+  phi_lrnrs = sl3::Lrnr_glm_fast$new(), estimator = c("onestep",
   "substitution", "reweighted"))
 }
 \arguments{

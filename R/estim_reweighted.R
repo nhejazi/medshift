@@ -30,11 +30,11 @@
 #' @keywords internal
 #
 est_ipw <- function(data,
-                   delta,
-                   g_lrnrs,
-                   e_lrnrs,
-                   w_names,
-                   z_names) {
+                    delta,
+                    g_lrnrs,
+                    e_lrnrs,
+                    w_names,
+                    z_names) {
   # fit regression for incremental propensity score intervention
   g_out <- fit_g_mech(
     data = data, delta = delta,

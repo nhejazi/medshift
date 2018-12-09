@@ -1,11 +1,11 @@
-context("Estimators work for simple incremental propensity score interventions")
+context("Estimators agree for incremental propensity score interventions")
 
 library(data.table)
 library(stringr)
 library(future)
 library(hal9001)
 library(sl3)
-set.seed(429153)
+set.seed(7128816)
 delta <- 0.5
 
 ################################################################################
@@ -27,37 +27,41 @@ hal_binary_lrnr <- Lrnr_hal9001$new(
 ################################################################################
 # setup data and simulate to test with estimators
 ################################################################################
+make_simulated_data <- function(n_obs = 1000, # no. observations
+                                n_w = 3, # no. baseline covariates
+                                delta = 0.5) { # shift parameter value
 
-# simulate simple data for simple simulation
-make_simulated_data <- function(n_obs = 1000, # number of observations
-                                n_w = 3, # number of baseline covariates
-                                p_w = 0.5, # prob. of success in baseline vars
-                                delta_shift = delta # posited shift parameter
-) {
   # baseline covariate -- simple, binary
-  W <- as.matrix(replicate(n_w, rbinom(n_obs, 1, prob = p_w)))
+  W_1 <- rbinom(n_obs, 1, prob = 0.50)
+  W_2 <- rbinom(n_obs, 1, prob = 0.65)
+  W_3 <- rbinom(n_obs, 1, prob = 0.35)
+  W <- cbind(W_1, W_2, W_3)
 
   # create treatment based on baseline W
   A <- as.numeric(rbinom(n_obs, 1, prob = (rowSums(W) / 4 + 0.1)))
 
   # mediators to affect the outcome
   ## 1st mediator (binary)
-  z1_prob <- (A + W[, 1]^2 + runif(n_obs, 0, 0.1)) / max(A + W[, 3] + 0.1)
+  z1_prob <- 1 - plogis((A^2 + W[, 1]) / (A + W[, 1]^3 + 0.5))
+  z1_prob[z1_prob < 0.01] <- 0.01
+  z1_prob[z1_prob > 0.99] <- 0.99
   Z_1 <- rbinom(n_obs, 1, prob = z1_prob)
   ## 2nd mediator (binary)
-  z2_form <- (A - 1)^3 + W[, 2] - W[, 3] + runif(n_obs, 0, 0.2)
-  z2_prob <- abs(z2_form) / max(abs(z2_form))
-  z2_prob <- z2_prob + runif(n_obs, 0, 1 - max(z2_prob))
+  z2_prob <- plogis((A - 1)^3 + W[, 2] / (W[, 3] + 3))
+  z2_prob[z2_prob < 0.01] <- 0.01
+  z2_prob[z2_prob > 0.99] <- 0.99
   Z_2 <- rbinom(n_obs, 1, prob = z2_prob)
   ## 3rd mediator (binary)
-  z3_form <- (A - 1)^2 + 2 * W[, 1]^3 + rnorm(n_obs)
-  z3_prob <- abs(z3_form) / max(abs(z3_form))
+  z3_prob <- plogis((A - 1)^2 + 2 * W[, 1]^3 - 1 / (2 * W[, 1] + 0.5))
+  z3_prob[z3_prob < 0.01] <- 0.01
+  z3_prob[z3_prob > 0.99] <- 0.99
   Z_3 <- rbinom(n_obs, 1, prob = z3_prob)
   ## build matrix of mediators
   Z <- cbind(Z_1, Z_2, Z_3)
 
   # create outcome as a linear function of A, W + white noise
-  Y <- Z_1 + Z_2 - Z_3 + A - 0.1 * rowSums(W)^2 + rnorm(n_obs, mean = 0, sd = 1)
+  Y <- Z_1 + Z_2 - Z_3 + A - 0.1 * rowSums(W)^2 +
+    rnorm(n_obs, mean = 0, sd = 0.5)
 
   # full data structure
   data <- as.data.table(cbind(Y, Z, A, W))
@@ -68,10 +72,8 @@ make_simulated_data <- function(n_obs = 1000, # number of observations
   return(data)
 }
 
+# get data and column names for sl3 tasks (for convenience)
 data <- make_simulated_data()
-head(data)
-
-# column names for sl3 tasks (for convenience)
 z_names <- colnames(data)[str_detect(colnames(data), "Z")]
 w_names <- colnames(data)[str_detect(colnames(data), "W")]
 
@@ -108,6 +110,18 @@ theta_eff <- medshift(
   e_lrnrs = hal_binary_lrnr,
   m_lrnrs = hal_contin_lrnr,
   phi_lrnrs = hal_contin_lrnr,
-  estimator = "efficient"
+  estimator = "onestep"
 )
 theta_eff
+
+test_that("Substitution and re-weighted estimator agree", {
+  expect_equal(theta_sub, theta_re, tol = 1e-2)
+})
+
+test_that("Substitution and efficient one-step estimator agree", {
+  expect_equal(theta_sub, theta_eff, tol = 1e-2)
+})
+
+test_that("Re-weighted and efficient one-step estimator agree", {
+  expect_equal(theta_re, theta_eff, tol = 1e-2)
+})

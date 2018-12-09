@@ -296,4 +296,3 @@ fit_phi_mech <- function(data, lrnr_stack, m_output, w_names) {
   phi_est <- phi_fit$predict()
   return(phi_est)
 }
-

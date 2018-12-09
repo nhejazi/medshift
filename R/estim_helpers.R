@@ -7,6 +7,8 @@ utils::globalVariables(c("..w_names"))
 #'  regression, as produced by a call to \code{fit_g_mech}.
 #' @param m_output Object containing results from fitting the outcome
 #'  regression, as produced by a call to \code{fit_m_mech}.
+#'
+#' @keywords internal
 #
 compute_Dzw <- function(g_output, m_output) {
   # get g components from output for that nuisance parameter
@@ -41,6 +43,8 @@ compute_Dzw <- function(g_output, m_output) {
 #'  to units that received treatment (A = 1), for a binary intervention.
 #' @param idx_cntrl A \code{numeric} vector providing the indices corresponding
 #'  to units that did not receive treatment (A = 0), for a binary intervention.
+#'
+#' @keywords internal
 #
 compute_ipw <- function(g_output, e_output, idx_treat, idx_cntrl) {
   # compute components for A = 0 based on symmetry with A = 1 case
@@ -118,6 +122,8 @@ compute_ipw <- function(g_output, e_output, idx_treat, idx_cntrl) {
 #'
 #' @importFrom data.table data.table
 #' @importFrom origami training validation fold_index
+#'
+#' @keywords internal
 #
 cv_eif <- function(fold,
                    data,
@@ -203,4 +209,3 @@ cv_eif <- function(fold,
   ))
   return(out)
 }
-
