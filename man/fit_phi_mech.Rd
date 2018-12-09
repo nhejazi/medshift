@@ -19,7 +19,8 @@ from \code{Lrnr_base}), containing a single or set of instantiated learners
 from the \code{sl3} package, to be used in fitting a cleverly parameterized
 propensity score that includes the mediators, i.e., e = P(A | Z, W).}
 
-\item{m_output}{...}
+\item{m_output}{Object containing results from fitting the outcome
+regression, as produced by a call to \code{fit_m_mech}.}
 
 \item{w_names}{A \code{character} vector of the names of the columns that
 correspond to baseline covariates (W). The input for this argument is
