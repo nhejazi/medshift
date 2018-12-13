@@ -115,7 +115,7 @@ theta_eff <- medshift(
 theta_eff
 
 test_that("Substitution and re-weighted estimator agree", {
-  expect_equal(theta_sub, theta_re, tol = 1e-2)
+  expect_equal(theta_sub, theta_re, tol = 1e-3)
 })
 
 test_that("Substitution and efficient one-step estimator agree", {
