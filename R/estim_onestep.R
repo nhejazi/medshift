@@ -64,8 +64,8 @@ est_onestep <- function(data,
     lrnr_stack_e = e_lrnrs,
     lrnr_stack_m = m_lrnrs,
     lrnr_stack_phi = phi_lrnrs,
-    z_names = z_names,
     w_names = w_names,
+    z_names = z_names,
     use_future = FALSE,
     .combine = FALSE
   )
