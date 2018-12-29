@@ -2,7 +2,8 @@
 % Please edit documentation in R/medshift.R
 \name{medshift}
 \alias{medshift}
-\title{Nonparametric estimation of (in)direct effects under stochastic interventions}
+\title{Nonparametric estimation of decomposition term for causal mediation analysis
+with stochastic interventions}
 \usage{
 medshift(W, A, Z, Y, delta, g_lrnrs = sl3::Lrnr_glm_fast$new(family =
   stats::binomial()), e_lrnrs = sl3::Lrnr_glm_fast$new(family =
@@ -58,5 +59,6 @@ user should consider consulting Díaz & Hejazi (2018+) for a comparative
 investigation of each of these estimators.}
 }
 \description{
-Nonparametric estimation of (in)direct effects under stochastic interventions
+Nonparametric estimation of decomposition term for causal mediation analysis
+with stochastic interventions
 }

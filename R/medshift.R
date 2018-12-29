@@ -1,4 +1,5 @@
-#' Nonparametric estimation of (in)direct effects under stochastic interventions
+#' Nonparametric estimation of decomposition term for causal mediation analysis
+#' with stochastic interventions
 #'
 #' @param W A \code{matrix}, \code{data.frame}, or similar corresponding to a
 #'  set of baseline covariates.
@@ -89,6 +90,8 @@ medshift <- function(W,
       z_names = z_names
     )
   }
-  # output
+
+  # lazily create output as S3 class
+  class(est_out) <- "medshiftx"
   return(est_out)
 }

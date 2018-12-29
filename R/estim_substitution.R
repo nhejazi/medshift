@@ -52,5 +52,6 @@ est_substitution <- function(data,
   estim_sub <- mean(Dzw_groupwise$dzw_cntrl) + mean(Dzw_groupwise$dzw_treat)
 
   # output
-  return(estim_sub)
+  estim_sub_out <- list(theta = estim_sub, type = "substitution")
+  return(estim_sub_out)
 }

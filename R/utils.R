@@ -1,6 +1,7 @@
 #' Confidence Intervals for Stochastic Mediation Parameters
 #'
-#' Compute confidence intervals for estimates produced by \code{tmle_medshift}
+#' Compute confidence intervals for objects of class \code{medshiftx}, which
+#' contain estimates produced by \code{medshift}.
 #'
 #' @param object An object of class \code{medshift}, as produced by invoking
 #'  the function \code{tmle_medshift}, for which a confidence interval is to be
@@ -12,28 +13,32 @@
 #' @param ... Other arguments. Not currently used.
 #'
 #' @importFrom stats qnorm
+#' @importFrom assertthat assert_that
 #'
-#' @method confint medshift
+#' @method confint medshiftx
 #'
 #' @export
 #
-confint.medshift <- function(object,
-                             parm = seq_len(object$psi),
-                             level = 0.95,
-                             ...) {
+confint.medshiftx <- function(object,
+                              parm = seq_len(object$psi),
+                              level = 0.95,
+                              ...) {
+  # inference is currently limited to the one-step efficient estimator
+  # TODO: allow use for TML estimators once impelemented
+  assertthat::assert_that(object$type == "one-step efficient")
 
   # first, let's get Z_(1 - alpha)
-  norm_bounds <- c(-1, 1) * abs(stats::qnorm(p = (1 - level) / 2))
+  ci_norm_bounds <- c(-1, 1) * abs(stats::qnorm(p = (1 - level) / 2))
 
   # compute the EIF variance multiplier for the CI
   # NOTE: the variance value is already scaled by length of observations
-  sd_eif <- sqrt(object$var)
+  se_eif <- sqrt(object$var)
 
   # compute the interval around the point estimate
-  ci_psi <- norm_bounds * sd_eif + object$psi
+  ci_theta <- ci_norm_bounds * se_eif + object$theta
 
   # set up output CI object
-  ci_out <- c(ci_psi[1], object$psi, ci_psi[2])
+  ci_out <- c(ci_theta[1], object$theta, ci_theta[2])
   names(ci_out) <- c("lwr_ci", "est", "upr_ci")
   return(ci_out)
 }
@@ -42,7 +47,7 @@ confint.medshift <- function(object,
 
 #' Summary for Stochastic Mediation Parameter Objects
 #'
-#' Print a convenient summary for objects computed using \code{tmle_medshift}.
+#' Print a convenient summary for objects of \code{S3} class \code{medshiftx}.
 #'
 #' @param object An object of class \code{medshift}, as produced by invoking
 #'  the function \code{tmle_medshift}, for which a confidence interval is to be
@@ -53,25 +58,33 @@ confint.medshift <- function(object,
 #'
 #' @importFrom stats confint
 #'
-#' @method summary medshift
+#' @method summary medshiftx
 #'
 #' @export
 #
-summary.medshift <- function(object,
-                             ...,
-                             ci_level = 0.95) {
+summary.medshiftx <- function(object,
+                              ...,
+                              ci_level = 0.95) {
+  # inference is currently limited to the one-step efficient estimator
+  # TODO: allow use for TML estimators once impelemented
+  if (object$type == "one-step efficient") {
+    # compute confidence interval using the pre-defined method
+    ci <- stats::confint(object, level = ci_level)
 
-  # compute confidence interval using the pre-defined method
-  ci <- stats::confint(object, level = ci_level)
+    # only print useful info about the mean of the efficient influence function
+    eif_mean <- format(mean(object$eif), scientific = TRUE)
 
-  # only print useful info about the mean of the efficient influence function
-  eif_mean <- format(mean(object$eif), scientific = TRUE)
-
-  # create output table from input object and confidence interval results
-  out <- c(round(c(ci, object$var), digits = 6), eif_mean, object$n_iter)
-  names(out) <- c(
-    "lwr_ci", "param_est", "upr_ci", "param_var"
-  )
+    # create output table from input object and confidence interval results
+    out <- c(round(c(ci, object$var), digits = 6), eif_mean, object$type)
+    names(out) <- c(
+      "lwr_ci", "param_est", "upr_ci", "param_var", "eif_mean", "estimator"
+    )
+  } else {
+    out <- c(round(object$theta, digits = 6), object$type)
+    names(out) <- c(
+      "param_est", "estimator"
+    )
+  }
   print(noquote(out))
 }
 
@@ -79,18 +92,23 @@ summary.medshift <- function(object,
 
 #' Print Method for Class medshift
 #'
-#' The \code{print} method for objects of class \code{medshift}.
+#' The \code{print} method for objects of class \code{medshiftx}.
 #'
 #' @param x An object of class \code{medshift}.
 #' @param ... Other options (not currently used).
 #'
+#' @method print medshiftx
+#'
 #' @export
-#'
-#' @method print medshift
-#'
 #
-print.medshift <- function(x, ...) {
-  print(x[c("psi", "var", "msg", "n_iter")])
+print.medshiftx <- function(x, ...) {
+  # inference is currently limited to the one-step efficient estimator
+  # TODO: allow use for TML estimators once impelemented
+  if (x$type == "one-step efficient") {
+    print(x[c("theta", "var", "type")])
+  } else {
+    print(x[c("theta", "type")])
+  }
 }
 
 ################################################################################

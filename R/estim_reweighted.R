@@ -62,5 +62,6 @@ est_ipw <- function(data,
   estim_ipw <- mean(((g_shifted / e_pred) / mean_aipw) * data$Y)
 
   # output
-  return(estim_ipw)
+  estim_ipw_out <- list(theta = estim_ipw, type = "re-weighted (IPW)")
+  return(estim_ipw_out)
 }
