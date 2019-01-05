@@ -199,7 +199,7 @@ which is implemented in the `medshift` R package [@hejazi2018+medshift]. We
 make use of that implementation to estimate $\mathbb{E}\{Y(g_{\delta}, q)\}$
 via its one-step estimator $\hat{\theta}(\delta)$ below
 
-```{r efficient_est, message=FALSE, warning=FALSE, cache=TRUE}
+```{r efficient_est, message=FALSE, warning=FALSE}
 # let's compute the parameter where A (but not Z) are shifted
 theta_eff <- medshift(W = W, A = A, Z = Z, Y = Y,
                       delta = delta_shift_ipsi,
