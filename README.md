@@ -71,24 +71,24 @@ prior to submitting a pull request.
 After using the `medshift` R package, please cite the following:
 
 ``` 
-    @article{diaz2018+causal,
+    @article{diaz2019+causal,
       title={Causal mediation analysis for stochastic interventions},
       author={D{\'\i}az, Iv{\'a}n and Hejazi, Nima S},
       journal={},
       volume={},
       number={},
       pages={},
-      year={2018+},
+      year={2019+},
       publisher={}
     }
 
-    @manual{hejazi2018+medshift,
+    @manual{hejazi2019medshift,
       author = {Hejazi, Nima S and D{\'\i}az, Iv{\'a}n},
       title = {{medshift}: Causal mediation analysis for stochastic
         interventions in {R}},
-      year  = {2018+},
+      year  = {2019},
       url = {https://github.com/nhejazi/medshift},
-      note = {R package version 0.0.1}
+      note = {R package version 0.0.8}
     }
 ```
 
@@ -96,14 +96,14 @@ After using the `medshift` R package, please cite the following:
 
 ## License
 
-© 2018 [Nima S. Hejazi](https://nimahejazi.org)
+© 2018-2019 [Nima S. Hejazi](https://nimahejazi.org)
 
 The contents of this repository are distributed under the MIT license.
 See below for details:
 
     MIT License
     
-    Copyright (c) 2018 Nima S. Hejazi
+    Copyright (c) 2018-2019 Nima S. Hejazi
     
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -129,7 +129,7 @@ See below for details:
 
 <div id="refs" class="references">
 
-<div id="ref-diaz2018+causal">
+<div id="ref-diaz2019+causal">
 
 Díaz, Iván, and Nima S Hejazi. n.d. “Causal Mediation Analysis for
 Stochastic Interventions.”

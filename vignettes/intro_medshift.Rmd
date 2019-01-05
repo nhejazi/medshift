@@ -1,0 +1,245 @@
+---
+title: "Causal Mediation Analysis for Stochastic Interventions"
+author: "[Nima Hejazi](https://nimahejazi.org) and
+  [Iván Díaz](https://www.idiaz.xyz/)"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+bibliography: vignette-refs.bib
+vignette: >
+  %\VignetteIndexEntry{IPCW-TMLEs with Stochastic Treatment Regimes}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r prelim, message=FALSE, warning=FALSE}
+# plotting and scientific notation
+options(scipen = 999)  ## has scientific notation ever annoyed you?
+
+# packages
+library(data.table)
+library(dplyr)
+library(sl3)
+library(medshift)
+
+# prng
+set.seed(429153)
+
+# convenience function to compute inference via delta method: EY1 - EY0
+param_linear_contrast <- function(params, eifs, ci_level = 0.95) {
+  # bounds for confidence interval
+  ci_norm_bounds <- c(-1, 1) * abs(stats::qnorm(p = (1 - ci_level) / 2))
+  param_est <- params[[1]] - params[[2]]
+  eif <- eifs[[1]] - eifs[[2]]
+  se_eif <- sqrt(var(eif) / length(eif))
+  param_ci <- param_est + ci_norm_bounds * se_eif
+  # parameter and inference
+  out <- c(param_ci[1], param_est, param_ci[2])
+  names(out) <- c("lwr_ci", "param_est", "upr_ci")
+  return(out)
+}
+```
+
+# Background
+
+We are interested in assessing the Natural Direct Effect (NDE) and the Natural
+Indirect Effect (NIE), based on the decomposition of the population mediated
+intervention mean given in @diaz2019+causal.
+
+To proceed, we'll use as our running example a simple data set from an
+observational study of the relationship between BMI and kids behavior,
+distributed as part of the [`mma` R package on
+CRAN](https://CRAN.R-project.org/package=mma). First, let's load this data set
+and take a quick look at it
+
+```{r load_data, message=FALSE, warning=FALSE}
+library(mma)
+data(weight_behavior)
+dim(weight_behavior)
+head(weight_behavior)
+```
+
+The documentation for the data set describes it as a "database obtained from the
+Louisiana State University Health Sciences Center, New Orleans, by  Dr. Richard
+Scribner. He  explored the relationship  between BMI and kids behavior through a
+survey at children, teachers and parents in Grenada in 2014. This data set
+includes 691 observations and 15 variables."
+
+Unfortunately, the data set contains a few observations with missing values. As
+these are unrelated to the object of our analysis, we'll simply remove these for
+the time being. Note that in a real data analysis, we might consider strategies
+to fully make of the observed data, perhaps by imputing missing values. For now,
+we simply remove the incomplete observations, resulting in a data set with fewer
+observations but much the same structure as the original:
+
+```{r remove_na, echo=FALSE, message=FALSE, warning=FALSE}
+# remove missing values
+is_na <- unique(do.call(c, apply(apply(weight_behavior, 2, is.na), 2, which)))
+weight_behavior_complete <- weight_behavior[-is_na, ]
+weight_behavior_complete$sports <-
+  as.numeric(weight_behavior_complete$sports) - 1
+dim(weight_behavior_complete)
+head(weight_behavior_complete)
+```
+
+For the analysis of this observational data set, we focus on the effect of
+participating in a sports team (`sports`) on the BMI of children (`bmi`), taking
+several related covariates as mediators (`snack`, `exercises`, `overweigh`) and
+all other collected covariates as potential confounders. Considering an NPSEM,
+we separate the observed variables from the data set into their corresponding
+nodes as follows
+
+```{r npsem, message=FALSE, warning=FALSE}
+Y <- weight_behavior_complete$bmi
+A <- weight_behavior_complete$sports
+Z <- weight_behavior_complete %>%
+  select(snack, exercises, overweigh)
+W <- weight_behavior_complete %>%
+  select(age, sex, race, numpeople, car, gotosch, tvhours, cmpthours,
+         cellhours, sweat)
+```
+
+Finally, in our analysis, we consider an incremental propensity score
+intervention (IPSI), as first proposed by @kennedy2017nonparametric, wherein the
+_odds of participating in a sports team_ is modulated by some fixed amount
+($0 \leq \delta \leq 1$) for each individual. Such an intervention may be
+interpreted as the effect of a school program that motivates children to
+participate in sports teams. To exemplify our approach, we postulate a
+motivational intervention that increases the odds of participating in a sports
+team by 25% for each individual:
+
+```{r delta_ipsi, message=FALSE, warning=FALSE}
+delta_shift_ipsi <- 0.25
+```
+
+To easily incorporate ensemble machine learning into the estimation procedure,
+we rely on the facilities provided in the [`sl3` R
+package](https://tlverse.org/sl3) [@coyle2018sl3]. For a complete guide on using
+the `sl3` R package, consider consulting https://tlverse.org/sl3, or
+https://tlverse.org (and https://github.com/tlverse) for the `tlverse`
+ecosystem, of which `sl3` is a major part. We construct an ensemble learner
+using a handful of popular machine learning algorithms below
+
+```{r make_sl, message=FALSE, warning=FALSE}
+# random forest learner based on ranger
+rf_lrnr_ntree1e3 <- Lrnr_ranger$new(num.trees = 1000)
+
+# SL learners used for continuous data (the nuisance parameter M)
+enet_contin_lrnr <- Lrnr_glmnet$new(alpha = 0.5, family = "gaussian",
+                                    nfolds = 3)
+lasso_contin_lrnr <- Lrnr_glmnet$new(alpha = 1, family = "gaussian",
+                                     nfolds = 3)
+fglm_contin_lrnr <- Lrnr_glm_fast$new(family = gaussian())
+contin_lrnr_lib <- Stack$new(enet_contin_lrnr, lasso_contin_lrnr,
+                             fglm_contin_lrnr, rf_lrnr_ntree1e3)
+sl_contin_lrnr <- Lrnr_sl$new(learners = contin_lrnr_lib,
+                              metalearner = Lrnr_nnls$new())
+
+# SL learners used for binary data (nuisance parameters G and E in this case)
+enet_binary_lrnr <- Lrnr_glmnet$new(alpha = 0.5, family = "binomial",
+                                    nfolds = 3)
+lasso_binary_lrnr <- Lrnr_glmnet$new(alpha = 1, family = "binomial",
+                                     nfolds = 3)
+fglm_binary_lrnr <- Lrnr_glm_fast$new(family = binomial())
+binary_lrnr_lib <- Stack$new(enet_binary_lrnr, lasso_binary_lrnr,
+                             fglm_binary_lrnr, rf_lrnr_ntree1e3)
+sl_binary_lrnr <- Lrnr_sl$new(learners = binary_lrnr_lib,
+                              metalearner = Lrnr_nnls$new())
+```
+
+## Decomposing the population intervention mean
+
+We may decompose the PIE in terms of a \textit{direct
+effect (DE)} and an \textit{indirect effect (IE)}:
+\begin{equation*}
+    \psi(\delta) = \overbrace{\mathbb{E}\{Y(g, q) -
+                                  Y(g_\delta, q)\}}^{\text{DE}} +
+                   \overbrace{\mathbb{E}\{Y(g_\delta, q) -
+                                  Y(g_\delta, q_\delta)\}}^{\text{IE}}
+\end{equation*}
+This decomposition of the PIE as the sum of direct and indirect
+effects has an interpretation analogous to the corresponding standard
+decomposition of the average treatment effect. In the sequel, we will compute
+each of the components of the direct and indirect effects above using
+appropriate estimators as follows
+
+* For $\mathbb{E}\{Y(g, q)\}$, the sample mean $\frac{1}{n}\sum_{i=1}^n Y_i$ is
+  sufficient;
+* for $\mathbb{E}\{Y(g_{\delta}, q)\}$, a one-step efficient estimator for the
+  pure effect (of altering the exposure mechanism but not the mediation
+  mechanism), as proposed in @diaz2019+causal; and,
+* for $\mathbb{E}\{Y(g_{\delta}, q_{\delta})\}$, a one-step efficient estimator
+  for the joint effect (of altering both the exposure and mediation mechanisms),
+  as proposed in @kennedy2017nonparametric and implemented in the [`npcausal` R
+  package](https://github.com/ehkennedy/npcausal).
+
+## Estimating the pure non-mediated effect
+
+As given in @diaz2019+causal, the statistical functional identifying the pure
+effect $\mathbb{E}\{Y(g_{\delta}, q)\}$, which corresponds to altering the
+exposure mechanism while keeping the mediation mechanism (and its reliance on
+the exposure) fixed, is
+\begin{equation*}
+\theta_0(\delta) = \int m_0(a, z, w) g_{0,\delta}(a \mid w) p_0(z, w)
+d\nu(a, z, w),
+\end{equation*}
+for which a one-step nonparametric-efficient estimator is available. The
+corresponding _efficient influence function_ (EIF) with respect to the
+nonparametric model $\mathcal{M}$ is $D_{\eta,\delta}(o) = D^Y_{\eta,\delta}(o)
++ D^A_{\eta,\delta}(o) + D^{Z,W}_{\eta,\delta}(o) - \theta(\delta)$. The
+one-step estimator may be computed using the EIF estimating equation, making use
+of cross-fitting to circumvent any need for entropy conditions. The resultant
+estimator is
+\begin{equation*}
+  \hat{\theta}(\delta) = \frac{1}{n} \sum_{i = 1}^n D_{\hat{\eta}_{j(i)},
+  \delta}(O_i) = \frac{1}{n} \sum_{i = 1}^n \left\{ D^Y_{\hat{\eta}_{j(i)},
+  \delta}(O_i) + D^A_{\hat{\eta}_{j(i)}, \delta}(O_i) +
+  D^{Z,W}_{\hat{\eta}_{j(i)}, \delta}(O_i) \right\},
+\end{equation*}
+which is implemented in the `medshift` R package [@hejazi2018+medshift]. We
+make use of that implementation to estimate $\mathbb{E}\{Y(g_{\delta}, q)\}$
+via its one-step estimator $\hat{\theta}(\delta)$ below
+
+```{r efficient_est, message=FALSE, warning=FALSE, cache=TRUE}
+# let's compute the parameter where A (but not Z) are shifted
+theta_eff <- medshift(W = W, A = A, Z = Z, Y = Y,
+                      delta = delta_shift_ipsi,
+                      g = sl_binary_lrnr,
+                      e = sl_binary_lrnr,
+                      m = sl_contin_lrnr,
+                      phi = fglm_contin_lrnr,
+                      estimator = "onestep",
+                      estimator_args = list(cv_folds = 2))
+theta_eff
+```
+
+## Estimating the Natural Direct Effect
+
+Recall that, based on the decomposition outlined previously, the _natural direct
+effect_ (NDE) may be denoted $\beta_{\text{NDE}}(\delta) = \mathbb{E}Y -
+\theta_0(\delta)$. Thus, an estimator of the NDE,
+$\hat{\beta}_{\text{NDE}}(\delta)$ may be expressed as a composition of
+estimators of its constituent parameters:
+\begin{equation*}
+  \hat{\beta}_{\text{NDE}}({\delta}) = \frac{1}{n} \sum_{i = 1}^n Y_i -
+  \hat{\theta}(\delta).
+\end{equation*}
+Based on the above, we may construct an estimator of the NDE using the
+quantities already computed
+
+```{r comp_nde_binary, message=FALSE, warning=FALSE}
+# parameter estimates and EIFs for components of direct effect
+EY <- mean(Y)
+eif_EY <- Y - EY
+params_nde <- list(EY, theta_eff$theta)
+eifs_nde <- list(eif_EY, theta_eff$eif)
+
+# natural direct effect = EY - estimated quantity
+nde_est <- param_linear_contrast(params_nde, eifs_nde)
+nde_est
+```
+
+As given above, we have for our estimate of the natural direct effect
+$\hat{\beta}_{\text{NDE}}({\delta}) =$ `r round(nde_est, 3)`.
+
+## References
+

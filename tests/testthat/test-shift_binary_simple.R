@@ -110,7 +110,7 @@ theta_eff <- medshift(
   e_lrnrs = hal_binary_lrnr,
   m_lrnrs = hal_contin_lrnr,
   phi_lrnrs = hal_contin_lrnr,
-  estimator = "onestep"
+  estimator = "onestep",
 )
 theta_eff
 

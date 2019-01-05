@@ -9,7 +9,7 @@ medshift(W, A, Z, Y, delta, g_lrnrs = sl3::Lrnr_glm_fast$new(family =
   stats::binomial()), e_lrnrs = sl3::Lrnr_glm_fast$new(family =
   stats::binomial()), m_lrnrs = sl3::Lrnr_glm_fast$new(),
   phi_lrnrs = sl3::Lrnr_glm_fast$new(), estimator = c("onestep",
-  "substitution", "reweighted"))
+  "substitution", "reweighted"), estimator_args = list(cv_folds = 10))
 }
 \arguments{
 \item{W}{A \code{matrix}, \code{data.frame}, or similar corresponding to a
@@ -55,8 +55,16 @@ E[m(A = 1, Z, W) - m(A = 0, Z, W) | W).}
 \item{estimator}{The desired estimator of the natural direct effect to be
 computed. Currently, choices are limited to a substitution estimator, a
 re-weighted estimator, and an efficient one-step estimator. The interested
-user should consider consulting Díaz & Hejazi (2018+) for a comparative
+user should consider consulting Díaz & Hejazi (2019+) for a comparative
 investigation of each of these estimators.}
+
+\item{estimator_args}{A \code{list} of extra arguments to be passed (via
+\code{...}) to the function call for the specified estimator. The default
+is so chosen as to allow the number of folds used in computing the AIPW
+estimator to be easily tweaked. Refer to the documentation for functions
+\code{\link{est_onestep}}, \code{\link{est_ipw}}, and
+\code{\link{est_substitution}} for details on what other arguments may be
+specified through this mechanism.}
 }
 \description{
 Nonparametric estimation of decomposition term for causal mediation analysis

@@ -35,8 +35,15 @@
 #' @param estimator The desired estimator of the natural direct effect to be
 #'  computed. Currently, choices are limited to a substitution estimator, a
 #'  re-weighted estimator, and an efficient one-step estimator. The interested
-#'  user should consider consulting Díaz & Hejazi (2018+) for a comparative
+#'  user should consider consulting Díaz & Hejazi (2019+) for a comparative
 #'  investigation of each of these estimators.
+#' @param estimator_args A \code{list} of extra arguments to be passed (via
+#'  \code{...}) to the function call for the specified estimator. The default
+#'  is so chosen as to allow the number of folds used in computing the AIPW
+#'  estimator to be easily tweaked. Refer to the documentation for functions
+#'  \code{\link{est_onestep}}, \code{\link{est_ipw}}, and
+#'  \code{\link{est_substitution}} for details on what other arguments may be
+#'  specified through this mechanism.
 #'
 #' @importFrom data.table as.data.table setnames
 #' @importFrom origami make_folds cross_validate
@@ -58,10 +65,12 @@ medshift <- function(W,
                      phi_lrnrs = sl3::Lrnr_glm_fast$new(),
                      estimator = c(
                        "onestep", "substitution",
-                       "reweighted"
-                     )) {
+                       "reweighted"),
+                     estimator_args = list(cv_folds = 10)
+                    ) {
   # set defaults
   estimator <- match.arg(estimator)
+  estimator_args <- unlist(estimator_args, recursive = FALSE)
 
   # construct input data structure
   data <- data.table::as.data.table(cbind(Y, Z, A, W))
@@ -71,24 +80,29 @@ medshift <- function(W,
 
   if (estimator == "substitution") {
     # SUBSTITUTION ESTIMATOR
-    est_out <- est_substitution(
+    sub_est_args <- list(
       data = data, delta = delta, g_lrnrs = g_lrnrs,
-      m_lrnrs = m_lrnrs, w_names = w_names, z_names = z_names
+      m_lrnrs = m_lrnrs, w_names = w_names, z_names = z_names,
+      estimator_args
     )
+    est_out <- do.call(est_substitution, sub_est_args)
   } else if (estimator == "reweighted") {
     # INVERSE PROBABILITY RE-WEIGHTED ESTIMATOR
-    est_out <- est_ipw(
+    ipw_est_args <- list(
       data = data, delta = delta, g_lrnrs = g_lrnrs,
-      e_lrnrs = e_lrnrs, w_names = w_names, z_names = z_names
+      e_lrnrs = e_lrnrs, w_names = w_names, z_names = z_names,
+      estimator_args
     )
+    est_out <- do.call(est_ipw, ipw_est_args)
   } else if (estimator == "onestep") {
     # EFFICIENT ONE-STEP ESTIMATOR
-    est_out <- est_onestep(
+    aipw_est_args <- list(
       data = data, delta = delta, g_lrnrs = g_lrnrs,
       e_lrnrs = e_lrnrs, m_lrnrs = m_lrnrs,
       phi_lrnrs = phi_lrnrs, w_names = w_names,
-      z_names = z_names
+      z_names = z_names, estimator_args
     )
+    est_out <- do.call(est_onestep, aipw_est_args)
   }
 
   # lazily create output as S3 class

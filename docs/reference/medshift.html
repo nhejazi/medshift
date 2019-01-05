@@ -66,7 +66,7 @@ with stochastic interventions" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">medshift</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.8</span>
       </span>
     </div>
 
@@ -80,6 +80,18 @@ with stochastic interventions" />
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/intro_medshift.html">Causal Mediation Analysis for Stochastic Interventions</a>
+    </li>
+  </ul>
 </li>
       </ul>
       
@@ -119,7 +131,7 @@ with stochastic interventions</p>
   <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/family'>binomial</a></span>()), <span class='kw'>e_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='https://www.rdocumentation.org/packages/sl3/topics/Lrnr_glm_fast'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(<span class='kw'>family</span> <span class='kw'>=</span>
   <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/family'>binomial</a></span>()), <span class='kw'>m_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='https://www.rdocumentation.org/packages/sl3/topics/Lrnr_glm_fast'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(),
   <span class='kw'>phi_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='https://www.rdocumentation.org/packages/sl3/topics/Lrnr_glm_fast'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(), <span class='kw'>estimator</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"onestep"</span>,
-  <span class='st'>"substitution"</span>, <span class='st'>"reweighted"</span>))</pre>
+  <span class='st'>"substitution"</span>, <span class='st'>"reweighted"</span>), <span class='kw'>estimator_args</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>cv_folds</span> <span class='kw'>=</span> <span class='fl'>10</span>))</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -187,8 +199,18 @@ E[m(A = 1, Z, W) - m(A = 0, Z, W) | W).</p></td>
       <td><p>The desired estimator of the natural direct effect to be
 computed. Currently, choices are limited to a substitution estimator, a
 re-weighted estimator, and an efficient one-step estimator. The interested
-user should consider consulting Díaz &amp; Hejazi (2018+) for a comparative
+user should consider consulting Díaz &amp; Hejazi (2019+) for a comparative
 investigation of each of these estimators.</p></td>
+    </tr>
+    <tr>
+      <th>estimator_args</th>
+      <td><p>A <code>list</code> of extra arguments to be passed (via
+<code>...</code>) to the function call for the specified estimator. The default
+is so chosen as to allow the number of folds used in computing the AIPW
+estimator to be easily tweaked. Refer to the documentation for functions
+<code><a href='est_onestep.html'>est_onestep</a></code>, <code><a href='est_ipw.html'>est_ipw</a></code>, and
+<code><a href='est_substitution.html'>est_substitution</a></code> for details on what other arguments may be
+specified through this mechanism.</p></td>
     </tr>
     </table>
     
