@@ -74,8 +74,10 @@ medshift <- function(W,
 
   # construct input data structure
   data <- data.table::as.data.table(cbind(Y, Z, A, W))
-  w_names <- paste("W", seq_len(dim(matrix(W))[2]), sep = "_")
-  z_names <- paste("Z", seq_len(dim(matrix(Z))[2]), sep = "_")
+  w_names <- paste("W", seq_len(dim(data.table::as.data.table(W))[2]),
+                   sep = "_")
+  z_names <- paste("Z", seq_len(dim(data.table::as.data.table(Z))[2]),
+                   sep = "_")
   data.table::setnames(data, c("Y", z_names, "A", w_names))
 
   if (estimator == "substitution") {

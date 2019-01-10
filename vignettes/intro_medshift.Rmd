@@ -85,11 +85,11 @@ _odds of participating in a sports team_ is modulated by some fixed amount
 ($0 \leq \delta \leq \infty$) for each individual. Such an intervention may be
 interpreted as the effect of a school program that motivates children to
 participate in sports teams. To exemplify our approach, we postulate a
-motivational intervention that _doubles the odds_ of participating in a sports
+motivational intervention that _triples the odds_ of participating in a sports
 team for each individual:
 
 ```{r delta_ipsi, message=FALSE, warning=FALSE}
-delta_shift_ipsi <- 2
+delta_shift_ipsi <- 3
 ```
 
 To easily incorporate ensemble machine learning into the estimation procedure,
@@ -127,15 +127,15 @@ sl_binary_lrnr <- Lrnr_sl$new(learners = binary_lrnr_lib,
                               metalearner = Lrnr_nnls$new())
 ```
 
-## Decomposing the population intervention mean
+## Decomposing the population intervention effect
 
-We may decompose the PIE in terms of a \textit{direct
-effect (DE)} and an \textit{indirect effect (IE)}:
+We may decompose the population intervention effect (PIE) in terms of a
+\textit{direct effect (PIDE)} and an \textit{indirect effect (PIIE)}:
 \begin{equation*}
     \psi(\delta) = \overbrace{\mathbb{E}\{Y(g, q) -
-                                  Y(g_\delta, q)\}}^{\text{DE}} +
+                                  Y(g_\delta, q)\}}^{\text{PIDE}} +
                    \overbrace{\mathbb{E}\{Y(g_\delta, q) -
-                                  Y(g_\delta, q_\delta)\}}^{\text{IE}}
+                                  Y(g_\delta, q_\delta)\}}^{\text{PIIE}}
 \end{equation*}
 This decomposition of the PIE as the sum of direct and indirect
 effects has an interpretation analogous to the corresponding standard
