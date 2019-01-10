@@ -14,7 +14,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-
 # R/`medshift`
 
 [![Travis-CI Build Status](https://travis-ci.org/nhejazi/medshift.svg?branch=master)](https://travis-ci.org/nhejazi/medshift)
@@ -32,11 +31,11 @@ Díaz](https://idiaz.xyz)
 
 ## What's `medshift`?
 
-The `medshift` R package is designed to provide facilities for estimating direct
-and indirect effects of stochastic interventions in settings in which causal
-mediation analysis is of interest. `medshift` is designed as an implementation
-to accompany the methods described in "Causal mediation analysis for stochastic
-interventions" [@diaz2019+causal].
+The `medshift` R package is designed to provide facilities for estimating a
+parameter that arises in a decomposition of the population intervention causal
+effect into the (in)direct effects under stochastic interventions in the setting
+of mediation analysis. `medshift` is designed as an implementation to accompany
+the methodology described @diaz2019causal.
 
 ---
 
@@ -45,15 +44,61 @@ interventions" [@diaz2019+causal].
 Install the most recent _stable release_ from GitHub via
 [`devtools`](https://www.rstudio.com/products/rpackages/devtools/):
 
-```{r gh-master-installation, eval = FALSE}
-devtools::install_github("nhejazi/medshift", build_vignettes = FALSE)
+```{r gh-master-installation, eval=FALSE}
+devtools::install_github("nhejazi/medshift")
 ```
 
 ---
 
 ## Example
 
-Forthcoming...
+To illustrate how `medshift` may be used to estimation the effect of applying a
+stochastic intervention to the treatment (`A`) while keeping the mediator(s)
+(`Z`) fixed, consider the following example:
+
+```{r simple_example, message=FALSE, warning=FALSE}
+library(data.table)
+library(medshift)
+
+# produces a simple data set based on ca causal model with mediation
+make_simple_mediation_data <- function(n_obs = 1000) {
+  # baseline covariate -- simple, binary
+  W <- rbinom(n_obs, 1, prob = 0.50)
+
+  # create treatment based on baseline W
+  A <- as.numeric(rbinom(n_obs, 1, prob = W / 4 + 0.1))
+
+  # single mediator to affect the outcome
+  z1_prob <- 1 - plogis((A^2 + W) / (A + W^3 + 0.5))
+  z1_prob[z1_prob < 0.01] <- 0.01
+  z1_prob[z1_prob > 0.99] <- 0.99
+  Z <- rbinom(n_obs, 1, prob = z1_prob)
+
+  # create outcome as a linear function of A, W + white noise
+  Y <- Z + A - 0.1 * W + rnorm(n_obs, mean = 0, sd = 0.25)
+
+  # full data structure
+  data <- as.data.table(cbind(Y, Z, A, W))
+  setnames(data, c("Y", "Z", "A", "W"))
+  return(data)
+}
+
+# set seed and simulate example data
+set.seed(75681)
+example_data <- make_simple_mediation_data()
+
+# compute AIPW estimate based on an incremental propensity score intervention
+# that triples (delta = 3) the individual-specific odds of receiving treatment
+aipw_medshift <- medshift(W = example_data$W, A = example_data$A,
+                          Z = example_data$Z, Y = example_data$Y,
+                          delta = 3, estimator = "onestep",
+                          estimator_args = list(cv_folds = 3))
+summary(aipw_medshift)
+```
+
+For details on how to use data adaptive regression (machine learning) techniques
+in the estimation of nuisance parameters, consider consulting the vignette that
+accompanies the package.
 
 ---
 
@@ -77,14 +122,16 @@ prior to submitting a pull request.
 
 After using the `medshift` R package, please cite the following:
 
-        @article{diaz2019+causal,
+        @article{diaz2019causal,
           title={Causal mediation analysis for stochastic interventions},
           author={D{\'\i}az, Iv{\'a}n and Hejazi, Nima S},
-          journal={},
+          year={2019},
+          url = {https://arxiv.org/abs/1901.02776},
+          doi = {},
+          journal={submitted},
           volume={},
           number={},
           pages={},
-          year={2019+},
           publisher={}
         }
 
