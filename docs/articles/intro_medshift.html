@@ -151,30 +151,34 @@
 <p>Finally, in our analysis, we consider an incremental propensity score intervention (IPSI), as first proposed by <span class="citation">Kennedy (2018)</span>, wherein the <em>odds of participating in a sports team</em> is modulated by some fixed amount (<span class="math inline">\(0 \leq \delta \leq \infty\)</span>) for each individual. Such an intervention may be interpreted as the effect of a school program that motivates children to participate in sports teams. To exemplify our approach, we postulate a motivational intervention that <em>triples the odds</em> of participating in a sports team for each individual:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">delta_shift_ipsi &lt;-<span class="st"> </span><span class="dv">3</span></a></code></pre></div>
 <p>To easily incorporate ensemble machine learning into the estimation procedure, we rely on the facilities provided in the <a href="https://tlverse.org/sl3"><code>sl3</code> R package</a> <span class="citation">(Coyle et al. 2018)</span>. For a complete guide on using the <code>sl3</code> R package, consider consulting <a href="https://tlverse.org/sl3" class="uri">https://tlverse.org/sl3</a>, or <a href="https://tlverse.org" class="uri">https://tlverse.org</a> (and <a href="https://github.com/tlverse" class="uri">https://github.com/tlverse</a>) for the <code>tlverse</code> ecosystem, of which <code>sl3</code> is a major part. We construct an ensemble learner using a handful of popular machine learning algorithms below</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="co"># random forest learner based on ranger</span></a>
-<a class="sourceLine" id="cb9-2" data-line-number="2">rf_lrnr_ntree1e3 &lt;-<span class="st"> </span>Lrnr_ranger<span class="op">$</span><span class="kw">new</span>(<span class="dt">num.trees =</span> <span class="dv">1000</span>)</a>
-<a class="sourceLine" id="cb9-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="co"># SL learners used for continuous data (the nuisance parameter M)</span></a>
-<a class="sourceLine" id="cb9-5" data-line-number="5">enet_contin_lrnr &lt;-<span class="st"> </span>Lrnr_glmnet<span class="op">$</span><span class="kw">new</span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>, <span class="dt">family =</span> <span class="st">"gaussian"</span>,</a>
-<a class="sourceLine" id="cb9-6" data-line-number="6">                                    <span class="dt">nfolds =</span> <span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb9-7" data-line-number="7">lasso_contin_lrnr &lt;-<span class="st"> </span>Lrnr_glmnet<span class="op">$</span><span class="kw">new</span>(<span class="dt">alpha =</span> <span class="dv">1</span>, <span class="dt">family =</span> <span class="st">"gaussian"</span>,</a>
-<a class="sourceLine" id="cb9-8" data-line-number="8">                                     <span class="dt">nfolds =</span> <span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb9-9" data-line-number="9">fglm_contin_lrnr &lt;-<span class="st"> </span>Lrnr_glm_fast<span class="op">$</span><span class="kw">new</span>(<span class="dt">family =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/family">gaussian</a></span>())</a>
-<a class="sourceLine" id="cb9-10" data-line-number="10">contin_lrnr_lib &lt;-<span class="st"> </span>Stack<span class="op">$</span><span class="kw">new</span>(enet_contin_lrnr, lasso_contin_lrnr,</a>
-<a class="sourceLine" id="cb9-11" data-line-number="11">                             fglm_contin_lrnr, rf_lrnr_ntree1e3)</a>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="co"># SL learners used for continuous data (the nuisance parameter M)</span></a>
+<a class="sourceLine" id="cb9-2" data-line-number="2">xgb_contin_lrnr &lt;-<span class="st"> </span>Lrnr_xgboost<span class="op">$</span><span class="kw">new</span>(<span class="dt">nrounds =</span> <span class="dv">50</span>, <span class="dt">objective =</span> <span class="st">"reg:linear"</span>)</a>
+<a class="sourceLine" id="cb9-3" data-line-number="3">hal_contin_lrnr &lt;-<span class="st"> </span>Lrnr_hal9001<span class="op">$</span><span class="kw">new</span>(<span class="dt">n_folds =</span> <span class="dv">5</span>, <span class="dt">degrees =</span> <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb9-4" data-line-number="4">enet_contin_lrnr &lt;-<span class="st"> </span>Lrnr_glmnet<span class="op">$</span><span class="kw">new</span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>, <span class="dt">family =</span> <span class="st">"gaussian"</span>,</a>
+<a class="sourceLine" id="cb9-5" data-line-number="5">                                    <span class="dt">nfolds =</span> <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb9-6" data-line-number="6">lasso_contin_lrnr &lt;-<span class="st"> </span>Lrnr_glmnet<span class="op">$</span><span class="kw">new</span>(<span class="dt">alpha =</span> <span class="dv">1</span>, <span class="dt">family =</span> <span class="st">"gaussian"</span>,</a>
+<a class="sourceLine" id="cb9-7" data-line-number="7">                                     <span class="dt">nfolds =</span> <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb9-8" data-line-number="8">fglm_contin_lrnr &lt;-<span class="st"> </span>Lrnr_glm_fast<span class="op">$</span><span class="kw">new</span>(<span class="dt">family =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/family">gaussian</a></span>())</a>
+<a class="sourceLine" id="cb9-9" data-line-number="9">contin_lrnr_lib &lt;-<span class="st"> </span>Stack<span class="op">$</span><span class="kw">new</span>(enet_contin_lrnr, lasso_contin_lrnr,</a>
+<a class="sourceLine" id="cb9-10" data-line-number="10">                             fglm_contin_lrnr, xgb_contin_lrnr,</a>
+<a class="sourceLine" id="cb9-11" data-line-number="11">                             hal_contin_lrnr)</a>
 <a class="sourceLine" id="cb9-12" data-line-number="12">sl_contin_lrnr &lt;-<span class="st"> </span>Lrnr_sl<span class="op">$</span><span class="kw">new</span>(<span class="dt">learners =</span> contin_lrnr_lib,</a>
 <a class="sourceLine" id="cb9-13" data-line-number="13">                              <span class="dt">metalearner =</span> Lrnr_nnls<span class="op">$</span><span class="kw">new</span>())</a>
 <a class="sourceLine" id="cb9-14" data-line-number="14"></a>
 <a class="sourceLine" id="cb9-15" data-line-number="15"><span class="co"># SL learners used for binary data (nuisance parameters G and E in this case)</span></a>
-<a class="sourceLine" id="cb9-16" data-line-number="16">enet_binary_lrnr &lt;-<span class="st"> </span>Lrnr_glmnet<span class="op">$</span><span class="kw">new</span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>, <span class="dt">family =</span> <span class="st">"binomial"</span>,</a>
-<a class="sourceLine" id="cb9-17" data-line-number="17">                                    <span class="dt">nfolds =</span> <span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb9-18" data-line-number="18">lasso_binary_lrnr &lt;-<span class="st"> </span>Lrnr_glmnet<span class="op">$</span><span class="kw">new</span>(<span class="dt">alpha =</span> <span class="dv">1</span>, <span class="dt">family =</span> <span class="st">"binomial"</span>,</a>
-<a class="sourceLine" id="cb9-19" data-line-number="19">                                     <span class="dt">nfolds =</span> <span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb9-20" data-line-number="20">fglm_binary_lrnr &lt;-<span class="st"> </span>Lrnr_glm_fast<span class="op">$</span><span class="kw">new</span>(<span class="dt">family =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/family">binomial</a></span>())</a>
-<a class="sourceLine" id="cb9-21" data-line-number="21">binary_lrnr_lib &lt;-<span class="st"> </span>Stack<span class="op">$</span><span class="kw">new</span>(enet_binary_lrnr, lasso_binary_lrnr,</a>
-<a class="sourceLine" id="cb9-22" data-line-number="22">                             fglm_binary_lrnr, rf_lrnr_ntree1e3)</a>
-<a class="sourceLine" id="cb9-23" data-line-number="23">sl_binary_lrnr &lt;-<span class="st"> </span>Lrnr_sl<span class="op">$</span><span class="kw">new</span>(<span class="dt">learners =</span> binary_lrnr_lib,</a>
-<a class="sourceLine" id="cb9-24" data-line-number="24">                              <span class="dt">metalearner =</span> Lrnr_nnls<span class="op">$</span><span class="kw">new</span>())</a></code></pre></div>
+<a class="sourceLine" id="cb9-16" data-line-number="16">xgb_binary_lrnr &lt;-<span class="st"> </span>Lrnr_xgboost<span class="op">$</span><span class="kw">new</span>(<span class="dt">nrounds =</span> <span class="dv">50</span>, <span class="dt">objective =</span> <span class="st">"reg:logistic"</span>)</a>
+<a class="sourceLine" id="cb9-17" data-line-number="17">hal_binary_lrnr &lt;-<span class="st"> </span>Lrnr_hal9001<span class="op">$</span><span class="kw">new</span>(<span class="dt">n_folds =</span> <span class="dv">5</span>, <span class="dt">degrees =</span> <span class="dv">3</span>,</a>
+<a class="sourceLine" id="cb9-18" data-line-number="18">                                    <span class="dt">fit_type =</span> <span class="st">"glmnet"</span>, <span class="dt">family =</span> <span class="st">"binomial"</span>)</a>
+<a class="sourceLine" id="cb9-19" data-line-number="19">enet_binary_lrnr &lt;-<span class="st"> </span>Lrnr_glmnet<span class="op">$</span><span class="kw">new</span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>, <span class="dt">family =</span> <span class="st">"binomial"</span>,</a>
+<a class="sourceLine" id="cb9-20" data-line-number="20">                                    <span class="dt">nfolds =</span> <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb9-21" data-line-number="21">lasso_binary_lrnr &lt;-<span class="st"> </span>Lrnr_glmnet<span class="op">$</span><span class="kw">new</span>(<span class="dt">alpha =</span> <span class="dv">1</span>, <span class="dt">family =</span> <span class="st">"binomial"</span>,</a>
+<a class="sourceLine" id="cb9-22" data-line-number="22">                                     <span class="dt">nfolds =</span> <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb9-23" data-line-number="23">fglm_binary_lrnr &lt;-<span class="st"> </span>Lrnr_glm_fast<span class="op">$</span><span class="kw">new</span>(<span class="dt">family =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/family">binomial</a></span>())</a>
+<a class="sourceLine" id="cb9-24" data-line-number="24">binary_lrnr_lib &lt;-<span class="st"> </span>Stack<span class="op">$</span><span class="kw">new</span>(enet_binary_lrnr, lasso_binary_lrnr,</a>
+<a class="sourceLine" id="cb9-25" data-line-number="25">                             fglm_binary_lrnr, xgb_binary_lrnr,</a>
+<a class="sourceLine" id="cb9-26" data-line-number="26">                             hal_binary_lrnr)</a>
+<a class="sourceLine" id="cb9-27" data-line-number="27">sl_binary_lrnr &lt;-<span class="st"> </span>Lrnr_sl<span class="op">$</span><span class="kw">new</span>(<span class="dt">learners =</span> binary_lrnr_lib,</a>
+<a class="sourceLine" id="cb9-28" data-line-number="28">                              <span class="dt">metalearner =</span> Lrnr_nnls<span class="op">$</span><span class="kw">new</span>())</a></code></pre></div>
 <div id="decomposing-the-population-intervention-effect" class="section level2">
 <h2 class="hasAnchor">
 <a href="#decomposing-the-population-intervention-effect" class="anchor"></a>Decomposing the population intervention effect</h2>
@@ -213,9 +217,9 @@ d\nu(a, z, w),
 <a class="sourceLine" id="cb10-9" data-line-number="9">                      <span class="dt">estimator_args =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">cv_folds =</span> <span class="dv">2</span>))</a>
 <a class="sourceLine" id="cb10-10" data-line-number="10"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/summary">summary</a></span>(theta_eff)</a></code></pre></div>
 <pre><code>##             lwr_ci          param_est             upr_ci 
-##          18.789055          19.147208           19.50536 
+##          18.758434           19.10965          19.460867 
 ##          param_var           eif_mean          estimator 
-##           0.033392       4.980549e-16 one-step efficient</code></pre>
+##           0.032111      -1.538315e-15 one-step efficient</code></pre>
 </div>
 <div id="estimating-the-direct-effect" class="section level2">
 <h2 class="hasAnchor">
@@ -249,8 +253,8 @@ d\nu(a, z, w),
 <a class="sourceLine" id="cb13-8" data-line-number="8">de_est &lt;-<span class="st"> </span><span class="kw">linear_contrast</span>(params_de, eifs_de)</a>
 <a class="sourceLine" id="cb13-9" data-line-number="9">de_est</a></code></pre></div>
 <pre><code>##      lwr_ci   param_est      upr_ci 
-## -0.50073948 -0.02009968  0.46054013</code></pre>
-<p>As given above, we have for our estimate of the direct effect <span class="math inline">\(\hat{\beta}_{\text{DE}}({\delta}) =\)</span> -0.02.</p>
+## -0.45834907  0.01745764  0.49326435</code></pre>
+<p>As given above, we have for our estimate of the direct effect <span class="math inline">\(\hat{\beta}_{\text{DE}}({\delta}) =\)</span> 0.017.</p>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="hasAnchor">
