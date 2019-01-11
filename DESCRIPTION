@@ -1,54 +1,62 @@
 Package: medshift
 Title: Causal mediation analysis for stochastic interventions
-Version: 0.0.1
+Version: 0.0.8
 Authors@R: c(
-    person("Nima", "Hejazi", email = "nhejazi@berkeley.edu",
+    person("Nima", "Hejazi", email = "nh@nimahejazi.org",
            role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0000-0002-7127-2789")),
     person("Iván", "Díaz", email = "ild2005@med.cornell.edu",
-           role = c("aut")),
-    person("Jeremy", "Coyle", email = "jeremy.coyle@gmail.com",
-           role = c("ctb"),
-           comment = c(ORCID = "0000-0002-9874-6649")),
+           role = c("aut"),
+           comment = c(ORCID = "0000-0001-9056-2047")),
     person("Mark", "van der Laan", email = "laan@berkeley.edu",
            role = c("ctb", "ths"),
-           comment = c(ORCID = "0000-0002-7127-2789"))
+           comment = c(ORCID = "0000-0003-1432-5511")),
+    person("Jeremy", "Coyle", email = "jeremy.coyle@gmail.com",
+           role = "ctb",
+           comment = c(ORCID = "0000-0002-9874-6649"))
   )
 Maintainer: Nima Hejazi <nh@nimahejazi.org>
-Description: Tools for efficiently estimating parameters of a decomposition of
-    the population intervention effect when performing causal mediation
-    analysis. An implementation accompanying the manuscript "Causal mediation
-    analysis for stochastic interventions" (Diaz et al, 2018+).
+Description: Estimators of a parameter arising in the decomposition of the
+    population intervention causal effect of stochastic interventions under
+    mediation analysis, including one-step augmented inverse probability
+    weighted (AIPW), re-weighting (IPW), and substitution estimators. This
+    parameter constitutes one of two parts of the population intervention
+    (in)direct effect in the mediation setting with stochastic interventions,
+    thus these estimators may be used in constructing assessing the (in)direct
+    effect under stochastic treatment regimes, including incremental propensity
+    score interventions and standard location shifts of the intervention (Díaz
+    and Hejazi; 2019 (submitted); <https://arxiv.org/abs/1901.02776>).
 Depends: R (>= 3.2.0)
 Imports:
-    R6,
-    uuid,
-    methods,
     stats,
+    methods,
+    data.table,
+    assertthat,
     dplyr,
     stringr,
-    data.table,
-    condensier,
+    origami,
     sl3,
-    tmle3,
-    hal9001
+    simcausal,
+    condensier
 Suggests:
     testthat,
     knitr,
     rmarkdown,
-    tidyverse,
     Rsolnp,
     nnls,
-    ranger
+    hal9001,
+    xgboost,
+    mma
 Remotes:
+    github::osofr/simcausal@master,
     github::osofr/condensier@master,
     github::tlverse/hal9001@master,
-    github::tlverse/sl3@master,
-    github::tlverse/tmle3@master
+    github::tlverse/origami@master,
+    github::tlverse/sl3@master
 License: MIT + file LICENSE
 URL: https://github.com/nhejazi/medshift
 BugReports: https://github.com/nhejazi/medshift/issues
 Encoding: UTF-8
 LazyData: true
 VignetteBuilder: knitr
-RoxygenNote: 6.1.0.9000
+RoxygenNote: 6.1.1
