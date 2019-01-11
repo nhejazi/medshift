@@ -610,14 +610,56 @@ body {
 <p><strong>Authors:</strong> <a href="https://nimahejazi.org">Nima Hejazi</a> and <a href="https://idiaz.xyz">Iván Díaz</a></p>
 <hr />
 <h2 id="whats-medshift">What’s <code>medshift</code>?</h2>
-<p>The <code>medshift</code> R package is designed to provide facilities for estimating direct and indirect effects of stochastic interventions in settings in which causal mediation analysis is of interest. <code>medshift</code> is designed as an implementation to accompany the methods described in “Causal mediation analysis for stochastic interventions” (Díaz and Hejazi, n.d.).</p>
+<p>The <code>medshift</code> R package is designed to provide facilities for estimating a parameter that arises in a decomposition of the population intervention causal effect into the (in)direct effects under stochastic interventions in the setting of mediation analysis. <code>medshift</code> is designed as an implementation to accompany the methodology described Díaz and Hejazi (2019).</p>
 <hr />
 <h2 id="installation">Installation</h2>
 <p>Install the most recent <em>stable release</em> from GitHub via <a href="https://www.rstudio.com/products/rpackages/devtools/"><code>devtools</code></a>:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;nhejazi/medshift&quot;</span>, <span class="dt">build_vignettes =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;nhejazi/medshift&quot;</span>)</a></code></pre></div>
 <hr />
 <h2 id="example">Example</h2>
-<p>Forthcoming…</p>
+<p>To illustrate how <code>medshift</code> may be used to estimation the effect of applying a stochastic intervention to the treatment (<code>A</code>) while keeping the mediator(s) (<code>Z</code>) fixed, consider the following example:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">library</span>(data.table)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="kw">library</span>(medshift)</a>
+<a class="sourceLine" id="cb2-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="co"># produces a simple data set based on ca causal model with mediation</span></a>
+<a class="sourceLine" id="cb2-5" data-line-number="5">make_simple_mediation_data &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">n_obs =</span> <span class="dv">1000</span>) {</a>
+<a class="sourceLine" id="cb2-6" data-line-number="6">  <span class="co"># baseline covariate -- simple, binary</span></a>
+<a class="sourceLine" id="cb2-7" data-line-number="7">  W &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n_obs, <span class="dv">1</span>, <span class="dt">prob =</span> <span class="fl">0.50</span>)</a>
+<a class="sourceLine" id="cb2-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb2-9" data-line-number="9">  <span class="co"># create treatment based on baseline W</span></a>
+<a class="sourceLine" id="cb2-10" data-line-number="10">  A &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">rbinom</span>(n_obs, <span class="dv">1</span>, <span class="dt">prob =</span> W <span class="op">/</span><span class="st"> </span><span class="dv">4</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.1</span>))</a>
+<a class="sourceLine" id="cb2-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb2-12" data-line-number="12">  <span class="co"># single mediator to affect the outcome</span></a>
+<a class="sourceLine" id="cb2-13" data-line-number="13">  z1_prob &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">plogis</span>((A<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>W) <span class="op">/</span><span class="st"> </span>(A <span class="op">+</span><span class="st"> </span>W<span class="op">^</span><span class="dv">3</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.5</span>))</a>
+<a class="sourceLine" id="cb2-14" data-line-number="14">  z1_prob[z1_prob <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.01</span>] &lt;-<span class="st"> </span><span class="fl">0.01</span></a>
+<a class="sourceLine" id="cb2-15" data-line-number="15">  z1_prob[z1_prob <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.99</span>] &lt;-<span class="st"> </span><span class="fl">0.99</span></a>
+<a class="sourceLine" id="cb2-16" data-line-number="16">  Z &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n_obs, <span class="dv">1</span>, <span class="dt">prob =</span> z1_prob)</a>
+<a class="sourceLine" id="cb2-17" data-line-number="17"></a>
+<a class="sourceLine" id="cb2-18" data-line-number="18">  <span class="co"># create outcome as a linear function of A, W + white noise</span></a>
+<a class="sourceLine" id="cb2-19" data-line-number="19">  Y &lt;-<span class="st"> </span>Z <span class="op">+</span><span class="st"> </span>A <span class="op">-</span><span class="st"> </span><span class="fl">0.1</span> <span class="op">*</span><span class="st"> </span>W <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n_obs, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="fl">0.25</span>)</a>
+<a class="sourceLine" id="cb2-20" data-line-number="20"></a>
+<a class="sourceLine" id="cb2-21" data-line-number="21">  <span class="co"># full data structure</span></a>
+<a class="sourceLine" id="cb2-22" data-line-number="22">  data &lt;-<span class="st"> </span><span class="kw">as.data.table</span>(<span class="kw">cbind</span>(Y, Z, A, W))</a>
+<a class="sourceLine" id="cb2-23" data-line-number="23">  <span class="kw">setnames</span>(data, <span class="kw">c</span>(<span class="st">&quot;Y&quot;</span>, <span class="st">&quot;Z&quot;</span>, <span class="st">&quot;A&quot;</span>, <span class="st">&quot;W&quot;</span>))</a>
+<a class="sourceLine" id="cb2-24" data-line-number="24">  <span class="kw">return</span>(data)</a>
+<a class="sourceLine" id="cb2-25" data-line-number="25">}</a>
+<a class="sourceLine" id="cb2-26" data-line-number="26"></a>
+<a class="sourceLine" id="cb2-27" data-line-number="27"><span class="co"># set seed and simulate example data</span></a>
+<a class="sourceLine" id="cb2-28" data-line-number="28"><span class="kw">set.seed</span>(<span class="dv">75681</span>)</a>
+<a class="sourceLine" id="cb2-29" data-line-number="29">example_data &lt;-<span class="st"> </span><span class="kw">make_simple_mediation_data</span>()</a>
+<a class="sourceLine" id="cb2-30" data-line-number="30"></a>
+<a class="sourceLine" id="cb2-31" data-line-number="31"><span class="co"># compute AIPW estimate based on an incremental propensity score intervention</span></a>
+<a class="sourceLine" id="cb2-32" data-line-number="32"><span class="co"># that triples (delta = 3) the individual-specific odds of receiving treatment</span></a>
+<a class="sourceLine" id="cb2-33" data-line-number="33">aipw_medshift &lt;-<span class="st"> </span><span class="kw">medshift</span>(<span class="dt">W =</span> example_data<span class="op">$</span>W, <span class="dt">A =</span> example_data<span class="op">$</span>A,</a>
+<a class="sourceLine" id="cb2-34" data-line-number="34">                          <span class="dt">Z =</span> example_data<span class="op">$</span>Z, <span class="dt">Y =</span> example_data<span class="op">$</span>Y,</a>
+<a class="sourceLine" id="cb2-35" data-line-number="35">                          <span class="dt">delta =</span> <span class="dv">3</span>, <span class="dt">estimator =</span> <span class="st">&quot;onestep&quot;</span>,</a>
+<a class="sourceLine" id="cb2-36" data-line-number="36">                          <span class="dt">estimator_args =</span> <span class="kw">list</span>(<span class="dt">cv_folds =</span> <span class="dv">3</span>))</a>
+<a class="sourceLine" id="cb2-37" data-line-number="37"><span class="kw">summary</span>(aipw_medshift)</a>
+<a class="sourceLine" id="cb2-38" data-line-number="38"><span class="co">#&gt;             lwr_ci          param_est             upr_ci </span></a>
+<a class="sourceLine" id="cb2-39" data-line-number="39"><span class="co">#&gt;           0.740072           0.788103           0.836135 </span></a>
+<a class="sourceLine" id="cb2-40" data-line-number="40"><span class="co">#&gt;          param_var           eif_mean          estimator </span></a>
+<a class="sourceLine" id="cb2-41" data-line-number="41"><span class="co">#&gt;           0.000601      -3.501778e-17 one-step efficient</span></a></code></pre></div>
+<p>For details on how to use data adaptive regression (machine learning) techniques in the estimation of nuisance parameters, consider consulting the vignette that accompanies the package.</p>
 <hr />
 <h2 id="issues">Issues</h2>
 <p>If you encounter any bugs or have any specific feature requests, please <a href="https://github.com/nhejazi/medshift/issues">file an issue</a>.</p>
@@ -627,14 +669,16 @@ body {
 <hr />
 <h2 id="citation">Citation</h2>
 <p>After using the <code>medshift</code> R package, please cite the following:</p>
-<pre><code>    @article{diaz2019+causal,
+<pre><code>    @article{diaz2019causal,
       title={Causal mediation analysis for stochastic interventions},
       author={D{\'\i}az, Iv{\'a}n and Hejazi, Nima S},
-      journal={},
+      year={2019},
+      url = {https://arxiv.org/abs/1901.02776},
+      doi = {},
+      journal={submitted},
       volume={},
       number={},
       pages={},
-      year={2019+},
       publisher={}
     }
 
@@ -677,9 +721,9 @@ SOFTWARE.
 <h2 id="references">References</h2>
 <div id="refs" class="references">
 
-<div id="ref-diaz2019+causal">
+<div id="ref-diaz2019causal">
 
-<p>Díaz, Iván, and Nima S Hejazi. n.d. “Causal Mediation Analysis for Stochastic Interventions.”</p>
+<p>Díaz, Iván, and Nima S Hejazi. 2019. “Causal Mediation Analysis for Stochastic Interventions.” <em>Submitted</em>. <a href="https://arxiv.org/abs/1901.02776" class="uri">https://arxiv.org/abs/1901.02776</a>.</p>
 </div>
 
 </div>

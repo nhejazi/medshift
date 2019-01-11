@@ -65,9 +65,9 @@ medshift <- function(W,
                      phi_lrnrs = sl3::Lrnr_glm_fast$new(),
                      estimator = c(
                        "onestep", "substitution",
-                       "reweighted"),
-                     estimator_args = list(cv_folds = 10)
-                    ) {
+                       "reweighted"
+                     ),
+                     estimator_args = list(cv_folds = 10)) {
   # set defaults
   estimator <- match.arg(estimator)
   estimator_args <- unlist(estimator_args, recursive = FALSE)
@@ -75,9 +75,11 @@ medshift <- function(W,
   # construct input data structure
   data <- data.table::as.data.table(cbind(Y, Z, A, W))
   w_names <- paste("W", seq_len(dim(data.table::as.data.table(W))[2]),
-                   sep = "_")
+    sep = "_"
+  )
   z_names <- paste("Z", seq_len(dim(data.table::as.data.table(Z))[2]),
-                   sep = "_")
+    sep = "_"
+  )
   data.table::setnames(data, c("Y", z_names, "A", w_names))
 
   if (estimator == "substitution") {

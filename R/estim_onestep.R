@@ -60,8 +60,9 @@ est_onestep <- function(data,
 
   # create folds for use with origami::cross_validate
   folds <- origami::make_folds(data,
-                               fold_fun = origami::folds_vfold,
-                               V = cv_folds)
+    fold_fun = origami::folds_vfold,
+    V = cv_folds
+  )
 
   # perform the cv_eif procedure on a per-fold basis
   cv_eif_results <- origami::cross_validate(
@@ -93,9 +94,11 @@ est_onestep <- function(data,
   estim_onestep_var <- stats::var(estim_eif) / length(estim_eif)
 
   # output
-  estim_onestep_out <- list(theta = estim_onestep_param,
-                            var = estim_onestep_var,
-                            eif = (estim_eif - estim_onestep_param),
-                            type = "one-step efficient")
+  estim_onestep_out <- list(
+    theta = estim_onestep_param,
+    var = estim_onestep_var,
+    eif = (estim_eif - estim_onestep_param),
+    type = "one-step efficient"
+  )
   return(estim_onestep_out)
 }
