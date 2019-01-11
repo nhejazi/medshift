@@ -1,7 +1,6 @@
 branches:
   only:
   - master
-  - devel
 
 env:
   global:
@@ -10,7 +9,6 @@ env:
 language: r
 sudo: required
 cache: packages
-
 warnings_are_errors: true
 r_build_args: '--no-manual'
 r_check_args: '--no-vignettes --no-manual'
@@ -24,20 +22,24 @@ before_install:
 
 r_packages:
   - devtools
+  - sessioninfo
   - covr
+  - data.table
 
 r_github_packages:
-  - r-lib/devtools
   - r-lib/sessioninfo
   - Rdatatable/data.table
   - jimhester/covr
-  - jeremyrcoyle/hal9001
+  - osofr/simcausal
   - osofr/condensier
-  - tlverse/sl3@devel
+  - tlverse/delayed
+  - tlverse/origami
+  - tlverse/hal9001
+  - tlverse/sl3
 
 after_success:
   ## coverage
-  - travis_wait 30 Rscript -e "covr::codecov(line_exclusions = list('R/plots.R', 'R/utils.R'))"
+  - travis_wait 30 Rscript -e "covr::codecov(line_exclusions = list('R/utils.R'))"
 
 on_failure:
   - "./travis-tool.sh dump_logs"

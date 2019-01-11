@@ -28,7 +28,7 @@ The `medshift` R package is designed to provide facilities for
 estimating a parameter that arises in a decomposition of the population
 intervention causal effect into the (in)direct effects under stochastic
 interventions in the setting of mediation analysis. `medshift` is
-designed as an implementation to accompany the methodology described
+designed as an implementation to accompany the methodology described in
 Díaz and Hejazi (2019).
 
 -----
@@ -46,7 +46,7 @@ devtools::install_github("nhejazi/medshift")
 
 ## Example
 
-To illustrate how `medshift` may be used to estimation the effect of
+To illustrate how `medshift` may be used to estimate the effect of
 applying a stochastic intervention to the treatment (`A`) while keeping
 the mediator(s) (`Z`) fixed, consider the following example:
 

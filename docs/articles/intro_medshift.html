@@ -213,9 +213,9 @@ d\nu(a, z, w),
 <a class="sourceLine" id="cb10-9" data-line-number="9">                      <span class="dt">estimator_args =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">cv_folds =</span> <span class="dv">2</span>))</a>
 <a class="sourceLine" id="cb10-10" data-line-number="10"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/summary">summary</a></span>(theta_eff)</a></code></pre></div>
 <pre><code>##             lwr_ci          param_est             upr_ci 
-##           18.76968          19.128884          19.488087 
+##          18.789055          19.147208           19.50536 
 ##          param_var           eif_mean          estimator 
-##           0.033588       7.739494e-16 one-step efficient</code></pre>
+##           0.033392       4.980549e-16 one-step efficient</code></pre>
 </div>
 <div id="estimating-the-direct-effect" class="section level2">
 <h2 class="hasAnchor">
@@ -248,9 +248,9 @@ d\nu(a, z, w),
 <a class="sourceLine" id="cb13-7" data-line-number="7"><span class="co"># direct effect = EY - estimated quantity</span></a>
 <a class="sourceLine" id="cb13-8" data-line-number="8">de_est &lt;-<span class="st"> </span><span class="kw">linear_contrast</span>(params_de, eifs_de)</a>
 <a class="sourceLine" id="cb13-9" data-line-number="9">de_est</a></code></pre></div>
-<pre><code>##       lwr_ci    param_est       upr_ci 
-## -0.483830553 -0.001775968  0.480278617</code></pre>
-<p>As given above, we have for our estimate of the direct effect <span class="math inline">\(\hat{\beta}_{\text{DE}}({\delta}) =\)</span> -0.002.</p>
+<pre><code>##      lwr_ci   param_est      upr_ci 
+## -0.50073948 -0.02009968  0.46054013</code></pre>
+<p>As given above, we have for our estimate of the direct effect <span class="math inline">\(\hat{\beta}_{\text{DE}}({\delta}) =\)</span> -0.02.</p>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="hasAnchor">
