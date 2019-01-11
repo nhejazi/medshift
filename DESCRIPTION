@@ -45,6 +45,7 @@ Suggests:
     Rsolnp,
     nnls,
     hal9001,
+    xgboost,
     mma
 Remotes:
     github::osofr/simcausal@master,
