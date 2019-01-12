@@ -1,4 +1,4 @@
-#' Defines a TML Estimator for the Outcome under a Shifted Treatment
+#' Defines a TML Estimator for mediation with binary stochastic interventions
 #'
 #' Current limitations: pretty much tailored to \code{Param_TSM}
 #' See TODO notes for places generalization can be added
@@ -9,8 +9,8 @@
 #'
 #' @export
 #
-tmle3_Spec_medshift <- R6::R6Class(
-  classname = "tmle3_Spec_medshift",
+tmle3_Spec_binary_medshift <- R6::R6Class(
+  classname = "tmle3_Spec_binary_medshift",
   portable = TRUE,
   class = TRUE,
   inherit = tmle3_Spec,

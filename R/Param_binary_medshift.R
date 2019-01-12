@@ -1,4 +1,4 @@
-#' Parameter for efficient estimation equation-based estimator
+#' Parameter for the pure mediated effect under binary stochastic interventions
 #'
 #' Parameter definition...
 #'
