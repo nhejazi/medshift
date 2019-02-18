@@ -1,6 +1,6 @@
 #' Confidence Intervals for Stochastic Mediation Parameters
 #'
-#' Compute confidence intervals for objects of class \code{medshiftx}, which
+#' Compute confidence intervals for objects of class \code{medshift}, which
 #' contain estimates produced by \code{medshift}.
 #'
 #' @param object An object of class \code{medshift}, as produced by invoking
@@ -15,11 +15,11 @@
 #' @importFrom stats qnorm
 #' @importFrom assertthat assert_that
 #'
-#' @method confint medshiftx
+#' @method confint medshift
 #'
 #' @export
 #
-confint.medshiftx <- function(object,
+confint.medshift <- function(object,
                               parm = seq_len(object$psi),
                               level = 0.95,
                               ...) {
@@ -47,7 +47,7 @@ confint.medshiftx <- function(object,
 
 #' Summary for Stochastic Mediation Parameter Objects
 #'
-#' Print a convenient summary for objects of \code{S3} class \code{medshiftx}.
+#' Print a convenient summary for objects of \code{S3} class \code{medshift}.
 #'
 #' @param object An object of class \code{medshift}, as produced by invoking
 #'  the function \code{tmle_medshift}, for which a confidence interval is to be
@@ -58,11 +58,11 @@ confint.medshiftx <- function(object,
 #'
 #' @importFrom stats confint
 #'
-#' @method summary medshiftx
+#' @method summary medshift
 #'
 #' @export
 #
-summary.medshiftx <- function(object,
+summary.medshift <- function(object,
                               ...,
                               ci_level = 0.95) {
   # inference is currently limited to the one-step efficient estimator
@@ -92,16 +92,16 @@ summary.medshiftx <- function(object,
 
 #' Print Method for Class medshift
 #'
-#' The \code{print} method for objects of class \code{medshiftx}.
+#' The \code{print} method for objects of class \code{medshift}.
 #'
 #' @param x An object of class \code{medshift}.
 #' @param ... Other options (not currently used).
 #'
-#' @method print medshiftx
+#' @method print medshift
 #'
 #' @export
 #
-print.medshiftx <- function(x, ...) {
+print.medshift <- function(x, ...) {
   # inference is currently limited to the one-step efficient estimator
   # TODO: allow use for TML estimators once impelemented
   if (x$type == "one-step efficient") {
@@ -152,3 +152,34 @@ bound_propensity <- function(vals, bounds = c(0.01, 0.99)) {
   vals[vals > bounds[2]] <- bounds[2]
   return(vals)
 }
+
+################################################################################
+
+#' Scale Values to the Unary Interval [0, 1]
+#'
+#' @param vals A \code{numeric} vector of values to be scaled into the interval
+#'  [0, 1].
+#'
+#' @keywords internal
+#
+scale_to_unary <- function(vals) {
+  vals_scaled <- (vals - min(vals)) / (max(vals) - min(vals))
+  return(vals_scaled)
+}
+
+################################################################################
+
+#' Scale Values to the Original Scale
+#'
+#' @param scaled_vals A \code{numeric} vector of values scaled to lie in the
+#'  interval [0, 1] by use of \code{\link{scale_to_unary}}.
+#' @param max_orig The maximum of the values on the original scale.
+#' @param min_orig The minimum of the values on the original scale.
+#'
+#' @keywords internal
+#
+scale_to_original <- function(scaled_vals, max_orig, min_orig) {
+  vals_orig <- (scaled_vals * (max_orig - min_orig)) + min_orig
+  return(vals_orig)
+}
+

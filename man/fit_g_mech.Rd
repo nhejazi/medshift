@@ -4,7 +4,8 @@
 \alias{fit_g_mech}
 \title{Fit propensity score with incremental stochastic shift intervention}
 \usage{
-fit_g_mech(data, valid_data = NULL, delta, lrnr_stack, w_names)
+fit_g_mech(data, valid_data = NULL, delta, lrnr_stack, w_names,
+  type = c())
 }
 \arguments{
 \item{data}{A \code{data.table} containing the observed data, with columns

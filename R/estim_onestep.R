@@ -98,7 +98,7 @@ est_onestep <- function(data,
     theta = estim_onestep_param,
     var = estim_onestep_var,
     eif = (estim_eif - estim_onestep_param),
-    type = "one-step efficient"
+    type = "one-step (AIPW)"
   )
   return(estim_onestep_out)
 }

@@ -37,6 +37,11 @@
 #'  re-weighted estimator, and an efficient one-step estimator. The interested
 #'  user should consider consulting Díaz & Hejazi (2019+) for a comparative
 #'  investigation of each of these estimators.
+#' @param shift_type A choice of the type of stochastic treatment regime to use
+#'  -- either \code{"additive"} for a modified treatment policy that shifts the
+#'  center of the observed intervention distribution by the scalar \code{delta}
+#'  or \code{"odds"} for an incremental propensity score shift that multiples
+#'  the odds of receiving the intervention by the scalar \code{delta}.
 #' @param estimator_args A \code{list} of extra arguments to be passed (via
 #'  \code{...}) to the function call for the specified estimator. The default
 #'  is so chosen as to allow the number of folds used in computing the AIPW
@@ -45,6 +50,7 @@
 #'  \code{\link{est_substitution}} for details on what other arguments may be
 #'  specified through this mechanism.
 #'
+#' @importFrom assertthat assert_that
 #' @importFrom data.table as.data.table setnames
 #' @importFrom origami make_folds cross_validate
 #' @importFrom sl3 Lrnr_glm_fast
@@ -67,10 +73,19 @@ medshift <- function(W,
                        "onestep", "substitution",
                        "reweighted"
                      ),
+                     shift_type = c("additive", "odds"),
                      estimator_args = list(cv_folds = 10)) {
   # set defaults
   estimator <- match.arg(estimator)
   estimator_args <- unlist(estimator_args, recursive = FALSE)
+
+  # check whether type of shift is appropriate for intervention node
+  if (shift_type == "odds") {
+    assertthat::assert_that(length(unique(A)) == 2)
+    message("Intervention: incremental propensity score shift for binary A")
+  } else {
+    message("Intervention: additive modified treatment policy for continuous A")
+  }
 
   # construct input data structure
   data <- data.table::as.data.table(cbind(Y, Z, A, W))
@@ -110,6 +125,6 @@ medshift <- function(W,
   }
 
   # lazily create output as S3 class
-  class(est_out) <- "medshiftx"
+  class(est_out) <- "medshift"
   return(est_out)
 }

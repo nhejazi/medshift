@@ -30,7 +30,8 @@ utils::globalVariables(c("A", ".N", "..w_names"))
 #' @importFrom sl3 sl3_Task
 #
 fit_g_mech <- function(data, valid_data = NULL,
-                       delta, lrnr_stack, w_names) {
+                       delta, lrnr_stack, w_names,
+                       type = c()) {
   #  construct task for propensity score fit
   g_task <- sl3::sl3_Task$new(
     data = data,

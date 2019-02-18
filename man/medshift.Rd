@@ -9,7 +9,8 @@ medshift(W, A, Z, Y, delta, g_lrnrs = sl3::Lrnr_glm_fast$new(family =
   stats::binomial()), e_lrnrs = sl3::Lrnr_glm_fast$new(family =
   stats::binomial()), m_lrnrs = sl3::Lrnr_glm_fast$new(),
   phi_lrnrs = sl3::Lrnr_glm_fast$new(), estimator = c("onestep",
-  "substitution", "reweighted"), estimator_args = list(cv_folds = 10))
+  "substitution", "reweighted"), shift_type = c("additive", "odds"),
+  estimator_args = list(cv_folds = 10))
 }
 \arguments{
 \item{W}{A \code{matrix}, \code{data.frame}, or similar corresponding to a
@@ -57,6 +58,12 @@ computed. Currently, choices are limited to a substitution estimator, a
 re-weighted estimator, and an efficient one-step estimator. The interested
 user should consider consulting Díaz & Hejazi (2019+) for a comparative
 investigation of each of these estimators.}
+
+\item{shift_type}{A choice of the type of stochastic treatment regime to use
+-- either \code{"additive"} for a modified treatment policy that shifts the
+center of the observed intervention distribution by the scalar \code{delta}
+or \code{"odds"} for an incremental propensity score shift that multiples
+the odds of receiving the intervention by the scalar \code{delta}.}
 
 \item{estimator_args}{A \code{list} of extra arguments to be passed (via
 \code{...}) to the function call for the specified estimator. The default

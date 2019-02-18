@@ -1,6 +1,6 @@
 Package: medshift
 Title: Causal mediation analysis for stochastic interventions
-Version: 0.0.8
+Version: 0.0.9
 Authors@R: c(
     person("Nima", "Hejazi", email = "nh@nimahejazi.org",
            role = c("aut", "cre", "cph"),
@@ -19,13 +19,14 @@ Maintainer: Nima Hejazi <nh@nimahejazi.org>
 Description: Estimators of a parameter arising in the decomposition of the
     population intervention causal effect of stochastic interventions under
     mediation analysis, including one-step augmented inverse probability
-    weighted (AIPW), re-weighting (IPW), and substitution estimators. This
+    weighted (AIPW), re-weighting (IPW), and substitution estimators. The target
     parameter constitutes one of two parts of the population intervention
-    (in)direct effect in the mediation setting with stochastic interventions,
-    thus these estimators may be used in constructing assessing the (in)direct
-    effect under stochastic treatment regimes, including incremental propensity
-    score interventions and standard location shifts of the intervention (Díaz
-    and Hejazi; 2019 (submitted); <https://arxiv.org/abs/1901.02776>).
+    (in)direct effect under stochastic interventions subject to mediation; thus,
+    these estimators may be used in constructing estimates of the (in)direct
+    effect under stochastic treatment regimes. An incremental propensity score
+    intervention is implemented for the case of binary treatments while an
+    additive modified treatment policy is implemented for continuous treatments.
+    See Díaz and Hejazi (2019) <https://arxiv.org/abs/1901.02776> for details.
 Depends: R (>= 3.2.0)
 Imports:
     stats,
