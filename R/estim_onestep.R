@@ -42,6 +42,11 @@ utils::globalVariables(c("..eif_component_names"))
 #'  allows for entropy conditions on the AIPW estimator to be relaxed. Note: for
 #'  compatibility with \code{origami::make_folds}, this value specified here
 #'  must be greater than or equal to 2; the default is to create 10 folds.
+#' @param shift_type A choice of the type of stochastic treatment regime to use
+#'  -- either \code{"additive"} for a modified treatment policy that shifts the
+#'  center of the observed intervention distribution by the scalar \code{delta}
+#'  or \code{"odds"} for an incremental propensity score shift that multiples
+#'  the odds of receiving the intervention by the scalar \code{delta}.
 #'
 #' @importFrom stats var
 #' @importFrom origami make_folds cross_validate folds_vfold
@@ -54,7 +59,8 @@ est_onestep <- function(data,
                         phi_lrnrs,
                         w_names,
                         z_names,
-                        cv_folds = 10) {
+                        cv_folds = 10,
+                        shift_type) {
   # use origami to perform CV-SL, fitting/evaluating EIF components per fold
   eif_component_names <- c("Dy", "Da", "Dzw")
 
@@ -70,6 +76,7 @@ est_onestep <- function(data,
     folds = folds,
     data = data,
     delta = delta,
+    shift_type = shift_type,
     lrnr_stack_g = g_lrnrs,
     lrnr_stack_e = e_lrnrs,
     lrnr_stack_m = m_lrnrs,

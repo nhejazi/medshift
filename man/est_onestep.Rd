@@ -5,7 +5,7 @@
 \title{Estimating equation one-step (efficient) estimator}
 \usage{
 est_onestep(data, delta, g_lrnrs, e_lrnrs, m_lrnrs, phi_lrnrs, w_names,
-  z_names, cv_folds = 10)
+  z_names, cv_folds = 10, shift_type)
 }
 \arguments{
 \item{data}{A \code{data.table} containing the observed data, with columns
@@ -56,6 +56,12 @@ to be created for cross-validation. Use of cross-validation / cross-fitting
 allows for entropy conditions on the AIPW estimator to be relaxed. Note: for
 compatibility with \code{origami::make_folds}, this value specified here
 must be greater than or equal to 2; the default is to create 10 folds.}
+
+\item{shift_type}{A choice of the type of stochastic treatment regime to use
+-- either \code{"additive"} for a modified treatment policy that shifts the
+center of the observed intervention distribution by the scalar \code{delta}
+or \code{"odds"} for an incremental propensity score shift that multiples
+the odds of receiving the intervention by the scalar \code{delta}.}
 }
 \description{
 Estimating equation one-step (efficient) estimator

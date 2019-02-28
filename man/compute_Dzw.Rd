@@ -4,7 +4,7 @@
 \alias{compute_Dzw}
 \title{Get Dzw component of efficient influence function from nuisance parameters}
 \usage{
-compute_Dzw(g_output, m_output)
+compute_Dzw(g_output, m_output, shift_type = c("additive", "odds"))
 }
 \arguments{
 \item{g_output}{Object containing results from fitting the propensity score
@@ -12,6 +12,12 @@ regression, as produced by a call to \code{fit_g_mech}.}
 
 \item{m_output}{Object containing results from fitting the outcome
 regression, as produced by a call to \code{fit_m_mech}.}
+
+\item{shift_type}{A choice of the type of stochastic treatment regime to use
+-- either \code{"additive"} for a modified treatment policy that shifts the
+center of the observed intervention distribution by the scalar \code{delta}
+or \code{"odds"} for an incremental propensity score shift that multiples
+the odds of receiving the intervention by the scalar \code{delta}.}
 }
 \description{
 Get Dzw component of efficient influence function from nuisance parameters

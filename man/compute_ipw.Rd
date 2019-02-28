@@ -4,7 +4,8 @@
 \alias{compute_ipw}
 \title{Get inverse probability weighted (IPW) estimate from nuisance parameters}
 \usage{
-compute_ipw(g_output, e_output, idx_treat, idx_cntrl)
+compute_ipw(g_output, e_output, idx_treat, idx_cntrl,
+  shift_type = c("additive", "odds"))
 }
 \arguments{
 \item{g_output}{Object containing results from fitting the propensity score
@@ -19,6 +20,12 @@ to units that received treatment (A = 1), for a binary intervention.}
 
 \item{idx_cntrl}{A \code{numeric} vector providing the indices corresponding
 to units that did not receive treatment (A = 0), for a binary intervention.}
+
+\item{shift_type}{A choice of the type of stochastic treatment regime to use
+-- either \code{"additive"} for a modified treatment policy that shifts the
+center of the observed intervention distribution by the scalar \code{delta}
+or \code{"odds"} for an incremental propensity score shift that multiples
+the odds of receiving the intervention by the scalar \code{delta}.}
 }
 \description{
 Get inverse probability weighted (IPW) estimate from nuisance parameters
