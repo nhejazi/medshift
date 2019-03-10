@@ -8,8 +8,8 @@ with stochastic interventions}
 medshift(W, A, Z, Y, delta, g_lrnrs = sl3::Lrnr_glm_fast$new(family =
   stats::binomial()), e_lrnrs = sl3::Lrnr_glm_fast$new(family =
   stats::binomial()), m_lrnrs = sl3::Lrnr_glm_fast$new(),
-  phi_lrnrs = sl3::Lrnr_glm_fast$new(), shift_type = c("additive",
-  "odds"), estimator = c("onestep", "substitution", "reweighted"),
+  phi_lrnrs = sl3::Lrnr_glm_fast$new(), shift_type = c("odds",
+  "additive"), estimator = c("onestep", "substitution", "reweighted"),
   estimator_args = list(cv_folds = 10))
 }
 \arguments{

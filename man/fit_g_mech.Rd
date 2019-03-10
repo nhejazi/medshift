@@ -5,7 +5,7 @@
 \title{Fit propensity score with incremental stochastic shift intervention}
 \usage{
 fit_g_mech(data, valid_data = NULL, delta, lrnr_stack, w_names,
-  shift_type = c("additive", "odds"))
+  shift_type = c("odds", "additive"))
 }
 \arguments{
 \item{data}{A \code{data.table} containing the observed data, with columns

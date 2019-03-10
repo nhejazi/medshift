@@ -8,7 +8,7 @@ scale_to_original(scaled_vals, max_orig, min_orig)
 }
 \arguments{
 \item{scaled_vals}{A \code{numeric} vector of values scaled to lie in the
-interval [0, 1] by use of \code{\link{scale_to_unary}}.}
+interval [0, 1] by use of \code{\link{scale_to_unit}}.}
 
 \item{max_orig}{The maximum of the values on the original scale.}
 

@@ -37,7 +37,10 @@ utils::globalVariables(c("A", ".N", "..w_names"))
 #
 fit_g_mech <- function(data, valid_data = NULL,
                        delta, lrnr_stack, w_names,
-                       shift_type = c("additive", "odds")) {
+                       shift_type = c("odds", "additive")) {
+  # set arguments preferentially
+  shift_type <- match.arg(shift_type)
+
   # construct task for propensity score fit
   g_task <- sl3::sl3_Task$new(
     data = data,
@@ -139,7 +142,10 @@ fit_g_mech <- function(data, valid_data = NULL,
 #
 fit_e_mech <- function(data, valid_data = NULL,
                        lrnr_stack, z_names, w_names,
-                       shift_type = c("additive", "odds")) {
+                       shift_type = c("odds", "additive")) {
+  # set arguments preferentially
+  shift_type <- match.arg(shift_type)
+
   # construct task for nuisance parameter fit
   e_task <- sl3::sl3_Task$new(
     data = data,
@@ -230,7 +236,10 @@ fit_e_mech <- function(data, valid_data = NULL,
 #
 fit_m_mech <- function(data, valid_data = NULL,
                        lrnr_stack, z_names, w_names,
-                       shift_type = c("additive", "odds")) {
+                       shift_type = c("odds", "additive")) {
+  # set arguments preferentially
+  shift_type <- match.arg(shift_type)
+
   #  construct task for propensity score fit
   m_task <- sl3::sl3_Task$new(
     data = data,

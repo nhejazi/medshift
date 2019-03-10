@@ -5,7 +5,7 @@
 \title{Fit propensity score regression while conditioning on mediators}
 \usage{
 fit_e_mech(data, valid_data = NULL, lrnr_stack, z_names, w_names,
-  shift_type = c("additive", "odds"))
+  shift_type = c("odds", "additive"))
 }
 \arguments{
 \item{data}{A \code{data.table} containing the observed data, with columns

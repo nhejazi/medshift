@@ -69,7 +69,7 @@ medshift <- function(W,
                        sl3::Lrnr_glm_fast$new(family = stats::binomial()),
                      m_lrnrs = sl3::Lrnr_glm_fast$new(),
                      phi_lrnrs = sl3::Lrnr_glm_fast$new(),
-                     shift_type = c("additive", "odds"),
+                     shift_type = c("odds", "additive"),
                      estimator = c(
                        "onestep", "substitution",
                        "reweighted"
@@ -77,14 +77,15 @@ medshift <- function(W,
                      estimator_args = list(cv_folds = 10)) {
   # set defaults
   estimator <- match.arg(estimator)
+  shift_type <- match.arg(shift_type)
   estimator_args <- unlist(estimator_args, recursive = FALSE)
 
   # check whether type of shift is appropriate for intervention node
   if (shift_type == "odds") {
     assertthat::assert_that(length(unique(A)) == 2)
-    message("Intervention: incremental propensity score shift for binary A")
+    message("Intervention on binary A: incremental propensity score shift")
   } else {
-    message("Intervention: additive modified treatment policy for continuous A")
+    message("Intervention on continuous A: additive modified treatment policy")
   }
 
   # construct input data structure

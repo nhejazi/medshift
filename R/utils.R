@@ -155,14 +155,14 @@ bound_propensity <- function(vals, bounds = c(0.01, 0.99)) {
 
 ################################################################################
 
-#' Scale Values to the Unary Interval [0, 1]
+#' Scale Values to the Unit Interval [0, 1]
 #'
 #' @param vals A \code{numeric} vector of values to be scaled into the interval
 #'  [0, 1].
 #'
 #' @keywords internal
 #
-scale_to_unary <- function(vals) {
+scale_to_unit <- function(vals) {
   vals_scaled <- (vals - min(vals)) / (max(vals) - min(vals))
   return(vals_scaled)
 }
@@ -172,7 +172,7 @@ scale_to_unary <- function(vals) {
 #' Scale Values to the Original Scale
 #'
 #' @param scaled_vals A \code{numeric} vector of values scaled to lie in the
-#'  interval [0, 1] by use of \code{\link{scale_to_unary}}.
+#'  interval [0, 1] by use of \code{\link{scale_to_unit}}.
 #' @param max_orig The maximum of the values on the original scale.
 #' @param min_orig The minimum of the values on the original scale.
 #'
