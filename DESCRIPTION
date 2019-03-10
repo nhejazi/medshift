@@ -30,24 +30,24 @@ Description: Estimators of a parameter arising in the decomposition of the
 Depends: R (>= 3.2.0)
 Imports:
     stats,
-    methods,
     data.table,
     assertthat,
-    dplyr,
-    stringr,
     origami,
-    sl3,
-    simcausal,
-    condensier
+    sl3
 Suggests:
     testthat,
     knitr,
     rmarkdown,
     Rsolnp,
     nnls,
+    dplyr,
+    methods,
+    stringr,
     hal9001,
     xgboost,
-    mma
+    mma,
+    simcausal,
+    condensier
 Remotes:
     github::osofr/simcausal@master,
     github::osofr/condensier@master,
