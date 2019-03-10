@@ -33,9 +33,9 @@
 #'  useful for computing the efficient one-step estimator, i.e., phi(W) =
 #'  E[m(A = 1, Z, W) - m(A = 0, Z, W) | W).
 #' @param shift_type A choice of the type of stochastic treatment regime to use
-#'  -- either \code{"additive"} for a modified treatment policy that shifts the
+#'  -- either \code{"mtp"} for a modified treatment policy that shifts the
 #'  center of the observed intervention distribution by the scalar \code{delta}
-#'  or \code{"odds"} for an incremental propensity score shift that multiples
+#'  or \code{"ipsi"} for an incremental propensity score shift that multiples
 #'  the odds of receiving the intervention by the scalar \code{delta}.
 #' @param estimator The desired estimator of the natural direct effect to be
 #'  computed. Currently, choices are limited to a substitution estimator, a
@@ -69,9 +69,10 @@ medshift <- function(W,
                        sl3::Lrnr_glm_fast$new(family = stats::binomial()),
                      m_lrnrs = sl3::Lrnr_glm_fast$new(),
                      phi_lrnrs = sl3::Lrnr_glm_fast$new(),
-                     shift_type = c("odds", "additive"),
+                     shift_type = c("ipsi", "mtp"),
                      estimator = c(
-                       "onestep", "substitution",
+                       "onestep",
+                       "substitution",
                        "reweighted"
                      ),
                      estimator_args = list(cv_folds = 10)) {
@@ -81,7 +82,7 @@ medshift <- function(W,
   estimator_args <- unlist(estimator_args, recursive = FALSE)
 
   # check whether type of shift is appropriate for intervention node
-  if (shift_type == "odds") {
+  if (shift_type == "ipsi") {
     assertthat::assert_that(length(unique(A)) == 2)
     message("Intervention on binary A: incremental propensity score shift")
   } else {
