@@ -30,7 +30,6 @@ environment:
 build_script:
   - travis-tool.sh install_deps
   - travis-tool.sh install_github r-lib/covr
-  - travis-tool.sh install_github r-lib/devtools
   - travis-tool.sh install_github r-lib/sessioninfo
   - travis-tool.sh install_github Rdatatable/data.table
   - travis-tool.sh install_github osofr/simcausal
@@ -77,5 +76,3 @@ notifications:
    message: "https://ci.appveyor.com/project/nhejazi/medshift"
    on_build_success: true
    on_build_failure: true
-   on_build_status_changed: true
-
