@@ -9,7 +9,7 @@ medshift(W, A, Z, Y, delta, g_lrnrs = sl3::Lrnr_glm_fast$new(family =
   stats::binomial()), e_lrnrs = sl3::Lrnr_glm_fast$new(family =
   stats::binomial()), m_lrnrs = sl3::Lrnr_glm_fast$new(),
   phi_lrnrs = sl3::Lrnr_glm_fast$new(), shift_type = c("ipsi", "mtp"),
-  estimator = c("onestep", "substitution", "reweighted"),
+  estimator = c("onestep", "tmle", "substitution", "reweighted"),
   estimator_args = list(cv_folds = 10))
 }
 \arguments{

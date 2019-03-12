@@ -72,6 +72,7 @@ medshift <- function(W,
                      shift_type = c("ipsi", "mtp"),
                      estimator = c(
                        "onestep",
+                       "tmle",
                        "substitution",
                        "reweighted"
                      ),
@@ -124,9 +125,12 @@ medshift <- function(W,
       z_names = z_names, shift_type = shift_type, estimator_args
     )
     est_out <- do.call(est_onestep, aipw_est_args)
+  } else if (estimator == "tmle") {
+    # TARGETED MAXIMUM LIKELIHOOD ESTIMATOR (just call tmle3::fit_tmle?)
+    message("The TML estimator is currently under development.")
   }
 
-  # lazily create output as S3 class
+  # lazily create output as classed list
   class(est_out) <- "medshift"
   return(est_out)
 }
