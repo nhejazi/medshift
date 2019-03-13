@@ -25,7 +25,7 @@ confint.medshift <- function(object,
                               ...) {
   # inference is currently limited to the one-step efficient estimator
   # TODO: allow use for TML estimators once impelemented
-  assertthat::assert_that(object$type == "one-step efficient")
+  assertthat::assert_that(object$type == "onestep")
 
   # first, let's get Z_(1 - alpha)
   ci_norm_bounds <- c(-1, 1) * abs(stats::qnorm(p = (1 - level) / 2))
@@ -66,16 +66,15 @@ summary.medshift <- function(object,
                               ...,
                               ci_level = 0.95) {
   # inference is currently limited to the one-step efficient estimator
-  # TODO: allow use for TML estimators once impelemented
-  if (object$type == "one-step efficient") {
+  if (object$type %in% c("onestep", "tmle")) {
     # compute confidence interval using the pre-defined method
     ci <- stats::confint(object, level = ci_level)
 
     # only print useful info about the mean of the efficient influence function
-    eif_mean <- format(mean(object$eif), scientific = TRUE)
+    eif_mean <- formatC(mean(object$eif), digits = 4, format = "e")
 
     # create output table from input object and confidence interval results
-    out <- c(round(c(ci, object$var), digits = 6), eif_mean, object$type)
+    out <- c(round(c(ci, object$var), digits = 4), eif_mean, object$type)
     names(out) <- c(
       "lwr_ci", "param_est", "upr_ci", "param_var", "eif_mean", "estimator"
     )

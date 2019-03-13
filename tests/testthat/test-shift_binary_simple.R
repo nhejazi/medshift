@@ -88,22 +88,22 @@ theta_sub <- medshift(
   e_lrnrs = hal_binary_lrnr,
   m_lrnrs = hal_contin_lrnr,
   phi_lrnrs = hal_contin_lrnr,
-  estimator = "substitution"
+  estimator = "sub"
 )
 theta_sub
 
-theta_re <- medshift(
+theta_ipw <- medshift(
   W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
   delta = delta,
   g_lrnrs = hal_binary_lrnr,
   e_lrnrs = hal_binary_lrnr,
   m_lrnrs = hal_contin_lrnr,
   phi_lrnrs = hal_contin_lrnr,
-  estimator = "reweighted"
+  estimator = "ipw"
 )
-theta_re
+theta_ipw
 
-theta_eff <- medshift(
+theta_aipw <- medshift(
   W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
   delta = delta,
   g_lrnrs = hal_binary_lrnr,
@@ -112,16 +112,16 @@ theta_eff <- medshift(
   phi_lrnrs = hal_contin_lrnr,
   estimator = "onestep",
 )
-theta_eff
+theta_aipw
 
-test_that("Substitution and re-weighted estimator agree", {
-  expect_equal(theta_sub$theta, theta_re$theta, tol = 1e-2)
+test_that("Substitution and IPW estimator agree", {
+  expect_equal(theta_sub$theta, theta_ipw$theta, tol = 1e-2)
 })
 
-test_that("Substitution and efficient one-step estimator agree", {
-  expect_equal(theta_sub$theta, theta_eff$theta, tol = 1e-2)
+test_that("Substitution and one-step estimator agree", {
+  expect_equal(theta_sub$theta, theta_aipw$theta, tol = 1e-2)
 })
 
-test_that("Re-weighted and efficient one-step estimator agree", {
-  expect_equal(theta_re$theta, theta_eff$theta, tol = 1e-2)
+test_that("IPW and efficient one-step estimator agree", {
+  expect_equal(theta_ipw$theta, theta_aipw$theta, tol = 1e-2)
 })

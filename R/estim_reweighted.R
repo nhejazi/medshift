@@ -75,6 +75,6 @@ est_ipw <- function(data,
   }
 
   # output
-  estim_ipw_out <- list(theta = estim_ipw, type = "re-weighted (IPW)")
+  estim_ipw_out <- list(theta = estim_ipw, type = "ipw")
   return(estim_ipw_out)
 }

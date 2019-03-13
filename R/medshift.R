@@ -73,8 +73,8 @@ medshift <- function(W,
                      estimator = c(
                        "onestep",
                        "tmle",
-                       "substitution",
-                       "reweighted"
+                       "sub",
+                       "ipw"
                      ),
                      estimator_args = list(cv_folds = 10)) {
   # set defaults
@@ -100,7 +100,7 @@ medshift <- function(W,
   )
   data.table::setnames(data, c("Y", z_names, "A", w_names))
 
-  if (estimator == "substitution") {
+  if (estimator == "sub") {
     # SUBSTITUTION ESTIMATOR
     sub_est_args <- list(
       data = data, delta = delta, g_lrnrs = g_lrnrs,
@@ -108,7 +108,7 @@ medshift <- function(W,
       shift_type = shift_type, estimator_args
     )
     est_out <- do.call(est_substitution, sub_est_args)
-  } else if (estimator == "reweighted") {
+  } else if (estimator == "ipw") {
     # INVERSE PROBABILITY RE-WEIGHTED ESTIMATOR
     ipw_est_args <- list(
       data = data, delta = delta, g_lrnrs = g_lrnrs,

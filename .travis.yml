@@ -22,7 +22,7 @@ before_install:
 
 r_packages:
   - devtools
-  -sessioninfo
+  - sessioninfo
   - covr
   - data.table
 

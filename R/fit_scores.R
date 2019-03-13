@@ -18,23 +18,30 @@ utils::globalVariables(c("..w_names"))
 compute_Dzw <- function(g_output,
                         m_output,
                         shift_type = c("ipsi", "mtp")) {
-  # get g components from output for that nuisance parameter
-  g_shifted_A1 <- g_output$g_est$g_pred_shifted_A1
-  g_shifted_A0 <- g_output$g_est$g_pred_shifted_A0
+  # set IPSI shift as default for now...
+  shift_type <- match.arg(shift_type)
 
-  # get m components from output for that nuisance parameter
-  m_pred_A1 <- m_output$m_pred$m_pred_A1
-  m_pred_A0 <- m_output$m_pred$m_pred_A0
+  if (shift_type == "ipsi") {
+    # get g components from output for that nuisance parameter
+    g_shifted_A1 <- g_output$g_est$g_pred_shifted_A1
+    g_shifted_A0 <- g_output$g_est$g_pred_shifted_A0
 
-  # compute component Dzw from nuisance parameters
-  Dzw_A1 <- g_shifted_A1 * m_pred_A1
-  Dzw_A0 <- g_shifted_A0 * m_pred_A0
+    # get m components from output for that nuisance parameter
+    m_pred_A1 <- m_output$m_pred$m_pred_A1
+    m_pred_A0 <- m_output$m_pred$m_pred_A0
 
-  # output as simple list
-  return(list(
-    dzw_cntrl = Dzw_A0,
-    dzw_treat = Dzw_A1
-  ))
+    # compute component Dzw from nuisance parameters
+    Dzw_A1 <- g_shifted_A1 * m_pred_A1
+    Dzw_A0 <- g_shifted_A0 * m_pred_A0
+
+    # output as simple list
+    return(list(
+      dzw_cntrl = Dzw_A0,
+      dzw_treat = Dzw_A1
+    ))
+  } else if (shift_type == "mtp") {
+    #...
+  }
 }
 
 ################################################################################
@@ -63,35 +70,42 @@ compute_ipw <- function(g_output,
                         idx_treat,
                         idx_cntrl,
                         shift_type = c("ipsi", "mtp")) {
-  # compute components for A = 0 based on symmetry with A = 1 case
-  g_shifted_A1 <- g_output$g_est$g_pred_shifted_A1
-  g_shifted_A0 <- g_output$g_est$g_pred_shifted_A0
-  e_pred_A1 <- e_output$e_est$e_pred_A1
-  e_pred_A0 <- e_output$e_est$e_pred_A0
+  # set IPSI shift as default for now...
+  shift_type <- match.arg(shift_type)
 
-  # subset computed components based on observed treatment status for g
-  g_shifted_obs <- rep(NA, length(idx_treat) + length(idx_cntrl))
-  g_shifted_A1_obs <- g_shifted_A1[idx_treat]
-  g_shifted_A0_obs <- g_shifted_A0[idx_cntrl]
-  g_shifted_obs[idx_treat] <- g_shifted_A1_obs
-  g_shifted_obs[idx_cntrl] <- g_shifted_A0_obs
+  if (shift_type == "ipsi") {
+    # compute components for A = 0 based on symmetry with A = 1 case
+    g_shifted_A1 <- g_output$g_est$g_pred_shifted_A1
+    g_shifted_A0 <- g_output$g_est$g_pred_shifted_A0
+    e_pred_A1 <- e_output$e_est$e_pred_A1
+    e_pred_A0 <- e_output$e_est$e_pred_A0
 
-  # subset computed components based on observed treatment status for e
-  e_pred_obs <- rep(NA, length(idx_treat) + length(idx_cntrl))
-  e_pred_A1_obs <- e_pred_A1[idx_treat]
-  e_pred_A0_obs <- e_pred_A0[idx_cntrl]
-  e_pred_obs[idx_treat] <- e_pred_A1_obs
-  e_pred_obs[idx_cntrl] <- e_pred_A0_obs
+    # subset computed components based on observed treatment status for g
+    g_shifted_obs <- rep(NA, length(idx_treat) + length(idx_cntrl))
+    g_shifted_A1_obs <- g_shifted_A1[idx_treat]
+    g_shifted_A0_obs <- g_shifted_A0[idx_cntrl]
+    g_shifted_obs[idx_treat] <- g_shifted_A1_obs
+    g_shifted_obs[idx_cntrl] <- g_shifted_A0_obs
 
-  # stabilize weights in A-IPW by dividing by sample average since E[g/e] = 1
-  mean_aipw <- mean(g_shifted_obs / e_pred_obs)
+    # subset computed components based on observed treatment status for e
+    e_pred_obs <- rep(NA, length(idx_treat) + length(idx_cntrl))
+    e_pred_A1_obs <- e_pred_A1[idx_treat]
+    e_pred_A0_obs <- e_pred_A0[idx_cntrl]
+    e_pred_obs[idx_treat] <- e_pred_A1_obs
+    e_pred_obs[idx_cntrl] <- e_pred_A0_obs
 
-  # output as simple list
-  return(list(
-    g_shifted = g_shifted_obs,
-    e_pred = e_pred_obs,
-    mean_aipw = mean_aipw
-  ))
+    # stabilize weights in A-IPW by dividing by sample average since E[g/e] = 1
+    mean_aipw <- mean(g_shifted_obs / e_pred_obs)
+
+    # output as simple list
+    return(list(
+      g_shifted = g_shifted_obs,
+      e_pred = e_pred_obs,
+      mean_aipw = mean_aipw
+    ))
+  } else if (shift_type == "mtp") {
+    #...
+  }
 }
 
 ################################################################################
@@ -156,6 +170,9 @@ cv_eif <- function(fold,
                    w_names,
                    z_names,
                    shift_type = c("ipsi", "mtp")) {
+  # set IPSI shift as default for now...
+  shift_type <- match.arg(shift_type)
+
   # make training and validation data
   train_data <- origami::training(data)
   valid_data <- origami::validation(data)
@@ -195,40 +212,41 @@ cv_eif <- function(fold,
     )
   }
 
-  # get indices of treated and control units in validation data
-  idx_A1 <- which(valid_data$A == 1)
-  idx_A0 <- which(valid_data$A == 0)
+  if (shift_type == "ipsi") {
+    # get indices of treated and control units in validation data
+    idx_A1 <- which(valid_data$A == 1)
+    idx_A0 <- which(valid_data$A == 0)
 
+    # compute component Dzw from nuisance parameters
+    Dzw_groupwise <- compute_Dzw(g_output = g_out, m_output = m_out)
+    Dzw <- Dzw_groupwise$dzw_cntrl + Dzw_groupwise$dzw_treat
 
-  # compute component Dzw from nuisance parameters
-  Dzw_groupwise <- compute_Dzw(g_output = g_out, m_output = m_out)
-  Dzw <- Dzw_groupwise$dzw_cntrl + Dzw_groupwise$dzw_treat
+    # compute component Da from nuisance parameters
+    g_pred_A1 <- g_out$g_est$g_pred_A1
+    g_pred_A0 <- g_out$g_est$g_pred_A0
+    Da_numerator <- delta * phi_est * (valid_data$A - g_pred_A1)
+    Da_denominator <- (delta * g_pred_A1 + g_pred_A0)^2
+    Da <- Da_numerator / Da_denominator
 
+    # compute component Dy from nuisance parameters
+    ipw_groupwise <- compute_ipw(
+      g_output = g_out, e_output = e_out,
+      idx_treat = idx_A1, idx_cntrl = idx_A0
+    )
+    m_pred_obs <- rep(NA, nrow(valid_data))
+    m_pred_A1_obs <- m_out$m_pred$m_pred_A1[idx_A1]
+    m_pred_A0_obs <- m_out$m_pred$m_pred_A0[idx_A0]
+    m_pred_obs[idx_A1] <- m_pred_A1_obs
+    m_pred_obs[idx_A0] <- m_pred_A0_obs
+    # stabilize weights in AIPW by dividing by sample average since E[g/e] = 1
+    mean_aipw <- ipw_groupwise$mean_aipw
+    g_shifted <- ipw_groupwise$g_shifted
+    e_pred <- ipw_groupwise$e_pred
+    Dy <- ((g_shifted / e_pred) / mean_aipw) * (valid_data$Y - m_pred_obs)
 
-  # compute component Da from nuisance parameters
-  g_pred_A1 <- g_out$g_est$g_pred_A1
-  g_pred_A0 <- g_out$g_est$g_pred_A0
-  Da_numerator <- delta * phi_est * (valid_data$A - g_pred_A1)
-  Da_denominator <- (delta * g_pred_A1 + g_pred_A0)^2
-  Da <- Da_numerator / Da_denominator
-
-
-  # compute component Dy from nuisance parameters
-  ipw_groupwise <- compute_ipw(
-    g_output = g_out, e_output = e_out,
-    idx_treat = idx_A1, idx_cntrl = idx_A0
-  )
-  m_pred_obs <- rep(NA, nrow(valid_data))
-  m_pred_A1_obs <- m_out$m_pred$m_pred_A1[idx_A1]
-  m_pred_A0_obs <- m_out$m_pred$m_pred_A0[idx_A0]
-  m_pred_obs[idx_A1] <- m_pred_A1_obs
-  m_pred_obs[idx_A0] <- m_pred_A0_obs
-  # stabilize weights in AIPW by dividing by sample average since E[g/e] = 1
-  mean_aipw <- ipw_groupwise$mean_aipw
-  g_shifted <- ipw_groupwise$g_shifted
-  e_pred <- ipw_groupwise$e_pred
-  Dy <- ((g_shifted / e_pred) / mean_aipw) * (valid_data$Y - m_pred_obs)
-
+  } else if (shift_type == "mtp") {
+    #...
+  }
 
   # output list
   out <- list(data.table::data.table(
