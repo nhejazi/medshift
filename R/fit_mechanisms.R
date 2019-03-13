@@ -1,4 +1,4 @@
-utils::globalVariables(c("A", ".N", "..w_names"))
+utils::globalVariables(c("A", ".N", "..w_names", "..phi_conditioning_nodes"))
 
 ################################################################################
 
@@ -110,7 +110,7 @@ fit_g_mech <- function(data,
     g_natural_pred <- g_natural_fit$predict()
 
     # create intervened data by applying modified treatment policy
-    data_intervene[, A := mtp_shift(A = A, delta = delta)]
+    data_intervene[, A := mtp_shift(A = A, W = get(w_names), delta = delta)]
     g_shifted_task <- sl3_Task$new(
       data = data_intervene,
       covariates = w_names,
@@ -162,7 +162,7 @@ fit_g_mech <- function(data,
 #'  or \code{"ipsi"} for an incremental propensity score shift that multiples
 #'  the odds of receiving the intervention by the scalar \code{delta}.
 #'
-#' @importFrom data.table as.data.table
+#' @importFrom data.table as.data.table copy setnames ":="
 #' @importFrom sl3 sl3_Task
 #
 fit_e_mech <- function(data,
@@ -175,22 +175,22 @@ fit_e_mech <- function(data,
   shift_type <- match.arg(shift_type)
 
   # construct task for nuisance parameter fit
-  e_task <- sl3::sl3_Task$new(
+  e_natural_task <- sl3::sl3_Task$new(
     data = data,
     covariates = c(z_names, w_names),
     outcome = "A"
   )
 
   # fit and predict
-  e_natural_fit <- lrnr_stack$train(e_task)
+  e_natural_fit <- lrnr_stack$train(e_natural_task)
 
   # use full data for counterfactual prediction if no validation data provided
   if (is.null(valid_data)) {
     # copy full data
-    data_A1 <- data.table::copy(data)
+    data_intervene <- data.table::copy(data)
   } else {
     # copy only validation data
-    data_A1 <- data.table::copy(valid_data)
+    data_intervene <- data.table::copy(valid_data)
   }
 
   if (shift_type == "ipsi") {
@@ -209,8 +209,8 @@ fit_e_mech <- function(data,
     e_intervened_pred_A0 <- 1 - e_intervened_pred_A1
 
     # bounding to numerical precision and for positivity considerations
-    out_e_mat <- cbind(g_intervened_pred_A1,
-                       g_intervened_pred_A0)
+    out_e_mat <- cbind(e_intervened_pred_A1,
+                       e_intervened_pred_A0)
     out_e_est <- apply(out_e_mat, 2, function(x) {
                          x_precise <- bound_precision(x)
                          x_bounded <- bound_propensity(x_precise)
@@ -270,7 +270,7 @@ fit_e_mech <- function(data,
 #'  or \code{"ipsi"} for an incremental propensity score shift that multiples
 #'  the odds of receiving the intervention by the scalar \code{delta}.
 #'
-#' @importFrom data.table as.data.table
+#' @importFrom data.table as.data.table copy setnames ":="
 #' @importFrom sl3 sl3_Task
 #
 fit_m_mech <- function(data,
@@ -283,55 +283,83 @@ fit_m_mech <- function(data,
   shift_type <- match.arg(shift_type)
 
   #  construct task for propensity score fit
-  m_task <- sl3::sl3_Task$new(
+  m_natural_task <- sl3::sl3_Task$new(
     data = data,
     covariates = c("A", z_names, w_names),
     outcome = "Y"
   )
 
   # fit and predict
-  m_natural_fit <- lrnr_stack$train(m_task)
-
-  # use full data for counterfactual prediction if no validation data provided
-  if (is.null(valid_data)) {
-    # copy full data
-    data_A1 <- copy(data)
-    data_A0 <- copy(data)
-  } else {
-    # copy only validation data
-    data_A1 <- copy(valid_data)
-    data_A0 <- copy(valid_data)
-  }
+  m_natural_fit <- lrnr_stack$train(m_natural_task)
 
   if (shift_type == "ipsi") {
+    # use full data for counterfactual prediction if no validation data given
+    if (is.null(valid_data)) {
+      # copy full data
+      data_intervene_A1 <- data.table::copy(data)
+      data_intervene_A0 <- data.table::copy(data)
+    } else {
+      # copy only validation data
+      data_intervene_A1 <- data.table::copy(valid_data)
+      data_intervene_A0 <- data.table::copy(valid_data)
+    }
+
     # copy data and set intervention A = 1
-    data_A1[, A := rep(1, .N)]
-    m_task_A1 <- sl3::sl3_Task$new(
-      data = data_A1,
+    data_intervene_A1[, A := rep(1, .N)]
+    m_intervened_A1_task <- sl3::sl3_Task$new(
+      data = data_intervene_A1,
       covariates = c("A", z_names, w_names),
       outcome = "Y"
     )
-    m_pred_A1 <- m_fit_stack$predict(m_task_A1)
+    m_intervened_pred_A1 <- m_natural_fit$predict(m_intervened_A1_task)
 
     # copy data and set intervention A = 0
-    data_A0[, A := rep(0, .N)]
-    m_task_A0 <- sl3::sl3_Task$new(
-      data = data_A0,
+    data_intervene_A0[, A := rep(0, .N)]
+    m_intervened_A0_task <- sl3::sl3_Task$new(
+      data = data_intervene_A0,
       covariates = c("A", z_names, w_names),
       outcome = "Y"
     )
-    m_pred_A0 <- m_fit_stack$predict(m_task_A0)
+    m_intervened_pred_A0 <- m_natural_fit$predict(m_intervened_A0_task)
 
     # output
+    out_m_est <- data.table::as.data.table(cbind(m_intervened_pred_A1,
+                                                 m_intervened_pred_A0))
+    data.table::setnames(out_m_est, c("m_pred_A1", "m_pred_A0"))
     out <- list(
-      m_pred = data.table::data.table(cbind(
-        m_pred_A1 = m_pred_A1,
-        m_pred_A0 = m_pred_A0
-      )),
-      m_fit_sl = m_fit_stack
+      m_pred = out_m_est,
+      m_fit_sl = m_natural_fit
     )
   } else if (shift_type == "mtp") {
-    message("Additive modified treatment policies are not yet implemented.")
+    # use full data for counterfactual prediction if no validation data given
+    if (is.null(valid_data)) {
+      # copy full data
+      data_intervene <- data.table::copy(data)
+    } else {
+      # copy only validation data
+      data_intervene <- data.table::copy(valid_data)
+    }
+
+    # get predictions from natural outcome regression model for observed data
+    m_natural_pred <- m_natural_fit$predict()
+
+    # create intervened data by applying modified treatment policy
+    data_intervene[, A := mtp_shift(A = A, delta = delta)]
+    m_intervened_task <- sl3::sl3_Task$new(
+      data = data_intervene,
+      covariates = c("A", z_names, w_names),
+      outcome = "Y"
+    )
+    m_intervened_pred <- m_natural_fit$predict(m_intervened_task)
+
+    # output
+    out_m_est <- data.table::as.data.table(cbind(m_natural_pred,
+                                                 m_intervened_pred))
+    data.table::setnames(out_m_est, c("m_natural", "m_shifted"))
+    out <- list(
+      m_pred = out_m_est,
+      m_fit_sl = m_natural_fit
+    )
   }
   return(out)
 }
@@ -400,6 +428,11 @@ fit_phi_mech_ipsi <- function(data,
 #'  propensity score that includes the mediators, i.e., e = P(A | Z, W).
 #' @param m_output Object containing results from fitting the outcome
 #'  regression, as produced by a call to \code{fit_m_mech}.
+#' @param e_output Object containing results from fitting the propensity score
+#'  regression while conditioning on mediators, as produced by a call to
+#'  \code{fit_e_mech}.
+#' @param g_output Object containing results from fitting the propensity score
+#'  regression, as produced by a call to \code{fit_g_mech}.
 #' @param w_names A \code{character} vector of the names of the columns that
 #'  correspond to baseline covariates (W). The input for this argument is
 #'  automatically generated by a call to the wrapper function \code{medshift}.
@@ -410,6 +443,28 @@ fit_phi_mech_ipsi <- function(data,
 fit_phi_mech_mtp <- function(data,
                              lrnr_stack,
                              m_output,
+                             e_output,
+                             g_output,
                              w_names) {
-  message("Phi mechanism for modified treatment policies not yet implemented")
+  # nuisance paramter phi definition for MTPs
+  m_shifted <- m_output$m_pred$m_shifted
+  e_natural <- e_output$e_est$e_natural
+  g_natural <- g_output$g_est$g_natural
+  phi_outcome <- (g_natural / e_natural) * m_shifted
+
+  # construct data structure for use with task objects
+  phi_conditioning_nodes <- c("A", w_names)
+  phi_data <- data.table::data.table(phi = phi_outcome,
+                                     data[, ..phi_conditioning_nodes])
+  phi_task <- sl3::sl3_Task$new(
+    data = phi_data,
+    covariates = phi_conditioning_nodes,
+    outcome = "phi",
+    outcome_type = "continuous"
+  )
+
+  # fit stack of learners and predict on the same data set
+  phi_fit <- lrnr_stack$train(phi_task)
+  phi_est <- phi_fit$predict()
+  return(phi_est)
 }

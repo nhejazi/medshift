@@ -5,7 +5,7 @@
 \title{Fit intervention-specific nuisance parameter for a continuous modified
 treatment policy}
 \usage{
-fit_phi_mech_mtp(data, lrnr_stack, m_output, w_names)
+fit_phi_mech_mtp(data, lrnr_stack, m_output, e_output, g_output, w_names)
 }
 \arguments{
 \item{data}{A \code{data.table} containing the observed data, with columns
@@ -22,6 +22,13 @@ propensity score that includes the mediators, i.e., e = P(A | Z, W).}
 
 \item{m_output}{Object containing results from fitting the outcome
 regression, as produced by a call to \code{fit_m_mech}.}
+
+\item{e_output}{Object containing results from fitting the propensity score
+regression while conditioning on mediators, as produced by a call to
+\code{fit_e_mech}.}
+
+\item{g_output}{Object containing results from fitting the propensity score
+regression, as produced by a call to \code{fit_g_mech}.}
 
 \item{w_names}{A \code{character} vector of the names of the columns that
 correspond to baseline covariates (W). The input for this argument is

@@ -4,10 +4,12 @@
 \alias{mtp_shift}
 \title{Modified Treatment Policy Shift}
 \usage{
-mtp_shift(A, delta)
+mtp_shift(A, W = NULL, delta)
 }
 \arguments{
 \item{A}{...}
+
+\item{W}{...}
 
 \item{delta}{...}
 }
