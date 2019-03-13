@@ -193,7 +193,7 @@ theta_eff <- medshift(W = W, A = A, Z = Z, Y = Y,
                       m = sl_contin_lrnr,
                       phi = fglm_contin_lrnr,
                       shift_type = "ipsi",
-                      estimator = "substitution",
+                      estimator = "onestep",
                       estimator_args = list(cv_folds = 2))
 summary(theta_eff)
 ```
