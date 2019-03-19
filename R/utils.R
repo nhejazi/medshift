@@ -182,3 +182,40 @@ scale_to_original <- function(scaled_vals, max_orig, min_orig) {
   return(vals_orig)
 }
 
+################################################################################
+
+#' Numerical Integration Over Domain of Treatment Mechanism
+#'
+#' In the case of modified treatment policies, it is necessary to numerically
+#' evaluate an integral over the domain of the treatment mechanism. This is a
+#' simple procedure to numerically compute such an integral based on Monte
+#' Carlo importance sampling from a uniform distribution.
+#'
+#' @param g_mech ...
+#' @param a_vals ...
+#' @param weighting ...
+#' @param int_grid_size A \code{numeric} scalar corresponding to the number of
+#'  points to be used in numerically evaluating an integral over the domain of
+#'  the natural value of the treatment. This is only relevant in the case of
+#'  modified treatment policies for continuous-valued treatments; it is ignored
+#'  in the case of incremental propensity score interventions.
+#'
+#' @keywords internal
+#
+integrate_over_g <- function(g_mech, a_vals, weighting, int_grid_size = 10) {
+  # numerical integration over the domain of A via Monte Carlo
+  min_a_shifted <- min(a_vals)
+  max_a_shifted <- max(a_vals)
+  range_a_shifted <- max_a_shifted - min_a_shifted
+
+  # sample points uniformly distributed over the treatment mechanism
+  int_grid_points <- sample(length(a_vals), int_grid_size)
+  g_mech_grid <- g_mech[int_grid_points]
+
+  # choose same grid of uniformly sampled points for the weighting component
+  weighting_grid <- weighting[int_grid_points]
+
+  # compute weighted combination of terms for numerical integration
+  integ_mc <- mean(range_a_shifted * g_mech_grid * weighting_grid)
+  return(integ_mc)
+}

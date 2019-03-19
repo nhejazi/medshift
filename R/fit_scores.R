@@ -40,7 +40,16 @@ compute_Dzw <- function(g_output,
       dzw_treat = Dzw_A1
     ))
   } else if (shift_type == "mtp") {
-    #...
+    # Monte Carlo integration integral using inverse uniform weighting
+    Dzw_int <- integrate_over_g(g_mech = g_output$g_est$g_pred_shifted,
+                                a_vals = g_output$a_vals$a_shifted,
+                                weighting = m_output$m_pred$m_natural,
+                                int_grid_size = 10)
+
+    # output as simple list
+    return(list(
+      dzw = Dzw_int
+    ))
   }
 }
 

@@ -119,6 +119,10 @@ fit_g_mech <- function(data,
     # get predictions from natural propensity score model for shifted data
     g_shifted_pred <- g_natural_fit$predict(g_shifted_task)
 
+    # get natural and shifted values of A for use in numerical integration
+    out_a_vals <- data.table::as.data.table(cbind(data$A, data_intervene$A))
+    data.table::setnames(out_a_vals, c("a_natural", "a_shifted"))
+
     # construct output
     out_g_est <- data.table::as.data.table(cbind(g_natural_pred,
                                                  g_shifted_pred))
@@ -126,6 +130,7 @@ fit_g_mech <- function(data,
 
     # output
     out <- list(
+      a_vals = out_a_vals,
       g_est = out_g_est,
       g_fit = g_natural_fit
     )

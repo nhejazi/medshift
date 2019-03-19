@@ -41,11 +41,26 @@ est_substitution <- function(data,
                              z_names,
                              shift_type = c("ipsi", "mtp"),
                              ...) {
+  browser()
   # estimate propensity score
-  g_out <- fit_g_mech(
-    data = data, delta = delta,
-    lrnr_stack = g_lrnrs, w_names = w_names, shift_type = shift_type
-  )
+  if (shift_type == "ipsi") {
+    g_out <- fit_g_mech(
+      data = data, delta = delta,
+      lrnr_stack = g_lrnrs, w_names = w_names, shift_type = shift_type
+    )
+  } else if (shift_type == "mtp") {
+    # get max and min of A
+    b <- max(data$A)
+    a <- min(data$A)
+    u <- runif(10)
+    A_grid <- a + (b - a) * u
+
+    g_out <- fit_g_mech(
+      data = data, delta = delta,
+      lrnr_stack = g_lrnrs, w_names = w_names, shift_type = shift_type
+    )
+    #...
+  }
 
   # fit regression for incremental propensity score intervention
   m_out <- fit_m_mech(
