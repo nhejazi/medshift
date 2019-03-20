@@ -4,8 +4,8 @@
 \alias{fit_m_mech}
 \title{Fit outcome regression}
 \usage{
-fit_m_mech(data, valid_data = NULL, lrnr_stack, z_names, w_names,
-  shift_type = c("ipsi", "mtp"))
+fit_m_mech(data, valid_data = NULL, delta = 0, lrnr_stack, z_names,
+  w_names, shift_type = c("ipsi", "mtp"))
 }
 \arguments{
 \item{data}{A \code{data.table} containing the observed data, with columns
@@ -18,6 +18,15 @@ wrapper function \code{medshift}.}
 \item{valid_data}{A holdout data set, with columns exactly matching those
 appearing in the preceding argument \code{data}, to be used for estimation
 via cross-fitting. Optional, defaulting to \code{NULL}.}
+
+\item{delta}{A \code{numeric} value indicating the degree of shift in the
+intervention to be used in defining the causal quantity of interest. In the
+case of binary interventions, this takes the form of an incremental
+propensity score shift, acting as a multiplier of the probability with which
+a given observational unit receives the intervention (EH Kennedy, 2018,
+JASA; <doi:10.1080/01621459.2017.1422737>), while in the case of continuous
+interventions, this is a modified treatment policy that shifts each value of
+the treatment.}
 
 \item{lrnr_stack}{A \code{Stack} object, or other learner class (inheriting
 from \code{Lrnr_base}), containing a single or set of instantiated learners

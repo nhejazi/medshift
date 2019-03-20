@@ -40,11 +40,10 @@ compute_Dzw <- function(g_output,
       dzw_treat = Dzw_A1
     ))
   } else if (shift_type == "mtp") {
-    # Monte Carlo integration integral using inverse uniform weighting
-    Dzw_int <- integrate_over_g(g_mech = g_output$g_est$g_pred_shifted,
+    # approximate Monte Carlo integral using inverse uniform weighting
+    Dzw_int <- integrate_over_g(g_mech = g_output$g_est$g_shifted,
                                 a_vals = g_output$a_vals$a_shifted,
-                                weighting = m_output$m_pred$m_natural,
-                                int_grid_size = 10)
+                                weighting = m_output$m_pred$m_natural)
 
     # output as simple list
     return(list(
@@ -76,14 +75,14 @@ compute_Dzw <- function(g_output,
 #
 compute_ipw <- function(g_output,
                         e_output,
-                        idx_treat,
-                        idx_cntrl,
+                        idx_treat = NULL,
+                        idx_cntrl = NULL,
                         shift_type = c("ipsi", "mtp")) {
   # set IPSI shift as default for now...
   shift_type <- match.arg(shift_type)
 
   if (shift_type == "ipsi") {
-    # compute components for A = 0 based on symmetry with A = 1 case
+    # extract components for A = 0 and A = 1 cases
     g_shifted_A1 <- g_output$g_est$g_pred_shifted_A1
     g_shifted_A0 <- g_output$g_est$g_pred_shifted_A0
     e_pred_A1 <- e_output$e_est$e_pred_A1
@@ -103,17 +102,29 @@ compute_ipw <- function(g_output,
     e_pred_obs[idx_treat] <- e_pred_A1_obs
     e_pred_obs[idx_cntrl] <- e_pred_A0_obs
 
-    # stabilize weights in A-IPW by dividing by sample average since E[g/e] = 1
-    mean_aipw <- mean(g_shifted_obs / e_pred_obs)
+    # stabilize weights by dividing by sample average since E[g/e] = 1
+    mean_ipw <- mean(g_shifted_obs / e_pred_obs)
 
     # output as simple list
     return(list(
       g_shifted = g_shifted_obs,
       e_pred = e_pred_obs,
-      mean_aipw = mean_aipw
+      mean_ipw = mean_ipw
     ))
   } else if (shift_type == "mtp") {
-    #...
+    # extract components of g and e mechanisms based on intervention type
+    g_shifted_pred <- g_output$g_est$g_shifted
+    e_natural_pred <- e_output$e_est$e_natural
+
+    # stabilize weights by dividing by sample average since E[g/e] = 1
+    mean_ipw <- mean(g_shifted_pred / e_natural_pred)
+
+    # output as simple list
+    return(list(
+      g_shifted = g_shifted_pred,
+      e_pred = e_natural_pred,
+      mean_ipw = mean_ipw
+    ))
   }
 }
 
@@ -191,21 +202,24 @@ cv_eif <- function(fold,
   g_out <- fit_g_mech(
     data = train_data, valid_data = valid_data,
     delta = delta,
-    lrnr_stack = lrnr_stack_g, w_names = w_names
+    lrnr_stack = lrnr_stack_g, w_names = w_names,
+    shift_type = shift_type
   )
 
   ## 2) fit clever regression for treatment, conditional on mediators
   e_out <- fit_e_mech(
     data = train_data, valid_data = valid_data,
     lrnr_stack = lrnr_stack_e,
-    z_names = z_names, w_names = w_names
+    z_names = z_names, w_names = w_names,
+    shift_type = shift_type
   )
 
   ## 3) fit regression for incremental propensity score intervention
   m_out <- fit_m_mech(
     data = train_data, valid_data = valid_data,
     lrnr_stack = lrnr_stack_m,
-    z_names = z_names, w_names = w_names
+    z_names = z_names, w_names = w_names,
+    shift_type = shift_type
   )
 
   ## 4) difference-reduced dimension regression for phi
@@ -227,7 +241,8 @@ cv_eif <- function(fold,
     idx_A0 <- which(valid_data$A == 0)
 
     # compute component Dzw from nuisance parameters
-    Dzw_groupwise <- compute_Dzw(g_output = g_out, m_output = m_out)
+    Dzw_groupwise <- compute_Dzw(g_output = g_out, m_output = m_out,
+                                 shift_type = shift_type)
     Dzw <- Dzw_groupwise$dzw_cntrl + Dzw_groupwise$dzw_treat
 
     # compute component Da from nuisance parameters
@@ -240,21 +255,59 @@ cv_eif <- function(fold,
     # compute component Dy from nuisance parameters
     ipw_groupwise <- compute_ipw(
       g_output = g_out, e_output = e_out,
-      idx_treat = idx_A1, idx_cntrl = idx_A0
+      idx_treat = idx_A1, idx_cntrl = idx_A0,
+      shift_type = shift_type
     )
+
+    # stabilize weights in AIPW by dividing by sample average since E[g/e] = 1
+    mean_ipw <- ipw_groupwise$mean_ipw
+    g_shifted <- ipw_groupwise$g_shifted
+    e_pred <- ipw_groupwise$e_pred
+    sipw <- ((g_shifted / e_pred) / mean_ipw)
+
+    # extract outcome component mechanism for estimting Dy
     m_pred_obs <- rep(NA, nrow(valid_data))
     m_pred_A1_obs <- m_out$m_pred$m_pred_A1[idx_A1]
     m_pred_A0_obs <- m_out$m_pred$m_pred_A0[idx_A0]
     m_pred_obs[idx_A1] <- m_pred_A1_obs
     m_pred_obs[idx_A0] <- m_pred_A0_obs
-    # stabilize weights in AIPW by dividing by sample average since E[g/e] = 1
-    mean_aipw <- ipw_groupwise$mean_aipw
-    g_shifted <- ipw_groupwise$g_shifted
-    e_pred <- ipw_groupwise$e_pred
-    Dy <- ((g_shifted / e_pred) / mean_aipw) * (valid_data$Y - m_pred_obs)
+
+    # assemble Dy component estimate
+    Dy <- sipw * (valid_data$Y - m_pred_obs)
 
   } else if (shift_type == "mtp") {
-    #...
+    # compute component Dzw from nuisance parameters
+    Dzw_est <- compute_Dzw(g_output = g_out, m_output = m_out,
+                           shift_type = shift_type)
+    Dzw <- as.numeric(Dzw_est$dzw)
+
+    # compute component Da from nuisance parameters
+    g_natural <- g_out$g_est$g_natural
+    a_natural <- g_out$a_vals$a_natural
+
+    # approximate Monte Carlo integral using inverse uniform weighting
+    Da_int <- integrate_over_g(g_mech = g_natural,
+                               a_vals = a_natural,
+                               weighting = phi_est)
+    Da <- phi_est - Da_int
+
+    # compute component Dy from nuisance parameters
+    ipw_out <- compute_ipw(
+      g_output = g_out, e_output = e_out,
+      shift_type = shift_type
+    )
+
+    # stabilize weights in AIPW by dividing by sample average since E[g/e] = 1
+    mean_ipw <- ipw_out$mean_ipw
+    g_shifted <- ipw_out$g_shifted
+    e_pred <- ipw_out$e_pred
+    sipw <- ((g_shifted / e_pred) / mean_ipw)
+
+    # extract outcome mechanism estimate under natural intervention value
+    m_pred <- m_out$m_pred$m_natural
+
+    # assemble Dy component estimate
+    Dy <- sipw * (valid_data$Y - m_pred)
   }
 
   # output list

@@ -61,18 +61,25 @@ est_ipw <- function(data,
     # compute IPW  estimator components from estimates of nuisance parameters
     ipw_out <- compute_ipw(
       g_output = g_out, e_output = e_out,
-      idx_treat = idx_A1, idx_cntrl = idx_A0
+      idx_treat = idx_A1, idx_cntrl = idx_A0,
+      shift_type = shift_type
     )
-    g_shifted <- ipw_out$g_shifted
-    e_pred <- ipw_out$e_pred
-    mean_aipw <- ipw_out$mean_aipw
-
-    # compute estimator
-    estim_ipw <- mean(((g_shifted / e_pred) / mean_aipw) * data$Y)
 
   } else {
-    message("IPW estimator for continuous MTPs not yet available.")
+    # compute IPW  estimator components from estimates of nuisance parameters
+    ipw_out <- compute_ipw(
+      g_output = g_out, e_output = e_out,
+      shift_type = shift_type
+    )
   }
+
+  # extract components from IPW estimation routine
+  g_shifted <- ipw_out$g_shifted
+  e_pred <- ipw_out$e_pred
+  mean_ipw <- ipw_out$mean_ipw
+
+  # compute estimator
+  estim_ipw <- mean(((g_shifted / e_pred) / mean_ipw) * data$Y)
 
   # output
   estim_ipw_out <- list(theta = estim_ipw, type = "ipw")

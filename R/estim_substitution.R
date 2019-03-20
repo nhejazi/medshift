@@ -41,26 +41,11 @@ est_substitution <- function(data,
                              z_names,
                              shift_type = c("ipsi", "mtp"),
                              ...) {
-  browser()
   # estimate propensity score
-  if (shift_type == "ipsi") {
-    g_out <- fit_g_mech(
-      data = data, delta = delta,
-      lrnr_stack = g_lrnrs, w_names = w_names, shift_type = shift_type
-    )
-  } else if (shift_type == "mtp") {
-    # get max and min of A
-    b <- max(data$A)
-    a <- min(data$A)
-    u <- runif(10)
-    A_grid <- a + (b - a) * u
-
-    g_out <- fit_g_mech(
-      data = data, delta = delta,
-      lrnr_stack = g_lrnrs, w_names = w_names, shift_type = shift_type
-    )
-    #...
-  }
+  g_out <- fit_g_mech(
+    data = data, delta = delta,
+    lrnr_stack = g_lrnrs, w_names = w_names, shift_type = shift_type
+  )
 
   # fit regression for incremental propensity score intervention
   m_out <- fit_m_mech(
@@ -69,10 +54,16 @@ est_substitution <- function(data,
   )
 
   # compute Dzw component of EIF using convenience function
-  Dzw_groupwise <- compute_Dzw(g_output = g_out, m_output = m_out)
+  Dzw_est <- compute_Dzw(g_output = g_out, m_output = m_out,
+                         shift_type = shift_type)
 
-  # compute estimator
-  estim_sub <- mean(Dzw_groupwise$dzw_cntrl) + mean(Dzw_groupwise$dzw_treat)
+  if (shift_type == "ipsi") {
+    # compute estimator
+    estim_sub <- mean(Dzw_est$dzw_cntrl) + mean(Dzw_est$dzw_treat)
+  } else if (shift_type == "mtp") {
+    # compute estimator
+    estim_sub <- as.numeric(Dzw_est$dzw)
+  }
 
   # output
   estim_sub_out <- list(theta = estim_sub, type = "sub")

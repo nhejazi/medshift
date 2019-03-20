@@ -4,7 +4,7 @@
 \alias{compute_ipw}
 \title{Get inverse probability weighted (IPW) estimate from nuisance parameters}
 \usage{
-compute_ipw(g_output, e_output, idx_treat, idx_cntrl,
+compute_ipw(g_output, e_output, idx_treat = NULL, idx_cntrl = NULL,
   shift_type = c("ipsi", "mtp"))
 }
 \arguments{
