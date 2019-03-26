@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{confint.medshift}
 \alias{confint.medshift}
-\title{Confidence Intervals for Stochastic Mediation Parameters}
+\title{Confidence Intervals for Stochastic Mediation Parameter Objects}
 \usage{
 \method{confint}{medshift}(object, parm = seq_len(object$psi),
   level = 0.95, ...)

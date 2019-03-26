@@ -48,6 +48,7 @@ fit_g_mech <- function(data,
   g_natural_task <- sl3::sl3_Task$new(
     data = data,
     covariates = w_names,
+    outcome_type = ifelse(shift_type == "ipsi", "binomial", "continuous"),
     outcome = "A"
   )
 
@@ -69,6 +70,7 @@ fit_g_mech <- function(data,
     g_intervened_task <- sl3_Task$new(
       data = data_intervene,
       covariates = w_names,
+      outcome_type = "binomial",
       outcome = "A"
     )
     # get predictions from natural propensity score model for intervened data
@@ -114,6 +116,7 @@ fit_g_mech <- function(data,
     g_shifted_task <- sl3_Task$new(
       data = data_intervene,
       covariates = w_names,
+      outcome_type = "continuous",
       outcome = "A"
     )
     # get predictions from natural propensity score model for shifted data
@@ -183,6 +186,7 @@ fit_e_mech <- function(data,
   e_natural_task <- sl3::sl3_Task$new(
     data = data,
     covariates = c(z_names, w_names),
+    outcome_type = ifelse(shift_type == "ipsi", "binomial", "continuous"),
     outcome = "A"
   )
 
@@ -204,6 +208,7 @@ fit_e_mech <- function(data,
     e_intervened_task <- sl3_Task$new(
       data = data_intervene,
       covariates = c(z_names, w_names),
+      outcome_type = "binomial",
       outcome = "A"
     )
 

@@ -102,7 +102,7 @@ compute_ipw <- function(g_output,
     e_pred_obs[idx_treat] <- e_pred_A1_obs
     e_pred_obs[idx_cntrl] <- e_pred_A0_obs
 
-    # stabilize weights by dividing by sample average since E[g/e] = 1
+    # Hajek/stabilized weights by dividing by sample average since E[g/e] = 1
     mean_ipw <- mean(g_shifted_obs / e_pred_obs)
 
     # output as simple list
@@ -116,7 +116,7 @@ compute_ipw <- function(g_output,
     g_shifted_pred <- g_output$g_est$g_shifted
     e_natural_pred <- e_output$e_est$e_natural
 
-    # stabilize weights by dividing by sample average since E[g/e] = 1
+    # Hajek/stabilized weights by dividing by sample average since E[g/e] = 1
     mean_ipw <- mean(g_shifted_pred / e_natural_pred)
 
     # output as simple list
@@ -197,8 +197,7 @@ cv_eif <- function(fold,
   train_data <- origami::training(data)
   valid_data <- origami::validation(data)
 
-  # compute nuisance parameters eta = (g, m, e, phi)
-  ## 1) fit regression for incremental propensity score intervention
+  # 1) fit regression for incremental propensity score intervention
   g_out <- fit_g_mech(
     data = train_data, valid_data = valid_data,
     delta = delta,
@@ -206,7 +205,7 @@ cv_eif <- function(fold,
     shift_type = shift_type
   )
 
-  ## 2) fit clever regression for treatment, conditional on mediators
+  # 2) fit clever regression for treatment, conditional on mediators
   e_out <- fit_e_mech(
     data = train_data, valid_data = valid_data,
     lrnr_stack = lrnr_stack_e,
@@ -214,7 +213,7 @@ cv_eif <- function(fold,
     shift_type = shift_type
   )
 
-  ## 3) fit regression for incremental propensity score intervention
+  # 3) fit regression for incremental propensity score intervention
   m_out <- fit_m_mech(
     data = train_data, valid_data = valid_data,
     lrnr_stack = lrnr_stack_m,
@@ -222,7 +221,7 @@ cv_eif <- function(fold,
     shift_type = shift_type
   )
 
-  ## 4) difference-reduced dimension regression for phi
+  # 4) difference-reduced dimension regression for phi
   if (shift_type == "ipsi") {
     phi_est <- fit_phi_mech_ipsi(
       data = valid_data, lrnr_stack = lrnr_stack_phi,
@@ -231,7 +230,8 @@ cv_eif <- function(fold,
   } else if (shift_type == "mtp") {
     phi_est <- fit_phi_mech_mtp(
       data = valid_data, lrnr_stack = lrnr_stack_phi,
-      m_output = m_out, w_names = w_names
+      m_output = m_out, e_output = e_out,
+      g_output = g_out, w_names = w_names
     )
   }
 
@@ -279,17 +279,17 @@ cv_eif <- function(fold,
     # compute component Dzw from nuisance parameters
     Dzw_est <- compute_Dzw(g_output = g_out, m_output = m_out,
                            shift_type = shift_type)
-    Dzw <- as.numeric(Dzw_est$dzw)
+    Dzw <- rep(as.numeric(sum(Dzw_est$dzw)), times = nrow(g_out$g_est))
 
     # compute component Da from nuisance parameters
     g_natural <- g_out$g_est$g_natural
     a_natural <- g_out$a_vals$a_natural
 
     # approximate Monte Carlo integral using inverse uniform weighting
-    Da_int <- integrate_over_g(g_mech = g_natural,
-                               a_vals = a_natural,
-                               weighting = phi_est)
-    Da <- phi_est - Da_int
+    int_Da_phi <- integrate_over_g(g_mech = g_natural,
+                                   a_vals = a_natural,
+                                   weighting = phi_est)
+    Da <- phi_est - sum(int_Da_phi)
 
     # compute component Dy from nuisance parameters
     ipw_out <- compute_ipw(

@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{print.medshift}
 \alias{print.medshift}
-\title{Print Method for Class medshift}
+\title{Print Method for Stochastic Mediation Parameter Objects}
 \usage{
 \method{print}{medshift}(x, ...)
 }

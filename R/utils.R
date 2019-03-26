@@ -1,4 +1,4 @@
-#' Confidence Intervals for Stochastic Mediation Parameters
+#' Confidence Intervals for Stochastic Mediation Parameter Objects
 #'
 #' Compute confidence intervals for objects of class \code{medshift}, which
 #' contain estimates produced by \code{medshift}.
@@ -89,7 +89,7 @@ summary.medshift <- function(object,
 
 ################################################################################
 
-#' Print Method for Class medshift
+#' Print Method for Stochastic Mediation Parameter Objects
 #'
 #' The \code{print} method for objects of class \code{medshift}.
 #'
@@ -184,31 +184,38 @@ scale_to_original <- function(scaled_vals, max_orig, min_orig) {
 
 ################################################################################
 
-#' Numerical Integration Over Domain of Treatment Mechanism
+#' Numerical Integration for Weighted Treatment Mechanism
 #'
 #' In the case of modified treatment policies, it is necessary to numerically
 #' evaluate an integral over the domain of the treatment mechanism. This is a
 #' simple procedure to numerically compute such an integral based on Monte
 #' Carlo importance sampling from a uniform distribution.
 #'
-#' @param g_mech ...
-#' @param a_vals ...
-#' @param weighting ...
-#' @param int_grid_size A \code{numeric} scalar corresponding to the number of
-#'  points to be used in numerically evaluating an integral over the domain of
-#'  the natural value of the treatment. This is only relevant in the case of
-#'  modified treatment policies for continuous-valued treatments; it is ignored
-#'  in the case of incremental propensity score interventions.
+#' @param g_mech The estimated conditional density corresponding to the natural
+#'  or shifted value of the treatment for modified treatment policies based on
+#'  the observed values of the treatment.
+#' @param a_vals The observed values of the treatment used in computing the
+#'  conditional density estimates provided in the argument \code{g_mech}.
+#' @param weighting A \code{numeric} vector of weights corresponding to various
+#'  regression functions estiated based on the observed values of the treatment.
+#'  Such values correspond to a multiplicative weight applied to the estimated
+#'  conditional density.
+#' @param int_grid_prop A \code{numeric} scalar corresponding to the propotion
+#'  of points to be used in numerically evaluating an integral over the domain
+#'  of the natural/shifted conditional density of the treatment. This is only
+#'  relevant in the case of modified treatment policies for continuous-valued
+#'  exposures; it is irrelevant for incremental propensity score interventions.
 #'
 #' @keywords internal
 #
-integrate_over_g <- function(g_mech, a_vals, weighting, int_grid_size = 10) {
+integrate_over_g <- function(g_mech, a_vals, weighting, int_grid_prop = 0.5) {
   # numerical integration over the domain of A via Monte Carlo
   min_a_shifted <- min(a_vals)
   max_a_shifted <- max(a_vals)
   range_a_shifted <- max_a_shifted - min_a_shifted
 
   # sample points uniformly distributed over the treatment mechanism
+  int_grid_size <- round(length(a_vals) * int_grid_prop)
   int_grid_points <- sample(length(a_vals), int_grid_size)
   g_mech_grid <- g_mech[int_grid_points]
 
@@ -216,6 +223,6 @@ integrate_over_g <- function(g_mech, a_vals, weighting, int_grid_size = 10) {
   weighting_grid <- weighting[int_grid_points]
 
   # compute weighted combination of terms for numerical integration
-  integ_mc <- mean(range_a_shifted * g_mech_grid * weighting_grid)
+  integ_mc <- (range_a_shifted / int_grid_size) * g_mech_grid * weighting_grid
   return(integ_mc)
 }

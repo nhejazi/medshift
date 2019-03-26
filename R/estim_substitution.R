@@ -62,7 +62,7 @@ est_substitution <- function(data,
     estim_sub <- mean(Dzw_est$dzw_cntrl) + mean(Dzw_est$dzw_treat)
   } else if (shift_type == "mtp") {
     # compute estimator
-    estim_sub <- as.numeric(Dzw_est$dzw)
+    estim_sub <- as.numeric(sum(Dzw_est$dzw))
   }
 
   # output
