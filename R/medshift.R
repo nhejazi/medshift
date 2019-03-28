@@ -8,6 +8,11 @@
 #' @param Z A \code{numeric} vector, \code{matrix}, \code{data.frame}, or
 #'  similar corresponding to a set of mediators (on the causal pathway between
 #'  the intervention A and the outcome Y).
+#' @param V A \code{numeric} vector corresponding to a mediator-outcome
+#'  confounder affected by treatment (on a causal pathway between intervention
+#'  A, mediator Z, and outcome Y, but unaffected itself by the mediator Z). For
+#'  standard mediation analysis, this node need not exist; accordingly, the
+#'  default value of this argument is set to \code{NULL}.
 #' @param Y A \code{numeric} vector corresponding to an outcome variable.
 #' @param delta A \code{numeric} value indicating the degree of shift in the
 #'  intervention to be used in defining the causal quantity of interest. In the
@@ -61,6 +66,7 @@
 medshift <- function(W,
                      A,
                      Z,
+                     V = NULL,
                      Y,
                      delta,
                      g_lrnrs =
@@ -76,7 +82,7 @@ medshift <- function(W,
                        "sub",
                        "ipw"
                      ),
-                     estimator_args = list(cv_folds = 10)) {
+                     estimator_args = list(cv_folds = 5)) {
   # set defaults
   estimator <- match.arg(estimator)
   shift_type <- match.arg(shift_type)
