@@ -10,7 +10,7 @@ medshift(W, A, Z, Y, delta, g_lrnrs = sl3::Lrnr_glm_fast$new(family =
   stats::binomial()), m_lrnrs = sl3::Lrnr_glm_fast$new(),
   phi_lrnrs = sl3::Lrnr_glm_fast$new(), shift_type = c("ipsi", "mtp"),
   estimator = c("onestep", "tmle", "sub", "ipw"),
-  estimator_args = list(cv_folds = 10))
+  estimator_args = list(cv_folds = 5))
 }
 \arguments{
 \item{W}{A \code{matrix}, \code{data.frame}, or similar corresponding to a

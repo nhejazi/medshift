@@ -191,38 +191,84 @@ scale_to_original <- function(scaled_vals, max_orig, min_orig) {
 #' simple procedure to numerically compute such an integral based on Monte
 #' Carlo importance sampling from a uniform distribution.
 #'
-#' @param g_mech The estimated conditional density corresponding to the natural
+#' @param data A \code{data.table} containing the observed data, with columns
+#'  in the order specified by the NPSEM (Y, Z, A, W), with column names set
+#'  appropriately based on the original input data. Such a structure is merely
+#'  a convenience utility to passing data around to the various core estimation
+#'  routines and is automatically generated as part of a call to the user-facing
+#'  wrapper function \code{\link{medshift}}.
+#' @param delta A \code{numeric} value indicating the degree of shift in the
+#'  intervention to be used in defining the causal quantity of interest. In the
+#'  case of binary interventions, this takes the form of an incremental
+#'  propensity score shift, acting as a multiplier of the probability with which
+#'  a given observational unit receives the intervention (EH Kennedy, 2018,
+#'  JASA; <doi:10.1080/01621459.2017.1422737>). In the case of continuous
+#'  interventions, this is a modified treatment policy that shifts the observed
+#'  treatment by the given value.
+#' @param mc_draws A \code{numeric} vector corresponding to draws from a uniform
+#'  distribution based on the range of the observed treatment mechanism. The
+#'  numerical integral is computed by using this grid as values of intervention
+#'  mechanism.
+#' @param dens_mech Estimated conditional density corresponding to the natural
 #'  or shifted value of the treatment for modified treatment policies based on
-#'  the observed values of the treatment.
-#' @param a_vals The observed values of the treatment used in computing the
-#'  conditional density estimates provided in the argument \code{g_mech}.
-#' @param weighting A \code{numeric} vector of weights corresponding to various
-#'  regression functions estiated based on the observed values of the treatment.
-#'  Such values correspond to a multiplicative weight applied to the estimated
-#'  conditional density.
-#' @param int_grid_prop A \code{numeric} scalar corresponding to the propotion
-#'  of points to be used in numerically evaluating an integral over the domain
-#'  of the natural/shifted conditional density of the treatment. This is only
-#'  relevant in the case of modified treatment policies for continuous-valued
-#'  exposures; it is irrelevant for incremental propensity score interventions.
+#'  the observed values of the treatment. This is an object with inherited class
+#'  \code{Lrnr_base}, automatically produced by \code{\link{fit_g_mech}}.
+#' @param wts_mech Estimated weighting mechanism learned from the observed data
+#'  For the substitution estimator, this is the outcome mechanism, while, for
+#'  the intervention score, this is a nuisance parameter defined by the type
+#'  of shift intervention to be evaluated. This is an object with inherited
+#'  class \code{Lrnr_base}.
+#'
+#' @importFrom data.table setkey setorder
+#' @importFrom stringr str_subset
+#' @importFrom sl3 sl3_Task
 #'
 #' @keywords internal
 #
-integrate_over_g <- function(g_mech, a_vals, weighting, int_grid_prop = 0.5) {
+mc_integrate_dens <- function(data, delta, mc_draws, dens_mech, wts_mech) {
+  # create expanded data set with multiple records for MC draws
+  data[, id := 1:.N]
+  data.table::setkey(data, id)
+  mc_records_data <- data[rep(1:.N, length(mc_draws)), ]
+  data.table::setorder(mc_records_data, id)
+  mc_records_data[, A := rep(mc_draws, nrow(data))]
+
+  # get names of baseline covariates and mediators
+  w_names <- stringr::str_subset(colnames(mc_records_data), "W")
+  z_names <- stringr::str_subset(colnames(mc_records_data), "Z")
+
   # numerical integration over the domain of A via Monte Carlo
-  min_a_shifted <- min(a_vals)
-  max_a_shifted <- max(a_vals)
-  range_a_shifted <- max_a_shifted - min_a_shifted
+  min_mc_scaling <- min(mc_draws)
+  max_mc_scaling <- max(mc_draws)
+  range_mc_scaling <- max_mc_scaling - min_mc_scaling
 
-  # sample points uniformly distributed over the treatment mechanism
-  int_grid_size <- round(length(a_vals) * int_grid_prop)
-  int_grid_points <- sample(length(a_vals), int_grid_size)
-  g_mech_grid <- g_mech[int_grid_points]
+  # make outcome task for Monte Carlo integration (never shifted)
+  m_mc_task <- sl3_Task$new(
+    data = mc_records_data,
+    covariates = c(w_names, "A", z_names),
+    outcome_type = "continuous",
+    outcome = "Y"
+  )
 
-  # choose same grid of uniformly sampled points for the weighting component
-  weighting_grid <- weighting[int_grid_points]
+  # compute Monte Carlo integral by predicting from task on expanded data
+  m_mc_pred <- wts_mech$predict(m_mc_task)
 
-  # compute weighted combination of terms for numerical integration
-  integ_mc <- (range_a_shifted / int_grid_size) * g_mech_grid * weighting_grid
-  return(integ_mc)
+  # estimate shifted intervention distribution with records data
+  mc_records_data[, A := mtp_shift(A = A, delta = delta)]
+  g_mc_task <- sl3_Task$new(
+    data = mc_records_data,
+    covariates = w_names,
+    outcome_type = "continuous",
+    outcome = "A"
+  )
+
+  # get predictions from natural propensity score model for Monte Carlo data
+  g_mc_pred <- dens_mech$predict(g_mc_task)
+
+  # compute weighted combination of terms for numerical integral
+  # NOTE: sum over product of predicted values based on the observation ID,
+  #       then re-scale based on the interval width
+  mc_integ <- as.numeric(by(g_mc_pred * m_mc_pred, mc_records_data$id, sum)) *
+    (range_mc_scaling / length(mc_draws))
+  return(mc_integ)
 }

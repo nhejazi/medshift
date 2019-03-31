@@ -73,58 +73,58 @@ make_simulated_data <- function(n_obs = 1000,  # no. observations
 
 # get data and column names for sl3 tasks (for convenience)
 data <- make_simulated_data()
-z_names <- colnames(data)[str_detect(colnames(data), "Z")]
-w_names <- colnames(data)[str_detect(colnames(data), "W")]
+z_names <- str_subset(colnames(data), "Z")
+w_names <- str_subset(colnames(data), "W")
 
 
 ################################################################################
 # test different estimators
 ################################################################################
-#theta_sub <- medshift(
-  #W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
-  #delta = delta_shift,
-  #g_lrnrs = hal_density_lrnr,
-  #e_lrnrs = hal_density_lrnr,
-  #m_lrnrs = hal_contin_lrnr,
-  #phi_lrnrs = hal_contin_lrnr,
-  #shift_type = "mtp",
-  #estimator = "sub"
-#)
-#theta_sub
+theta_sub <- medshift(
+  W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
+  delta = delta_shift,
+  g_lrnrs = hal_density_lrnr,
+  e_lrnrs = hal_density_lrnr,
+  m_lrnrs = hal_contin_lrnr,
+  phi_lrnrs = hal_contin_lrnr,
+  shift_type = "mtp",
+  estimator = "sub"
+)
+theta_sub
 
-#theta_ipw <- medshift(
-  #W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
-  #delta = delta_shift,
-  #g_lrnrs = hal_density_lrnr,
-  #e_lrnrs = hal_density_lrnr,
-  #m_lrnrs = hal_contin_lrnr,
-  #phi_lrnrs = hal_contin_lrnr,
-  #shift_type = "mtp",
-  #estimator = "ipw"
-#)
-#theta_ipw
+theta_ipw <- medshift(
+  W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
+  delta = delta_shift,
+  g_lrnrs = hal_density_lrnr,
+  e_lrnrs = hal_density_lrnr,
+  m_lrnrs = hal_contin_lrnr,
+  phi_lrnrs = hal_contin_lrnr,
+  shift_type = "mtp",
+  estimator = "ipw"
+)
+theta_ipw
 
-#theta_aipw <- medshift(
-  #W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
-  #delta = delta_shift,
-  #g_lrnrs = hal_density_lrnr,
-  #e_lrnrs = hal_density_lrnr,
-  #m_lrnrs = hal_contin_lrnr,
-  #phi_lrnrs = hal_contin_lrnr,
-  #shift_type = "mtp",
-  #estimator = "onestep",
-  #estimator_args = list(cv_folds = 2)
-#)
-#theta_aipw
+theta_aipw <- medshift(
+  W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
+  delta = delta_shift,
+  g_lrnrs = hal_density_lrnr,
+  e_lrnrs = hal_density_lrnr,
+  m_lrnrs = hal_contin_lrnr,
+  phi_lrnrs = hal_contin_lrnr,
+  shift_type = "mtp",
+  estimator = "onestep",
+  estimator_args = list(cv_folds = 2)
+)
+theta_aipw
 
-#test_that("Substitution and IPW estimator agree", {
-  #expect_equal(theta_sub$theta, theta_ipw$theta, tol = 1e-2)
-#})
+test_that("Substitution and IPW estimator agree", {
+  expect_equal(theta_sub$theta, theta_ipw$theta, tol = 1e-2)
+})
 
-#test_that("Substitution and one-step estimator agree", {
-  #expect_equal(theta_sub$theta, theta_aipw$theta, tol = 1e-2)
-#})
+test_that("Substitution and one-step estimator agree", {
+  expect_equal(theta_sub$theta, theta_aipw$theta, tol = 1e-2)
+})
 
-#test_that("IPW and efficient one-step estimator agree", {
-  #expect_equal(theta_ipw$theta, theta_aipw$theta, tol = 1e-2)
-#})
+test_that("IPW and efficient one-step estimator agree", {
+  expect_equal(theta_ipw$theta, theta_aipw$theta, tol = 1e-2)
+})

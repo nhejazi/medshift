@@ -4,20 +4,39 @@
 \alias{compute_Dzw}
 \title{Get Dzw component of efficient influence function from nuisance parameters}
 \usage{
-compute_Dzw(g_output, m_output, shift_type = c("ipsi", "mtp"))
+compute_Dzw(data, g_output, m_output, delta, shift_type = c("ipsi",
+  "mtp"), mc_int_draws = 20)
 }
 \arguments{
+\item{data}{A \code{data.table} containing the observed data, with columns
+in the order specified by the NPSEM (Y, Z, A, W), with column names set
+appropriately based on the original input data. Such a structure is merely
+a convenience utility to passing data around to the various core estimation
+routines and is automatically generated as part of a call to the user-facing
+wrapper function \code{medshift}.}
+
 \item{g_output}{Object containing results from fitting the propensity score
 regression, as produced by a call to \code{fit_g_mech}.}
 
 \item{m_output}{Object containing results from fitting the outcome
 regression, as produced by a call to \code{fit_m_mech}.}
 
+\item{delta}{A \code{numeric} value indicating the degree of shift in the
+intervention to be used in defining the causal quantity of interest. In the
+case of binary interventions, this takes the form of an incremental
+propensity score shift, acting as a multiplier of the probability with which
+a given observational unit receives the intervention (EH Kennedy, 2018,
+JASA; <doi:10.1080/01621459.2017.1422737>). In the case of continuous
+interventions, this is a modified treatment policy that shifts the observed
+treatment by the given value.}
+
 \item{shift_type}{A choice of the type of stochastic treatment regime to use
 -- either \code{"mtp"} for a modified treatment policy that shifts the
 center of the observed intervention distribution by the scalar \code{delta}
 or \code{"ipsi"} for an incremental propensity score shift that multiples
 the odds of receiving the intervention by the scalar \code{delta}.}
+
+\item{mc_int_draws}{...}
 }
 \description{
 Get Dzw component of efficient influence function from nuisance parameters

@@ -18,7 +18,9 @@ utils::globalVariables(c("A", ".N", "..w_names", "..phi_conditioning_nodes"))
 #'  case of binary interventions, this takes the form of an incremental
 #'  propensity score shift, acting as a multiplier of the probability with which
 #'  a given observational unit receives the intervention (EH Kennedy, 2018,
-#'  JASA; <doi:10.1080/01621459.2017.1422737>).
+#'  JASA; <doi:10.1080/01621459.2017.1422737>). In the case of continuous
+#'  interventions, this is a modified treatment policy that shifts the observed
+#'  treatment by the given value.
 #' @param lrnr_stack A \code{Stack} object, or other learner class (inheriting
 #'  from \code{Lrnr_base}), containing a single or set of instantiated learners
 #'  from the \code{sl3} package, to be used in fitting a model for the
@@ -41,8 +43,6 @@ fit_g_mech <- function(data,
                        lrnr_stack,
                        w_names,
                        shift_type = c("ipsi", "mtp")) {
-  # set argument defaults
-  shift_type <- match.arg(shift_type)
 
   # construct task for propensity score fit
   g_natural_task <- sl3::sl3_Task$new(
@@ -179,8 +179,6 @@ fit_e_mech <- function(data,
                        z_names,
                        w_names,
                        shift_type = c("ipsi", "mtp")) {
-  # set argument defaults
-  shift_type <- match.arg(shift_type)
 
   # construct task for nuisance parameter fit
   e_natural_task <- sl3::sl3_Task$new(
@@ -269,9 +267,9 @@ fit_e_mech <- function(data,
 #'  case of binary interventions, this takes the form of an incremental
 #'  propensity score shift, acting as a multiplier of the probability with which
 #'  a given observational unit receives the intervention (EH Kennedy, 2018,
-#'  JASA; <doi:10.1080/01621459.2017.1422737>), while in the case of continuous
-#'  interventions, this is a modified treatment policy that shifts each value of
-#'  the treatment.
+#'  JASA; <doi:10.1080/01621459.2017.1422737>). In the case of continuous
+#'  interventions, this is a modified treatment policy that shifts the observed
+#'  treatment by the given value.
 #' @param lrnr_stack A \code{Stack} object, or other learner class (inheriting
 #'  from \code{Lrnr_base}), containing a single or set of instantiated learners
 #'  from the \code{sl3} package, to be used in fitting the outcome regression,
@@ -293,13 +291,11 @@ fit_e_mech <- function(data,
 #
 fit_m_mech <- function(data,
                        valid_data = NULL,
-                       delta = 0,
+                       delta,
                        lrnr_stack,
                        z_names,
                        w_names,
                        shift_type = c("ipsi", "mtp")) {
-  # set argument defaults
-  shift_type <- match.arg(shift_type)
 
   #  construct task for propensity score fit
   m_natural_task <- sl3::sl3_Task$new(
@@ -347,7 +343,7 @@ fit_m_mech <- function(data,
     data.table::setnames(out_m_est, c("m_pred_A1", "m_pred_A0"))
     out <- list(
       m_pred = out_m_est,
-      m_fit_sl = m_natural_fit
+      m_fit = m_natural_fit
     )
   } else if (shift_type == "mtp") {
     # use full data for counterfactual prediction if no validation data given
@@ -377,7 +373,7 @@ fit_m_mech <- function(data,
     data.table::setnames(out_m_est, c("m_natural", "m_shifted"))
     out <- list(
       m_pred = out_m_est,
-      m_fit_sl = m_natural_fit
+      m_fit = m_natural_fit
     )
   }
   return(out)
@@ -385,7 +381,7 @@ fit_m_mech <- function(data,
 
 ################################################################################
 
-#' Fit intervention-specific nuisance parameter for a binary exponential tilt
+#' Fit nuisance parameter for incremental propensity score interventions
 #'
 #' @param data A \code{data.table} containing the observed data, with columns
 #'  in the order specified by the NPSEM (Y, Z, A, W), with column names set
@@ -427,13 +423,18 @@ fit_phi_mech_ipsi <- function(data,
   # fit stack of learners and predict on the same data set
   phi_fit <- lrnr_stack$train(phi_task)
   phi_est <- phi_fit$predict()
-  return(phi_est)
+
+  # output
+  phi_out <- list(
+    phi_pred = phi_est,
+    phi_fit = phi_fit
+  )
+  return(phi_out)
 }
 
 ################################################################################
 
-#' Fit intervention-specific nuisance parameter for a continuous modified
-#' treatment policy
+#' Fit nuisance parameter for modified treatment policies
 #'
 #' @param data A \code{data.table} containing the observed data, with columns
 #'  in the order specified by the NPSEM (Y, Z, A, W), with column names set
@@ -485,5 +486,11 @@ fit_phi_mech_mtp <- function(data,
   # fit stack of learners and predict on the same data set
   phi_fit <- lrnr_stack$train(phi_task)
   phi_est <- phi_fit$predict()
-  return(phi_est)
+
+  # output
+  phi_out <- list(
+    phi_pred = phi_est,
+    phi_fit = phi_fit
+  )
+  return(phi_out)
 }

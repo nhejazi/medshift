@@ -3,21 +3,41 @@ utils::globalVariables(c("..w_names"))
 
 #' Get Dzw component of efficient influence function from nuisance parameters
 #'
+#' @param data A \code{data.table} containing the observed data, with columns
+#'  in the order specified by the NPSEM (Y, Z, A, W), with column names set
+#'  appropriately based on the original input data. Such a structure is merely
+#'  a convenience utility to passing data around to the various core estimation
+#'  routines and is automatically generated as part of a call to the user-facing
+#'  wrapper function \code{medshift}.
 #' @param g_output Object containing results from fitting the propensity score
 #'  regression, as produced by a call to \code{fit_g_mech}.
 #' @param m_output Object containing results from fitting the outcome
 #'  regression, as produced by a call to \code{fit_m_mech}.
+#' @param delta A \code{numeric} value indicating the degree of shift in the
+#'  intervention to be used in defining the causal quantity of interest. In the
+#'  case of binary interventions, this takes the form of an incremental
+#'  propensity score shift, acting as a multiplier of the probability with which
+#'  a given observational unit receives the intervention (EH Kennedy, 2018,
+#'  JASA; <doi:10.1080/01621459.2017.1422737>). In the case of continuous
+#'  interventions, this is a modified treatment policy that shifts the observed
+#'  treatment by the given value.
 #' @param shift_type A choice of the type of stochastic treatment regime to use
 #'  -- either \code{"mtp"} for a modified treatment policy that shifts the
 #'  center of the observed intervention distribution by the scalar \code{delta}
 #'  or \code{"ipsi"} for an incremental propensity score shift that multiples
 #'  the odds of receiving the intervention by the scalar \code{delta}.
+#' @param mc_int_draws ...
+#'
+#' @importFrom stats runif
 #'
 #' @keywords internal
 #
-compute_Dzw <- function(g_output,
+compute_Dzw <- function(data,
+                        g_output,
                         m_output,
-                        shift_type = c("ipsi", "mtp")) {
+                        delta,
+                        shift_type = c("ipsi", "mtp"),
+                        mc_int_draws = 20) {
   # set IPSI shift as default for now...
   shift_type <- match.arg(shift_type)
 
@@ -40,14 +60,20 @@ compute_Dzw <- function(g_output,
       dzw_treat = Dzw_A1
     ))
   } else if (shift_type == "mtp") {
+    # compute/extract componenets for Monte Carlo integration
+    a_draws <- stats::runif(n = mc_int_draws, min = min(data$A),
+                            max = max(data$A))
+
     # approximate Monte Carlo integral using inverse uniform weighting
-    Dzw_int <- integrate_over_g(g_mech = g_output$g_est$g_shifted,
-                                a_vals = g_output$a_vals$a_shifted,
-                                weighting = m_output$m_pred$m_natural)
+    Dzw_shifted_int <- mc_integrate_dens(data = data,
+                                         delta = delta,
+                                         mc_draws = a_draws,
+                                         dens_mech = g_output$g_fit,
+                                         wts_mech = m_output$m_fit)
 
     # output as simple list
     return(list(
-      dzw = Dzw_int
+      dzw = Dzw_shifted_int
     ))
   }
 }
@@ -56,6 +82,12 @@ compute_Dzw <- function(g_output,
 
 #' Get inverse probability weighted (IPW) estimate from nuisance parameters
 #'
+#' @param data A \code{data.table} containing the observed data, with columns
+#'  in the order specified by the NPSEM (Y, Z, A, W), with column names set
+#'  appropriately based on the original input data. Such a structure is merely
+#'  a convenience utility to passing data around to the various core estimation
+#'  routines and is automatically generated as part of a call to the user-facing
+#'  wrapper function \code{medshift}.
 #' @param g_output Object containing results from fitting the propensity score
 #'  regression, as produced by a call to \code{fit_g_mech}.
 #' @param e_output Object containing results from fitting the propensity score
@@ -73,7 +105,8 @@ compute_Dzw <- function(g_output,
 #'
 #' @keywords internal
 #
-compute_ipw <- function(g_output,
+compute_ipw <- function(data,
+                        g_output,
                         e_output,
                         idx_treat = NULL,
                         idx_cntrl = NULL,
@@ -194,8 +227,8 @@ cv_eif <- function(fold,
   shift_type <- match.arg(shift_type)
 
   # make training and validation data
-  train_data <- origami::training(data)
-  valid_data <- origami::validation(data)
+  train_data <- origami::training(data, fold)
+  valid_data <- origami::validation(data, fold)
 
   # 1) fit regression for incremental propensity score intervention
   g_out <- fit_g_mech(
@@ -216,6 +249,7 @@ cv_eif <- function(fold,
   # 3) fit regression for incremental propensity score intervention
   m_out <- fit_m_mech(
     data = train_data, valid_data = valid_data,
+    delta = delta,
     lrnr_stack = lrnr_stack_m,
     z_names = z_names, w_names = w_names,
     shift_type = shift_type
@@ -223,12 +257,12 @@ cv_eif <- function(fold,
 
   # 4) difference-reduced dimension regression for phi
   if (shift_type == "ipsi") {
-    phi_est <- fit_phi_mech_ipsi(
+    phi_out <- fit_phi_mech_ipsi(
       data = valid_data, lrnr_stack = lrnr_stack_phi,
       m_output = m_out, w_names = w_names
     )
   } else if (shift_type == "mtp") {
-    phi_est <- fit_phi_mech_mtp(
+    phi_out <- fit_phi_mech_mtp(
       data = valid_data, lrnr_stack = lrnr_stack_phi,
       m_output = m_out, e_output = e_out,
       g_output = g_out, w_names = w_names
@@ -241,15 +275,18 @@ cv_eif <- function(fold,
     idx_A0 <- which(valid_data$A == 0)
 
     # compute component Dzw from nuisance parameters
-    Dzw_groupwise <- compute_Dzw(g_output = g_out, m_output = m_out,
+    Dzw_groupwise <- compute_Dzw(data = valid_data,
+                                 g_output = g_out,
+                                 m_output = m_out,
+                                 delta = delta,
                                  shift_type = shift_type)
     Dzw <- Dzw_groupwise$dzw_cntrl + Dzw_groupwise$dzw_treat
 
     # compute component Da from nuisance parameters
     g_pred_A1 <- g_out$g_est$g_pred_A1
     g_pred_A0 <- g_out$g_est$g_pred_A0
-    Da_numerator <- delta * phi_est * (valid_data$A - g_pred_A1)
-    Da_denominator <- (delta * g_pred_A1 + g_pred_A0)^2
+    Da_numerator <- delta * phi_out$phi_pred * (valid_data$A - g_pred_A1)
+    Da_denominator <- (delta * g_pred_A1 + g_pred_A0) ^ 2
     Da <- Da_numerator / Da_denominator
 
     # compute component Dy from nuisance parameters
@@ -263,7 +300,7 @@ cv_eif <- function(fold,
     mean_ipw <- ipw_groupwise$mean_ipw
     g_shifted <- ipw_groupwise$g_shifted
     e_pred <- ipw_groupwise$e_pred
-    sipw <- ((g_shifted / e_pred) / mean_ipw)
+    sipw <- ( (g_shifted / e_pred) / mean_ipw)
 
     # extract outcome component mechanism for estimting Dy
     m_pred_obs <- rep(NA, nrow(valid_data))
@@ -277,8 +314,12 @@ cv_eif <- function(fold,
 
   } else if (shift_type == "mtp") {
     # compute component Dzw from nuisance parameters
-    Dzw_est <- compute_Dzw(g_output = g_out, m_output = m_out,
+    Dzw_est <- compute_Dzw(data = valid_data,
+                           g_output = g_out,
+                           m_output = m_out,
+                           delta = delta,
                            shift_type = shift_type)
+    browser()
     Dzw <- rep(as.numeric(sum(Dzw_est$dzw)), times = nrow(g_out$g_est))
 
     # compute component Da from nuisance parameters
@@ -286,10 +327,12 @@ cv_eif <- function(fold,
     a_natural <- g_out$a_vals$a_natural
 
     # approximate Monte Carlo integral using inverse uniform weighting
-    int_Da_phi <- integrate_over_g(g_mech = g_natural,
-                                   a_vals = a_natural,
-                                   weighting = phi_est)
-    Da <- phi_est - sum(int_Da_phi)
+    Da_phi_int <- mc_integrate_dens(data = data,
+                                    delta = 0,
+                                    mc_draws = a_draws,
+                                    dens_mech = g_out$g_fit,
+                                    wts_mech = phi_out$phi_fit)
+    Da <- phi_out$phi_pred - sum(Da_phi_int)
 
     # compute component Dy from nuisance parameters
     ipw_out <- compute_ipw(

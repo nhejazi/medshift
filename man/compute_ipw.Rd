@@ -4,10 +4,17 @@
 \alias{compute_ipw}
 \title{Get inverse probability weighted (IPW) estimate from nuisance parameters}
 \usage{
-compute_ipw(g_output, e_output, idx_treat = NULL, idx_cntrl = NULL,
-  shift_type = c("ipsi", "mtp"))
+compute_ipw(data, g_output, e_output, idx_treat = NULL,
+  idx_cntrl = NULL, shift_type = c("ipsi", "mtp"))
 }
 \arguments{
+\item{data}{A \code{data.table} containing the observed data, with columns
+in the order specified by the NPSEM (Y, Z, A, W), with column names set
+appropriately based on the original input data. Such a structure is merely
+a convenience utility to passing data around to the various core estimation
+routines and is automatically generated as part of a call to the user-facing
+wrapper function \code{medshift}.}
+
 \item{g_output}{Object containing results from fitting the propensity score
 regression, as produced by a call to \code{fit_g_mech}.}
 

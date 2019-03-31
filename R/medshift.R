@@ -76,7 +76,7 @@ medshift <- function(W,
                        "sub",
                        "ipw"
                      ),
-                     estimator_args = list(cv_folds = 10)) {
+                     estimator_args = list(cv_folds = 5)) {
   # set defaults
   estimator <- match.arg(estimator)
   shift_type <- match.arg(shift_type)
@@ -87,7 +87,7 @@ medshift <- function(W,
     assertthat::assert_that(length(unique(A)) == 2)
     message("Intervention on binary A: incremental propensity score shift")
   } else {
-    message("Intervention on continuous A: additive modified treatment policy")
+    message("Intervention on continuous A: modified treatment policy")
   }
 
   # construct input data structure
@@ -101,7 +101,7 @@ medshift <- function(W,
   data.table::setnames(data, c("Y", z_names, "A", w_names))
 
   if (estimator == "sub") {
-    # SUBSTITUTION ESTIMATOR
+    # SUBSTITUTION/G-COMPUTATION ESTIMATOR
     sub_est_args <- list(
       data = data, delta = delta, g_lrnrs = g_lrnrs,
       m_lrnrs = m_lrnrs, w_names = w_names, z_names = z_names,
@@ -109,7 +109,7 @@ medshift <- function(W,
     )
     est_out <- do.call(est_substitution, sub_est_args)
   } else if (estimator == "ipw") {
-    # INVERSE PROBABILITY RE-WEIGHTED ESTIMATOR
+    # INVERSE PROBABILITY WEIGHTED ESTIMATOR
     ipw_est_args <- list(
       data = data, delta = delta, g_lrnrs = g_lrnrs,
       e_lrnrs = e_lrnrs, w_names = w_names, z_names = z_names,
@@ -117,7 +117,7 @@ medshift <- function(W,
     )
     est_out <- do.call(est_ipw, ipw_est_args)
   } else if (estimator == "onestep") {
-    # EFFICIENT ONE-STEP ESTIMATOR
+    # ONE-STEP ESTIMATOR WITH CROSS-FITTING
     aipw_est_args <- list(
       data = data, delta = delta, g_lrnrs = g_lrnrs,
       e_lrnrs = e_lrnrs, m_lrnrs = m_lrnrs,
@@ -126,11 +126,12 @@ medshift <- function(W,
     )
     est_out <- do.call(est_onestep, aipw_est_args)
   } else if (estimator == "tmle") {
-    # TARGETED MAXIMUM LIKELIHOOD ESTIMATOR (just call tmle3::fit_tmle?)
-    message("The TML estimator is currently under development.")
+    # TODO: TARGETED MAXIMUM LIKELIHOOD ESTIMATOR
+    # NOTE: should be a call to tmle3::fit_tmle
+    stop("The TML estimator is currently under development")
   }
 
-  # lazily create output as classed list
+  # output as classed list
   class(est_out) <- "medshift"
   return(est_out)
 }

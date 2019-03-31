@@ -79,7 +79,7 @@ est_ipw <- function(data,
   mean_ipw <- ipw_out$mean_ipw
 
   # compute estimator
-  estim_ipw <- mean(((g_shifted / e_pred) / mean_ipw) * data$Y)
+  estim_ipw <- mean( ( (g_shifted / e_pred) / mean_ipw) * data$Y)
 
   # output
   estim_ipw_out <- list(theta = estim_ipw, type = "ipw")

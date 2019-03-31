@@ -47,14 +47,17 @@ est_substitution <- function(data,
     lrnr_stack = g_lrnrs, w_names = w_names, shift_type = shift_type
   )
 
-  # fit regression for incremental propensity score intervention
+  # fit outcome regression
   m_out <- fit_m_mech(
-    data = data, lrnr_stack = m_lrnrs,
+    data = data, delta = 0, lrnr_stack = m_lrnrs,
     z_names = z_names, w_names = w_names, shift_type = shift_type
   )
 
   # compute Dzw component of EIF using convenience function
-  Dzw_est <- compute_Dzw(g_output = g_out, m_output = m_out,
+  Dzw_est <- compute_Dzw(data = data,
+                         g_output = g_out,
+                         m_output = m_out,
+                         delta = delta,
                          shift_type = shift_type)
 
   if (shift_type == "ipsi") {
@@ -62,7 +65,7 @@ est_substitution <- function(data,
     estim_sub <- mean(Dzw_est$dzw_cntrl) + mean(Dzw_est$dzw_treat)
   } else if (shift_type == "mtp") {
     # compute estimator
-    estim_sub <- as.numeric(sum(Dzw_est$dzw))
+    estim_sub <- mean(Dzw_est$dzw)
   }
 
   # output

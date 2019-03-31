@@ -24,7 +24,9 @@ intervention to be used in defining the causal quantity of interest. In the
 case of binary interventions, this takes the form of an incremental
 propensity score shift, acting as a multiplier of the probability with which
 a given observational unit receives the intervention (EH Kennedy, 2018,
-JASA; <doi:10.1080/01621459.2017.1422737>).}
+JASA; <doi:10.1080/01621459.2017.1422737>). In the case of continuous
+interventions, this is a modified treatment policy that shifts the observed
+treatment by the given value.}
 
 \item{lrnr_stack}{A \code{Stack} object, or other learner class (inheriting
 from \code{Lrnr_base}), containing a single or set of instantiated learners
