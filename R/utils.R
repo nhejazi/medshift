@@ -1,3 +1,7 @@
+utils::globalVariables(c("id"))
+
+################################################################################
+
 #' Confidence Intervals for Stochastic Mediation Parameter Objects
 #'
 #' Compute confidence intervals for objects of class \code{medshift}, which
@@ -243,23 +247,25 @@ mc_integrate_dens <- function(data, delta, mc_draws, dens_mech, wts_mech) {
   range_mc_scaling <- max_mc_scaling - min_mc_scaling
 
   # make outcome task for Monte Carlo integration (never shifted)
-  m_mc_task <- sl3_Task$new(
+  m_mc_task <- sl3::sl3_Task$new(
     data = mc_records_data,
     covariates = c(w_names, "A", z_names),
-    outcome_type = "continuous",
-    outcome = "Y"
+    outcome = "Y",
+    id = "id"
   )
 
   # compute Monte Carlo integral by predicting from task on expanded data
   m_mc_pred <- wts_mech$predict(m_mc_task)
 
+  browser()
   # estimate shifted intervention distribution with records data
-  mc_records_data[, A := mtp_shift(A = A, delta = delta)]
-  g_mc_task <- sl3_Task$new(
+  mc_records_data[, A := mtp_shift(A = A, W = get(w_names), delta = delta)]
+  g_mc_task <- sl3::sl3_Task$new(
     data = mc_records_data,
     covariates = w_names,
     outcome_type = "continuous",
-    outcome = "A"
+    outcome = "A",
+    id = "id"
   )
 
   # get predictions from natural propensity score model for Monte Carlo data

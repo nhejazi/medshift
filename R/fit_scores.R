@@ -38,8 +38,6 @@ compute_Dzw <- function(data,
                         delta,
                         shift_type = c("ipsi", "mtp"),
                         mc_int_draws = 20) {
-  # set IPSI shift as default for now...
-  shift_type <- match.arg(shift_type)
 
   if (shift_type == "ipsi") {
     # get g components from output for that nuisance parameter
@@ -111,8 +109,6 @@ compute_ipw <- function(data,
                         idx_treat = NULL,
                         idx_cntrl = NULL,
                         shift_type = c("ipsi", "mtp")) {
-  # set IPSI shift as default for now...
-  shift_type <- match.arg(shift_type)
 
   if (shift_type == "ipsi") {
     # extract components for A = 0 and A = 1 cases
@@ -207,6 +203,7 @@ compute_ipw <- function(data,
 #'  center of the observed intervention distribution by the scalar \code{delta}
 #'  or \code{"ipsi"} for an incremental propensity score shift that multiples
 #'  the odds of receiving the intervention by the scalar \code{delta}.
+#' @param mc_int_draws ...
 #'
 #' @importFrom data.table data.table
 #' @importFrom origami training validation fold_index
@@ -222,9 +219,8 @@ cv_eif <- function(fold,
                    lrnr_stack_phi,
                    w_names,
                    z_names,
-                   shift_type = c("ipsi", "mtp")) {
-  # set IPSI shift as default for now...
-  shift_type <- match.arg(shift_type)
+                   shift_type = c("ipsi", "mtp"),
+                   mc_int_draws = 20) {
 
   # make training and validation data
   train_data <- origami::training(data, fold)
@@ -319,20 +315,19 @@ cv_eif <- function(fold,
                            m_output = m_out,
                            delta = delta,
                            shift_type = shift_type)
-    browser()
-    Dzw <- rep(as.numeric(sum(Dzw_est$dzw)), times = nrow(g_out$g_est))
+    Dzw <- Dzw_est$dzw
 
-    # compute component Da from nuisance parameters
-    g_natural <- g_out$g_est$g_natural
-    a_natural <- g_out$a_vals$a_natural
+    # compute/extract componenets for Monte Carlo integration
+    a_draws <- stats::runif(n = mc_int_draws, min = min(valid_data$A),
+                            max = max(valid_data$A))
 
     # approximate Monte Carlo integral using inverse uniform weighting
-    Da_phi_int <- mc_integrate_dens(data = data,
+    Da_phi_int <- mc_integrate_dens(data = valid_data,
                                     delta = 0,
                                     mc_draws = a_draws,
                                     dens_mech = g_out$g_fit,
                                     wts_mech = phi_out$phi_fit)
-    Da <- phi_out$phi_pred - sum(Da_phi_int)
+    Da <- phi_out$phi_pred - Da_phi_int
 
     # compute component Dy from nuisance parameters
     ipw_out <- compute_ipw(
@@ -344,7 +339,7 @@ cv_eif <- function(fold,
     mean_ipw <- ipw_out$mean_ipw
     g_shifted <- ipw_out$g_shifted
     e_pred <- ipw_out$e_pred
-    sipw <- ((g_shifted / e_pred) / mean_ipw)
+    sipw <- ( (g_shifted / e_pred) / mean_ipw)
 
     # extract outcome mechanism estimate under natural intervention value
     m_pred <- m_out$m_pred$m_natural
