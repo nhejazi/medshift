@@ -1,20 +1,18 @@
 #' Nonparametric estimation of decomposition term for causal mediation analysis
-#' with stochastic interventions
+#' with stochastic interventions under mediator-outcome confounding
 #'
 #' @param W A \code{matrix}, \code{data.frame}, or similar corresponding to a
 #'  set of baseline covariates.
 #' @param A A \code{numeric} vector corresponding to a treatment variable. The
 #'  parameter of interest is defined as a location shift of this quantity.
+#' @param L A \code{numeric} vector corresponding to a mediator-outcome
+#'  confounder affected by treatment (on the causal pathway between intervention
+#'  A, mediator Z, and outcome Y, but unaffected itself by the mediator Z).
 #' @param Z A \code{numeric} vector, \code{matrix}, \code{data.frame}, or
 #'  similar corresponding to a set of mediators (on the causal pathway between
 #'  the intervention A and the outcome Y).
 #' @param Y A \code{numeric} vector corresponding to an outcome variable.
-#' @param delta A \code{numeric} value indicating the degree of shift in the
-#'  intervention to be used in defining the causal quantity of interest. In the
-#'  case of binary interventions, this takes the form of an incremental
-#'  propensity score shift, acting as a multiplier of the probability with which
-#'  a given observational unit receives the intervention (EH Kennedy, 2018,
-#'  JASA; <doi:10.1080/01621459.2017.1422737>).
+#' @param contrast ...
 #' @param g_lrnrs A \code{Stack} object, or other learner class (inheriting from
 #'  \code{Lrnr_base}), containing a single or set of instantiated learners from
 #'  the \code{sl3} package, to be used in fitting a model for the propensity
@@ -23,20 +21,25 @@
 #'  \code{Lrnr_base}), containing a single or set of instantiated learners from
 #'  the \code{sl3} package, to be used in fitting a cleverly parameterized
 #'  propensity score that includes the mediators, i.e., e = P(A | Z, W).
-#' @param m_lrnrs A \code{Stack} object, or other learner class (inheriting from
+#' @param q_lrnrs A \code{Stack} object, or other learner class (inheriting from
 #'  \code{Lrnr_base}), containing a single or set of instantiated learners from
-#'  the \code{sl3} package, to be used in fitting the outcome regression, i.e.,
-#'  m(A, Z, W).
-#' @param phi_lrnrs A \code{Stack} object, or other learner class (inheriting
+#'  the \code{sl3} package, to be used in fitting a regression involving the
+#'  mediator-outcome confounder, i.e., q(L | A', W).
+#' @param r_lrnrs A \code{Stack} object, or other learner class (inheriting from
+#'  \code{Lrnr_base}), containing a single or set of instantiated learners from
+#'  the \code{sl3} package, to be used in fitting a regression involving the
+#'  mediator-outcome confounder, i.e., r(L | A', M, W).
+#' @param u_lrnrs A \code{Stack} object, or other learner class (inheriting
 #'  from \code{Lrnr_base}), containing a single or set of instantiated learners
 #'  from the \code{sl3} package, to be used in fitting a reduced regression
-#'  useful for computing the efficient one-step estimator, i.e., phi(W) =
-#'  E[m(A = 1, Z, W) - m(A = 0, Z, W) | W).
-#' @param shift_type A choice of the type of stochastic treatment regime to use
-#'  -- either \code{"mtp"} for a modified treatment policy that shifts the
-#'  center of the observed intervention distribution by the scalar \code{delta}
-#'  or \code{"ipsi"} for an incremental propensity score shift that multiples
-#'  the odds of receiving the intervention by the scalar \code{delta}.
+#'  useful for computing the efficient one-step estimator, i.e., u(L, A, W) =
+#'  E[m(A, L, Z, W) * (q(L|A,W) / r(L|A,Z,W)) * (e(a'|Z,W) / e(A|Z,W)) |
+#'  L = l, A = a, W = w].
+#' @param v_lrnrs A \code{Stack} object, or other learner class (inheriting
+#'  from \code{Lrnr_base}), containing a single or set of instantiated learners
+#'  from the \code{sl3} package, to be used in fitting a reduced regression
+#'  useful for computing the efficient one-step estimator, i.e., v(A,W) =
+#'  E[\int_z m(a', l, Z, W) * q(l|A',W) d\nu(z) | A = a, W = w)].
 #' @param estimator The desired estimator of the natural direct effect to be
 #'  computed. Currently, choices are limited to a substitution estimator, a
 #'  re-weighted estimator, and an efficient one-step estimator. The interested
@@ -60,16 +63,20 @@
 #
 medshift <- function(W,
                      A,
+                     L,
                      Z,
                      Y,
-                     delta,
+                     contrast,
                      g_lrnrs =
                        sl3::Lrnr_glm_fast$new(family = stats::binomial()),
                      e_lrnrs =
                        sl3::Lrnr_glm_fast$new(family = stats::binomial()),
-                     m_lrnrs = sl3::Lrnr_glm_fast$new(),
-                     phi_lrnrs = sl3::Lrnr_glm_fast$new(),
-                     shift_type = c("ipsi", "mtp"),
+                     q_lrnrs,
+                       sl3::Lrnr_glm_fast$new(family = stats::binomial()),
+                     r_lrnrs,
+                       sl3::Lrnr_glm_fast$new(family = stats::binomial()),
+                     u_lrnrs = sl3::Lrnr_glm_fast$new(),
+                     v_lrnrs = sl3::Lrnr_glm_fast$new(),
                      estimator = c(
                        "onestep",
                        "tmle",
@@ -79,52 +86,34 @@ medshift <- function(W,
                      estimator_args = list(cv_folds = 5)) {
   # set defaults
   estimator <- match.arg(estimator)
-  shift_type <- match.arg(shift_type)
   estimator_args <- unlist(estimator_args, recursive = FALSE)
 
-  # check whether type of shift is appropriate for intervention node
-  if (shift_type == "ipsi") {
-    assertthat::assert_that(length(unique(A)) == 2)
-    message("Intervention on binary A: incremental propensity score shift")
-  } else {
-    message("Intervention on continuous A: additive modified treatment policy")
-  }
-
+  # NOTE: mediator-outcome confounding case
   # construct input data structure
-  data <- data.table::as.data.table(cbind(Y, Z, A, W))
+  data <- data.table::as.data.table(cbind(Y, Z, L, A, W))
   w_names <- paste("W", seq_len(dim(data.table::as.data.table(W))[2]),
     sep = "_"
   )
   z_names <- paste("Z", seq_len(dim(data.table::as.data.table(Z))[2]),
     sep = "_"
   )
-  data.table::setnames(data, c("Y", z_names, "A", w_names))
+  data.table::setnames(data, c("Y", z_names, "L", "A", w_names))
 
   if (estimator == "sub") {
     # SUBSTITUTION ESTIMATOR
-    sub_est_args <- list(
-      data = data, delta = delta, g_lrnrs = g_lrnrs,
-      m_lrnrs = m_lrnrs, w_names = w_names, z_names = z_names,
-      shift_type = shift_type, estimator_args
-    )
-    est_out <- do.call(est_substitution, sub_est_args)
+    stop("The substitution estimator is currently under development.")
   } else if (estimator == "ipw") {
     # INVERSE PROBABILITY RE-WEIGHTED ESTIMATOR
-    ipw_est_args <- list(
-      data = data, delta = delta, g_lrnrs = g_lrnrs,
-      e_lrnrs = e_lrnrs, w_names = w_names, z_names = z_names,
-      shift_type = shift_type, estimator_args
-    )
-    est_out <- do.call(est_ipw, ipw_est_args)
+    stop("The IPW estimator is currently under development.")
   } else if (estimator == "onestep") {
     # EFFICIENT ONE-STEP ESTIMATOR
     onestep_est_args <- list(
       data = data, delta = delta, g_lrnrs = g_lrnrs,
-      e_lrnrs = e_lrnrs, m_lrnrs = m_lrnrs,
-      phi_lrnrs = phi_lrnrs, w_names = w_names,
+      e_lrnrs = e_lrnrs, q_lrnrs = q_lrnrs, r_lrnrs = r_lrnrs,
+      u_lrnrs = u_lrnrs, v_lrnrs = v_lrnrs, w_names = w_names,
       z_names = z_names, shift_type = shift_type, estimator_args
     )
-    est_out <- do.call(est_onestep, onestep_est_args)
+    est_out <- do.call(est_onestep_moc, onestep_est_args)
   } else if (estimator == "tmle") {
     # TARGETED MAXIMUM LIKELIHOOD ESTIMATOR (just call tmle3::fit_tmle?)
     stop("The TML estimator is currently under development.")
