@@ -61,29 +61,29 @@
 #'
 #' @export
 #
-medshift <- function(W,
-                     A,
-                     L,
-                     Z,
-                     Y,
-                     contrast,
-                     g_lrnrs =
-                       sl3::Lrnr_glm_fast$new(family = stats::binomial()),
-                     e_lrnrs =
-                       sl3::Lrnr_glm_fast$new(family = stats::binomial()),
-                     q_lrnrs,
-                       sl3::Lrnr_glm_fast$new(family = stats::binomial()),
-                     r_lrnrs,
-                       sl3::Lrnr_glm_fast$new(family = stats::binomial()),
-                     u_lrnrs = sl3::Lrnr_glm_fast$new(),
-                     v_lrnrs = sl3::Lrnr_glm_fast$new(),
-                     estimator = c(
-                       "onestep",
-                       "tmle",
-                       "sub",
-                       "ipw"
-                     ),
-                     estimator_args = list(cv_folds = 5)) {
+medshift_moc <- function(W,
+                         A,
+                         L,
+                         Z,
+                         Y,
+                         contrast = c(0, 1),
+                         g_lrnrs =
+                           sl3::Lrnr_glm_fast$new(family = stats::binomial()),
+                         e_lrnrs =
+                           sl3::Lrnr_glm_fast$new(family = stats::binomial()),
+                         q_lrnrs =
+                           sl3::Lrnr_glm_fast$new(family = stats::binomial()),
+                         r_lrnrs =
+                           sl3::Lrnr_glm_fast$new(family = stats::binomial()),
+                         u_lrnrs = sl3::Lrnr_glm_fast$new(),
+                         v_lrnrs = sl3::Lrnr_glm_fast$new(),
+                         estimator = c(
+                           "onestep",
+                           "tmle",
+                           "sub",
+                           "ipw"
+                         ),
+                         estimator_args = list(cv_folds = 5)) {
   # set defaults
   estimator <- match.arg(estimator)
   estimator_args <- unlist(estimator_args, recursive = FALSE)
@@ -99,6 +99,8 @@ medshift <- function(W,
   )
   data.table::setnames(data, c("Y", z_names, "L", "A", w_names))
 
+  browser()
+
   if (estimator == "sub") {
     # SUBSTITUTION ESTIMATOR
     stop("The substitution estimator is currently under development.")
@@ -108,10 +110,12 @@ medshift <- function(W,
   } else if (estimator == "onestep") {
     # EFFICIENT ONE-STEP ESTIMATOR
     onestep_est_args <- list(
-      data = data, delta = delta, g_lrnrs = g_lrnrs,
-      e_lrnrs = e_lrnrs, q_lrnrs = q_lrnrs, r_lrnrs = r_lrnrs,
-      u_lrnrs = u_lrnrs, v_lrnrs = v_lrnrs, w_names = w_names,
-      z_names = z_names, shift_type = shift_type, estimator_args
+      data = data, contrast = contrast,
+      g_lrnrs = g_lrnrs, e_lrnrs = e_lrnrs,
+      q_lrnrs = q_lrnrs, r_lrnrs = r_lrnrs,
+      u_lrnrs = u_lrnrs, v_lrnrs = v_lrnrs,
+      w_names = w_names, z_names = z_names,
+      estimator_args
     )
     est_out <- do.call(est_onestep_moc, onestep_est_args)
   } else if (estimator == "tmle") {

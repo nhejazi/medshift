@@ -6,7 +6,22 @@ library(future)
 library(hal9001)
 library(sl3)
 set.seed(7128816)
-delta_shift <- 0.5
+
+################################################################################
+# setup learners for the nuisance parameters
+################################################################################
+
+# instantiate some learners
+mean_lrnr <- Lrnr_mean$new()
+fglm_contin_lrnr <- Lrnr_glm_fast$new()
+fglm_binary_lrnr <- Lrnr_glm_fast$new(family = binomial())
+hal_contin_lrnr <- Lrnr_hal9001$new(
+  fit_type = "glmnet", n_folds = 5
+)
+hal_binary_lrnr <- Lrnr_hal9001$new(
+  fit_type = "glmnet", n_folds = 5,
+  family = "binomial"
+)
 
 ################################################################################
 # setup data and simulate to test with estimators
@@ -42,4 +57,27 @@ sim_medoutcon_data <- function(n_obs = 1000) {
 
 # get data and column names for sl3 tasks (for convenience)
 data <- sim_medoutcon_data()
+w_names <- str_subset(colnames(data), "w")
+z_names <- str_subset(colnames(data), "m")
 
+################################################################################
+# test different estimators
+################################################################################
+
+theta_os <- medshift_moc(
+  W = data[, ..w_names], A = data$a, L = data$z,
+  Z = data[, ..z_names], Y = data$y,
+  contrast = c(0, 1),
+  g_lrnrs = hal_binary_lrnr,
+  e_lrnrs = hal_binary_lrnr,
+  q_lrnrs = hal_binary_lrnr,
+  r_lrnrs = hal_binary_lrnr,
+  u_lrnrs = hal_contin_lrnr,
+  v_lrnrs = hal_contin_lrnr,
+  estimator = "onestep",
+)
+theta_os
+
+#test_that("IPW and efficient one-step estimator agree", {
+  #expect_equal(theta_ipw$theta, theta_aipw$theta, tol = 1e-2)
+#})
