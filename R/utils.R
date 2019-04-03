@@ -1,7 +1,5 @@
 utils::globalVariables(c("id"))
 
-################################################################################
-
 #' Confidence Intervals for Stochastic Mediation Parameter Objects
 #'
 #' Compute confidence intervals for objects of class \code{medshift}, which
@@ -24,9 +22,9 @@ utils::globalVariables(c("id"))
 #' @export
 #
 confint.medshift <- function(object,
-                              parm = seq_len(object$psi),
-                              level = 0.95,
-                              ...) {
+                             parm = seq_len(object$psi),
+                             level = 0.95,
+                             ...) {
   # inference is currently limited to the one-step efficient estimator
   # TODO: allow use for TML estimators once impelemented
   assertthat::assert_that(object$type == "onestep")
@@ -67,8 +65,8 @@ confint.medshift <- function(object,
 #' @export
 #
 summary.medshift <- function(object,
-                              ...,
-                              ci_level = 0.95) {
+                             ...,
+                             ci_level = 0.95) {
   # inference is currently limited to the one-step efficient estimator
   if (object$type %in% c("onestep", "tmle")) {
     # compute confidence interval using the pre-defined method
@@ -222,6 +220,11 @@ scale_to_original <- function(scaled_vals, max_orig, min_orig) {
 #'  the intervention score, this is a nuisance parameter defined by the type
 #'  of shift intervention to be evaluated. This is an object with inherited
 #'  class \code{Lrnr_base}.
+#' @param shift_type A choice of the type of stochastic treatment regime to use
+#'  -- either \code{"mtp"} for a modified treatment policy that shifts the
+#'  center of the observed intervention distribution by the scalar \code{delta}
+#'  or \code{"ipsi"} for an incremental propensity score shift that multiples
+#'  the odds of receiving the intervention by the scalar \code{delta}.
 #'
 #' @importFrom data.table setkey setorder
 #' @importFrom stringr str_subset
@@ -229,7 +232,8 @@ scale_to_original <- function(scaled_vals, max_orig, min_orig) {
 #'
 #' @keywords internal
 #
-mc_integrate_dens <- function(data, delta, mc_draws, dens_mech, wts_mech) {
+mc_integrate_dens <- function(data, delta, mc_draws, dens_mech, wts_mech,
+                              shift_type = c("mtp", "ipsi")) {
   # create expanded data set with multiple records for MC draws
   data[, id := 1:.N]
   data.table::setkey(data, id)
@@ -257,9 +261,13 @@ mc_integrate_dens <- function(data, delta, mc_draws, dens_mech, wts_mech) {
   # compute Monte Carlo integral by predicting from task on expanded data
   m_mc_pred <- wts_mech$predict(m_mc_task)
 
-  browser()
+  # for modified treatment policies, need to apply shift to estimate g_{\delta}
+  # NOTE: for MTPs, the inverse shift factor is given as the input delta
+  if (shift_type == "mtp") {
+    mc_records_data[, A := mtp_shift(A = A, W = get(w_names), delta = delta)]
+  }
+
   # estimate shifted intervention distribution with records data
-  mc_records_data[, A := mtp_shift(A = A, W = get(w_names), delta = delta)]
   g_mc_task <- sl3::sl3_Task$new(
     data = mc_records_data,
     covariates = w_names,

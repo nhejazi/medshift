@@ -54,11 +54,13 @@ est_substitution <- function(data,
   )
 
   # compute Dzw component of EIF using convenience function
-  Dzw_est <- compute_Dzw(data = data,
-                         g_output = g_out,
-                         m_output = m_out,
-                         delta = delta,
-                         shift_type = shift_type)
+  Dzw_est <- compute_Dzw(
+    data = data,
+    g_output = g_out,
+    m_output = m_out,
+    delta = delta,
+    shift_type = shift_type
+  )
 
   if (shift_type == "ipsi") {
     # compute estimator

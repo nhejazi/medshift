@@ -64,7 +64,6 @@ est_ipw <- function(data,
       idx_treat = idx_A1, idx_cntrl = idx_A0,
       shift_type = shift_type
     )
-
   } else {
     # compute IPW  estimator components from estimates of nuisance parameters
     ipw_out <- compute_ipw(
@@ -79,7 +78,7 @@ est_ipw <- function(data,
   mean_ipw <- ipw_out$mean_ipw
 
   # compute estimator
-  estim_ipw <- mean( ( (g_shifted / e_pred) / mean_ipw) * data$Y)
+  estim_ipw <- mean(((g_shifted / e_pred) / mean_ipw) * data$Y)
 
   # output
   estim_ipw_out <- list(theta = estim_ipw, type = "ipw")

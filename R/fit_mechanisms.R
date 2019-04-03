@@ -80,27 +80,33 @@ fit_g_mech <- function(data,
     g_intervened_pred_A0 <- 1 - g_intervened_pred_A1
 
     # directly computed the shifted propensity score
-    g_intervened_pred_shifted_A1 <- ipsi_shift(gn_est = g_intervened_pred_A1,
-                                               delta = delta)
+    g_intervened_pred_shifted_A1 <- ipsi_shift(
+      gn_est = g_intervened_pred_A1,
+      delta = delta
+    )
 
     # compute shifted propensity score for A = 0 by symmetry
     g_intervened_pred_shifted_A0 <- 1 - g_intervened_pred_shifted_A1
 
     # bounding to numerical precision and for positivity considerations
-    out_g_mat <- cbind(g_intervened_pred_A1,
-                       g_intervened_pred_A0,
-                       g_intervened_pred_shifted_A1,
-                       g_intervened_pred_shifted_A0)
+    out_g_mat <- cbind(
+      g_intervened_pred_A1,
+      g_intervened_pred_A0,
+      g_intervened_pred_shifted_A1,
+      g_intervened_pred_shifted_A0
+    )
     out_g_est <- apply(out_g_mat, 2, function(x) {
-                         x_precise <- bound_precision(x)
-                         x_bounded <- bound_propensity(x_precise)
-                         return(x_bounded)
-                      })
+      x_precise <- bound_precision(x)
+      x_bounded <- bound_propensity(x_precise)
+      return(x_bounded)
+    })
     out_g_est <- data.table::as.data.table(out_g_est)
-    data.table::setnames(out_g_est, c("g_pred_A1",
-                                      "g_pred_A0",
-                                      "g_pred_shifted_A1",
-                                      "g_pred_shifted_A0"))
+    data.table::setnames(out_g_est, c(
+      "g_pred_A1",
+      "g_pred_A0",
+      "g_pred_shifted_A1",
+      "g_pred_shifted_A0"
+    ))
 
     # output
     out <- list(
@@ -123,8 +129,10 @@ fit_g_mech <- function(data,
     g_shifted_pred <- g_natural_fit$predict(g_shifted_task)
 
     # construct output
-    out_g_est <- data.table::as.data.table(cbind(g_natural_pred,
-                                                 g_shifted_pred))
+    out_g_est <- data.table::as.data.table(cbind(
+      g_natural_pred,
+      g_shifted_pred
+    ))
     data.table::setnames(out_g_est, c("g_natural", "g_shifted"))
 
     # output
@@ -212,13 +220,15 @@ fit_e_mech <- function(data,
     e_intervened_pred_A0 <- 1 - e_intervened_pred_A1
 
     # bounding to numerical precision and for positivity considerations
-    out_e_mat <- cbind(e_intervened_pred_A1,
-                       e_intervened_pred_A0)
+    out_e_mat <- cbind(
+      e_intervened_pred_A1,
+      e_intervened_pred_A0
+    )
     out_e_est <- apply(out_e_mat, 2, function(x) {
-                         x_precise <- bound_precision(x)
-                         x_bounded <- bound_propensity(x_precise)
-                         return(x_bounded)
-                      })
+      x_precise <- bound_precision(x)
+      x_bounded <- bound_propensity(x_precise)
+      return(x_bounded)
+    })
     out_e_est <- data.table::as.data.table(out_e_est)
     data.table::setnames(out_e_est, c("e_pred_A1", "e_pred_A0"))
 
@@ -333,8 +343,10 @@ fit_m_mech <- function(data,
     m_intervened_pred_A0 <- m_natural_fit$predict(m_intervened_A0_task)
 
     # output
-    out_m_est <- data.table::as.data.table(cbind(m_intervened_pred_A1,
-                                                 m_intervened_pred_A0))
+    out_m_est <- data.table::as.data.table(cbind(
+      m_intervened_pred_A1,
+      m_intervened_pred_A0
+    ))
     data.table::setnames(out_m_est, c("m_pred_A1", "m_pred_A0"))
     out <- list(
       m_pred = out_m_est,
@@ -363,8 +375,10 @@ fit_m_mech <- function(data,
     m_intervened_pred <- m_natural_fit$predict(m_intervened_task)
 
     # output
-    out_m_est <- data.table::as.data.table(cbind(m_natural_pred,
-                                                 m_intervened_pred))
+    out_m_est <- data.table::as.data.table(cbind(
+      m_natural_pred,
+      m_intervened_pred
+    ))
     data.table::setnames(out_m_est, c("m_natural", "m_shifted"))
     out <- list(
       m_pred = out_m_est,
@@ -469,8 +483,10 @@ fit_phi_mech_mtp <- function(data,
 
   # construct data structure for use with task objects
   phi_conditioning_nodes <- c("A", w_names)
-  phi_data <- data.table::data.table(phi = phi_outcome,
-                                     data[, ..phi_conditioning_nodes])
+  phi_data <- data.table::data.table(
+    phi = phi_outcome,
+    data[, ..phi_conditioning_nodes]
+  )
   phi_task <- sl3::sl3_Task$new(
     data = phi_data,
     covariates = phi_conditioning_nodes,

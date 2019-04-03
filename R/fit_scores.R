@@ -1,5 +1,4 @@
 utils::globalVariables(c("..w_names"))
-################################################################################
 
 #' Get Dzw component of efficient influence function from nuisance parameters
 #'
@@ -38,7 +37,6 @@ compute_Dzw <- function(data,
                         delta,
                         shift_type = c("ipsi", "mtp"),
                         mc_int_draws = 20) {
-
   if (shift_type == "ipsi") {
     # get g components from output for that nuisance parameter
     g_shifted_A1 <- g_output$g_est$g_pred_shifted_A1
@@ -58,16 +56,28 @@ compute_Dzw <- function(data,
       dzw_treat = Dzw_A1
     ))
   } else if (shift_type == "mtp") {
-    # compute/extract componenets for Monte Carlo integration
-    a_draws <- stats::runif(n = mc_int_draws, min = min(data$A),
-                            max = max(data$A))
+    # compute/extract components for Monte Carlo integration
+    a_draws <- stats::runif(
+      n = mc_int_draws, min = min(data$A),
+      max = max(data$A)
+    )
+
+    # NOTE: the MTP shift is applied as part of the Monte Carlo integration
+    #       routine BUT estimating g_{\delta} requires evaluating the natural
+    #       density at the inverse of this shift -- for additive MTPs that we
+    #       consider here (for now), this is only the arithmetic inverse...
+    # TODO: we should generalize the shift / shift inverse mechanism
+    delta_inv <- -delta
 
     # approximate Monte Carlo integral using inverse uniform weighting
-    Dzw_shifted_int <- mc_integrate_dens(data = data,
-                                         delta = delta,
-                                         mc_draws = a_draws,
-                                         dens_mech = g_output$g_fit,
-                                         wts_mech = m_output$m_fit)
+    Dzw_shifted_int <- mc_integrate_dens(
+      data = data,
+      delta = delta_inv,
+      mc_draws = a_draws,
+      dens_mech = g_output$g_fit,
+      wts_mech = m_output$m_fit,
+      shift_type = shift_type
+    )
 
     # output as simple list
     return(list(
@@ -109,7 +119,6 @@ compute_ipw <- function(data,
                         idx_treat = NULL,
                         idx_cntrl = NULL,
                         shift_type = c("ipsi", "mtp")) {
-
   if (shift_type == "ipsi") {
     # extract components for A = 0 and A = 1 cases
     g_shifted_A1 <- g_output$g_est$g_pred_shifted_A1
@@ -271,18 +280,20 @@ cv_eif <- function(fold,
     idx_A0 <- which(valid_data$A == 0)
 
     # compute component Dzw from nuisance parameters
-    Dzw_groupwise <- compute_Dzw(data = valid_data,
-                                 g_output = g_out,
-                                 m_output = m_out,
-                                 delta = delta,
-                                 shift_type = shift_type)
+    Dzw_groupwise <- compute_Dzw(
+      data = valid_data,
+      g_output = g_out,
+      m_output = m_out,
+      delta = delta,
+      shift_type = shift_type
+    )
     Dzw <- Dzw_groupwise$dzw_cntrl + Dzw_groupwise$dzw_treat
 
     # compute component Da from nuisance parameters
     g_pred_A1 <- g_out$g_est$g_pred_A1
     g_pred_A0 <- g_out$g_est$g_pred_A0
     Da_numerator <- delta * phi_out$phi_pred * (valid_data$A - g_pred_A1)
-    Da_denominator <- (delta * g_pred_A1 + g_pred_A0) ^ 2
+    Da_denominator <- (delta * g_pred_A1 + g_pred_A0)^2
     Da <- Da_numerator / Da_denominator
 
     # compute component Dy from nuisance parameters
@@ -296,7 +307,7 @@ cv_eif <- function(fold,
     mean_ipw <- ipw_groupwise$mean_ipw
     g_shifted <- ipw_groupwise$g_shifted
     e_pred <- ipw_groupwise$e_pred
-    sipw <- ( (g_shifted / e_pred) / mean_ipw)
+    sipw <- ((g_shifted / e_pred) / mean_ipw)
 
     # extract outcome component mechanism for estimting Dy
     m_pred_obs <- rep(NA, nrow(valid_data))
@@ -307,26 +318,32 @@ cv_eif <- function(fold,
 
     # assemble Dy component estimate
     Dy <- sipw * (valid_data$Y - m_pred_obs)
-
   } else if (shift_type == "mtp") {
     # compute component Dzw from nuisance parameters
-    Dzw_est <- compute_Dzw(data = valid_data,
-                           g_output = g_out,
-                           m_output = m_out,
-                           delta = delta,
-                           shift_type = shift_type)
+    Dzw_est <- compute_Dzw(
+      data = valid_data,
+      g_output = g_out,
+      m_output = m_out,
+      delta = delta,
+      shift_type = shift_type
+    )
     Dzw <- Dzw_est$dzw
 
     # compute/extract componenets for Monte Carlo integration
-    a_draws <- stats::runif(n = mc_int_draws, min = min(valid_data$A),
-                            max = max(valid_data$A))
+    a_draws <- stats::runif(
+      n = mc_int_draws, min = min(valid_data$A),
+      max = max(valid_data$A)
+    )
 
     # approximate Monte Carlo integral using inverse uniform weighting
-    Da_phi_int <- mc_integrate_dens(data = valid_data,
-                                    delta = 0,
-                                    mc_draws = a_draws,
-                                    dens_mech = g_out$g_fit,
-                                    wts_mech = phi_out$phi_fit)
+    Da_phi_int <- mc_integrate_dens(
+      data = valid_data,
+      delta = 0,
+      mc_draws = a_draws,
+      dens_mech = g_out$g_fit,
+      wts_mech = phi_out$phi_fit,
+      shift_type = shift_type
+    )
     Da <- phi_out$phi_pred - Da_phi_int
 
     # compute component Dy from nuisance parameters
@@ -339,7 +356,7 @@ cv_eif <- function(fold,
     mean_ipw <- ipw_out$mean_ipw
     g_shifted <- ipw_out$g_shifted
     e_pred <- ipw_out$e_pred
-    sipw <- ( (g_shifted / e_pred) / mean_ipw)
+    sipw <- ((g_shifted / e_pred) / mean_ipw)
 
     # extract outcome mechanism estimate under natural intervention value
     m_pred <- m_out$m_pred$m_natural

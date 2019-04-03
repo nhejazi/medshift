@@ -4,7 +4,8 @@
 \alias{mc_integrate_dens}
 \title{Numerical Integration for Weighted Treatment Mechanism}
 \usage{
-mc_integrate_dens(data, delta, mc_draws, dens_mech, wts_mech)
+mc_integrate_dens(data, delta, mc_draws, dens_mech, wts_mech,
+  shift_type = c("mtp", "ipsi"))
 }
 \arguments{
 \item{data}{A \code{data.table} containing the observed data, with columns
@@ -38,6 +39,12 @@ For the substitution estimator, this is the outcome mechanism, while, for
 the intervention score, this is a nuisance parameter defined by the type
 of shift intervention to be evaluated. This is an object with inherited
 class \code{Lrnr_base}.}
+
+\item{shift_type}{A choice of the type of stochastic treatment regime to use
+-- either \code{"mtp"} for a modified treatment policy that shifts the
+center of the observed intervention distribution by the scalar \code{delta}
+or \code{"ipsi"} for an incremental propensity score shift that multiples
+the odds of receiving the intervention by the scalar \code{delta}.}
 }
 \description{
 In the case of modified treatment policies, it is necessary to numerically

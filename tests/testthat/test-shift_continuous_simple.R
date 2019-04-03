@@ -27,8 +27,8 @@ hal_density_lrnr <- Lrnr_haldensify$new(
 ################################################################################
 # setup data and simulate to test with estimators
 ################################################################################
-make_simulated_data <- function(n_obs = 1000,  # no. observations
-                                n_w = 3) {     # no. baseline covariates
+make_simulated_data <- function(n_obs = 1000, # no. observations
+                                n_w = 3) { # no. baseline covariates
 
   # baseline covariate -- simple, binary
   W_1 <- rbinom(n_obs, 1, prob = 0.50)
