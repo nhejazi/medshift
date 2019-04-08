@@ -36,6 +36,7 @@ Imports:
     stringr,
     origami,
     sl3,
+    tmle3,
     simcausal,
     condensier
 Suggests:
