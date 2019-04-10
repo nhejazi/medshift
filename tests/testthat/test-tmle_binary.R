@@ -101,4 +101,32 @@ tmle_task <- tmle3_Task$new(data, npsem = npsem)
 likelihood_def <- Likelihood$new(factor_list)
 likelihood <- likelihood_def$train(tmle_task)
 likelihood$get_likelihoods(tmle_task)
+initial_likelihood <- likelihood
+
+# NEXT, need targeted_likelihood constructor
+updater <- tmle3_Update$new(cvtmle = FALSE)
+likelihood_targeted <- Targeted_Likelihood$new(initial_likelihood, updater)
+
+# compute a tmle3 "by hand"
+if (FALSE) {
+  # define data (from tmle3_Spec base class)
+  tmle_task <- tmle_spec$make_tmle_task(data, node_list)
+
+  # define likelihood (from tmle3_Spec base class)
+  likelihood_init <- tmle_spec$make_initial_likelihood(tmle_task, learner_list)
+
+  # define update method (fluctuation submodel and loss function)
+  updater <- tmle_spec$make_updater()
+  likelihood_targeted <- Targeted_Likelihood$new(likelihood_init, updater)
+
+  # invoke params specified in spec
+  tmle_params <- tmle_spec$make_params(tmle_task, likelihood_targeted)
+  updater$tmle_params <- tmle_params
+
+  # fit TML estimator update
+  tmle_fit <- fit_tmle3(tmle_task, likelihood_targeted, tmle_params, updater)
+
+  # extract results from tmle3_Fit object
+  tmle_fit
+}
 

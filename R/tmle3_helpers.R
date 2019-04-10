@@ -11,12 +11,10 @@ stochastic_mediation_npsem <- function(node_list, variable_types = NULL) {
     define_node("W", node_list$W, variable_type = variable_types$W),
     define_node("A", node_list$A, c("W"), variable_type = variable_types$A),
     define_node("Z", node_list$Z, c("A", "W"), variable_type = variable_types$Z),
-    define_node("eA", node_list$A, c("Z", "W"), variable_type = variable_types$A),
     define_node("Y", node_list$Y, c("Z", "A", "W"), variable_type = variable_types$Y, scale = TRUE)
   )
   return(npsem)
 }
-
 
 
 #' Stochastic Mediation Likelihood Factors
