@@ -7,10 +7,13 @@
 ipsi_shift(gn_est, delta)
 }
 \arguments{
-\item{gn_est}{...}
+\item{gn_est}{A \code{numeric} vector of the estimated propensity score, the
+probability of receiving treatment A given baseline covariates W.}
 
-\item{delta}{...}
+\item{delta}{A \code{numeric} scalar giving the degree by which the odds of
+receiving treatment are shifted in this type of intervention.}
 }
 \description{
-compute shift where gn := g(A = 1 | W)
+Compute the exponential tilt shift, which corresponds to an incremental
+propensity score intervention on gn := Pr(A = 1 | W).
 }

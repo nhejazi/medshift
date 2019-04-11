@@ -62,17 +62,10 @@ compute_Dzw <- function(data,
       max = max(data$A)
     )
 
-    # NOTE: the MTP shift is applied as part of the Monte Carlo integration
-    #       routine BUT estimating g_{\delta} requires evaluating the natural
-    #       density at the inverse of this shift -- for additive MTPs that we
-    #       consider here (for now), this is only the arithmetic inverse...
-    # TODO: we should generalize the shift / shift inverse mechanism
-    delta_inv <- -delta
-
     # approximate Monte Carlo integral using inverse uniform weighting
     Dzw_shifted_int <- mc_integrate_dens(
       data = data,
-      delta = delta_inv,
+      delta = delta,
       mc_draws = a_draws,
       dens_mech = g_output$g_fit,
       wts_mech = m_output$m_fit,

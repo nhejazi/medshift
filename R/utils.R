@@ -246,9 +246,7 @@ mc_integrate_dens <- function(data, delta, mc_draws, dens_mech, wts_mech,
   z_names <- stringr::str_subset(colnames(mc_records_data), "Z")
 
   # numerical integration over the domain of A via Monte Carlo
-  min_mc_scaling <- min(mc_draws)
-  max_mc_scaling <- max(mc_draws)
-  range_mc_scaling <- max_mc_scaling - min_mc_scaling
+  range_mc_scaling <- max(data$A) - min(data$A)
 
   # make outcome task for Monte Carlo integration (never shifted)
   m_mc_task <- sl3::sl3_Task$new(
@@ -264,7 +262,8 @@ mc_integrate_dens <- function(data, delta, mc_draws, dens_mech, wts_mech,
   # for modified treatment policies, need to apply shift to estimate g_{\delta}
   # NOTE: for MTPs, the inverse shift factor is given as the input delta
   if (shift_type == "mtp") {
-    mc_records_data[, A := mtp_shift(A = A, W = get(w_names), delta = delta)]
+    mc_records_data[, A := mtp_shift_inv(A = A, W = get(w_names),
+                                         delta = delta)]
   }
 
   # estimate shifted intervention distribution with records data
@@ -286,3 +285,6 @@ mc_integrate_dens <- function(data, delta, mc_draws, dens_mech, wts_mech,
     (range_mc_scaling / length(mc_draws))
   return(mc_integ)
 }
+
+################################################################################
+
