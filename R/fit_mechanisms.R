@@ -114,26 +114,46 @@ fit_g_mech <- function(data,
       g_fit = g_natural_fit
     )
   } else if (shift_type == "mtp") {
+    # needs copies of the data for shifting and inverse-shifting
+    data_intervene_std <- data.table::copy(data_intervene)
+    data_intervene_inv <- data.table::copy(data_intervene)
+
     # get predictions from natural propensity score model for observed data
     g_natural_pred <- g_natural_fit$predict()
 
-    # create intervened data by applying modified treatment policy
-    data_intervene[, A := mtp_shift(A = A, W = get(w_names), delta = delta)]
-    g_shifted_task <- sl3_Task$new(
-      data = data_intervene,
+    # create upward intervened data by applying modified treatment policy
+    data_intervene_std[, A := mtp_shift(A = A, W = get(w_names),
+                                        delta = delta)]
+    g_shifted_std_task <- sl3_Task$new(
+      data = data_intervene_std,
       covariates = w_names,
       outcome_type = "continuous",
       outcome = "A"
     )
     # get predictions from natural propensity score model for shifted data
-    g_shifted_pred <- g_natural_fit$predict(g_shifted_task)
+    g_shifted_std_pred <- g_natural_fit$predict(g_shifted_std_task)
+ 
+    # create downward intervened data by applying modified treatment policy
+    data_intervene_inv[, A := mtp_shift_inv(A = A, W = get(w_names),
+                                            delta = delta)]
+    g_shifted_inv_task <- sl3_Task$new(
+      data = data_intervene_inv,
+      covariates = w_names,
+      outcome_type = "continuous",
+      outcome = "A"
+    )
+
+    # get predictions from natural propensity score model for shifted data
+    g_shifted_inv_pred <- g_natural_fit$predict(g_shifted_inv_task)
 
     # construct output
     out_g_est <- data.table::as.data.table(cbind(
       g_natural_pred,
-      g_shifted_pred
+      g_shifted_std_pred,
+      g_shifted_inv_pred
     ))
-    data.table::setnames(out_g_est, c("g_natural", "g_shifted"))
+    data.table::setnames(out_g_est, c("g_natural", "g_shifted",
+                                      "g_shifted_inv"))
 
     # output
     out <- list(

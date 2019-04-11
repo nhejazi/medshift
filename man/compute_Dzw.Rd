@@ -5,7 +5,7 @@
 \title{Get Dzw component of efficient influence function from nuisance parameters}
 \usage{
 compute_Dzw(data, g_output, m_output, delta, shift_type = c("ipsi",
-  "mtp"), mc_int_draws = 20)
+  "mtp"), mc_int_draws = 50)
 }
 \arguments{
 \item{data}{A \code{data.table} containing the observed data, with columns

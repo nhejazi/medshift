@@ -36,7 +36,7 @@ compute_Dzw <- function(data,
                         m_output,
                         delta,
                         shift_type = c("ipsi", "mtp"),
-                        mc_int_draws = 20) {
+                        mc_int_draws = 50) {
   if (shift_type == "ipsi") {
     # get g components from output for that nuisance parameter
     g_shifted_A1 <- g_output$g_est$g_pred_shifted_A1
@@ -144,7 +144,7 @@ compute_ipw <- function(data,
     ))
   } else if (shift_type == "mtp") {
     # extract components of g and e mechanisms based on intervention type
-    g_shifted_pred <- g_output$g_est$g_shifted
+    g_shifted_pred <- g_output$g_est$g_shifted_inv
     e_natural_pred <- e_output$e_est$e_natural
 
     # Hajek/stabilized weights by dividing by sample average since E[g/e] = 1
