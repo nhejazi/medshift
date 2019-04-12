@@ -42,18 +42,12 @@ make_simulated_data <- function(n_obs = 1000, # no. observations
   # mediators to affect the outcome
   ## 1st mediator (binary)
   z1_prob <- 1 - plogis((A^2 + W[, 1]) / (A + W[, 1]^3 + 0.5))
-  z1_prob[z1_prob < 0.01] <- 0.01
-  z1_prob[z1_prob > 0.99] <- 0.99
   Z_1 <- rbinom(n_obs, 1, prob = z1_prob)
   ## 2nd mediator (binary)
   z2_prob <- plogis((A - 1)^3 + W[, 2] / (W[, 3] + 3))
-  z2_prob[z2_prob < 0.01] <- 0.01
-  z2_prob[z2_prob > 0.99] <- 0.99
   Z_2 <- rbinom(n_obs, 1, prob = z2_prob)
   ## 3rd mediator (binary)
   z3_prob <- plogis((A - 1)^2 + 2 * W[, 1]^3 - 1 / (2 * W[, 1] + 0.5))
-  z3_prob[z3_prob < 0.01] <- 0.01
-  z3_prob[z3_prob > 0.99] <- 0.99
   Z_3 <- rbinom(n_obs, 1, prob = z3_prob)
   ## build matrix of mediators
   Z <- cbind(Z_1, Z_2, Z_3)
@@ -72,7 +66,7 @@ make_simulated_data <- function(n_obs = 1000, # no. observations
 }
 
 # get data and column names for sl3 tasks (for convenience)
-data <- make_simulated_data()
+data <- make_simulated_data(n_obs = 1000)
 z_names <- str_subset(colnames(data), "Z")
 w_names <- str_subset(colnames(data), "W")
 
@@ -106,7 +100,7 @@ if (!lifes_too_short) {
   )
   theta_ipw
 
-  theta_aipw <- medshift(
+  theta_os <- medshift(
     W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
     delta = delta_shift,
     g_lrnrs = hal_density_lrnr,
@@ -117,7 +111,7 @@ if (!lifes_too_short) {
     estimator = "onestep",
     estimator_args = list(cv_folds = 2)
   )
-  theta_aipw
+  theta_os
 
   test_that("Substitution and IPW estimator agree", {
     expect_equal(theta_sub$theta, theta_ipw$theta, tol = 1e-2)

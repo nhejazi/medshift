@@ -104,7 +104,7 @@ theta_ipw <- medshift(
 )
 theta_ipw
 
-theta_aipw <- medshift(
+theta_os <- medshift(
   W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
   delta = delta_shift,
   g_lrnrs = hal_binary_lrnr,
@@ -114,16 +114,16 @@ theta_aipw <- medshift(
   shift_type = "ipsi",
   estimator = "onestep",
 )
-theta_aipw
+theta_os
 
 test_that("Substitution and IPW estimator agree", {
   expect_equal(theta_sub$theta, theta_ipw$theta, tol = 1e-2)
 })
 
 test_that("Substitution and one-step estimator agree", {
-  expect_equal(theta_sub$theta, theta_aipw$theta, tol = 1e-2)
+  expect_equal(theta_sub$theta, theta_os$theta, tol = 1e-2)
 })
 
 test_that("IPW and efficient one-step estimator agree", {
-  expect_equal(theta_ipw$theta, theta_aipw$theta, tol = 1e-2)
+  expect_equal(theta_ipw$theta, theta_os$theta, tol = 1e-2)
 })

@@ -36,7 +36,7 @@ compute_Dzw <- function(data,
                         m_output,
                         delta,
                         shift_type = c("ipsi", "mtp"),
-                        mc_int_draws = 50) {
+                        mc_int_draws = 20) {
   if (shift_type == "ipsi") {
     # get g components from output for that nuisance parameter
     g_shifted_A1 <- g_output$g_est$g_pred_shifted_A1
