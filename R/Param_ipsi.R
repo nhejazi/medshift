@@ -39,8 +39,8 @@
 #'     }
 #' }
 #' @export
-Param_ipsi_binary <- R6::R6Class(
-  classname = "Param_ipsi_binary",
+Param_medshift <- R6::R6Class(
+  classname = "Param_medshift",
   portable = TRUE,
   class = TRUE,
   inherit = tmle3::Param_base,

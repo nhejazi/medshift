@@ -44,18 +44,12 @@ make_simulated_data <- function(n_obs = 1000, # no. observations
   # mediators to affect the outcome
   ## 1st mediator (binary)
   z1_prob <- 1 - plogis((A^2 + W[, 1]) / (A + W[, 1]^3 + 0.5))
-  z1_prob[z1_prob < 0.01] <- 0.01
-  z1_prob[z1_prob > 0.99] <- 0.99
   Z_1 <- rbinom(n_obs, 1, prob = z1_prob)
   ## 2nd mediator (binary)
   z2_prob <- plogis((A - 1)^3 + W[, 2] / (W[, 3] + 3))
-  z2_prob[z2_prob < 0.01] <- 0.01
-  z2_prob[z2_prob > 0.99] <- 0.99
   Z_2 <- rbinom(n_obs, 1, prob = z2_prob)
   ## 3rd mediator (binary)
   z3_prob <- plogis((A - 1)^2 + 2 * W[, 1]^3 - 1 / (2 * W[, 1] + 0.5))
-  z3_prob[z3_prob < 0.01] <- 0.01
-  z3_prob[z3_prob > 0.99] <- 0.99
   Z_3 <- rbinom(n_obs, 1, prob = z3_prob)
   ## build matrix of mediators
   Z <- cbind(Z_1, Z_2, Z_3)
@@ -85,29 +79,29 @@ npsem <- list(
   )),
   define_node("A", c("A"), c("W")),
   define_node("Z", c("Z_1", "Z_2", "Z_3"), c("A", "W")),
-  define_node("eA", c("A"), c("Z", "W")),
   define_node("Y", c("Y"), c("Z", "A", "W"))
 )
 
 factor_list <- list(
   define_lf(LF_emp, "W"),
   define_lf(LF_fit, "A", hal_binary_lrnr),
-  define_lf(LF_fit, "eA", hal_binary_lrnr),
   define_lf(LF_fit, "Y", hal_contin_lrnr, type = "mean")
 )
 
 # create TMLE task
 tmle_task <- tmle3_Task$new(data, npsem = npsem)
 likelihood_def <- Likelihood$new(factor_list)
-likelihood <- likelihood_def$train(tmle_task)
-likelihood$get_likelihoods(tmle_task)
-initial_likelihood <- likelihood
+likelihood_init <- likelihood_def$train(tmle_task)
+likelihood_init$get_likelihoods(tmle_task)
 
 # NEXT, need targeted_likelihood constructor
 updater <- tmle3_Update$new(cvtmle = FALSE)
-likelihood_targeted <- Targeted_Likelihood$new(initial_likelihood, updater)
+likelihood_targeted <- Targeted_Likelihood$new(likelihood_init, updater)
 
 # compute a tmle3 "by hand"
+tsm <- define_param(Param_TSM, likelihood, intervention)
+updater$tmle_params <- tsm
+
 if (FALSE) {
   # define data (from tmle3_Spec base class)
   tmle_task <- tmle_spec$make_tmle_task(data, node_list)

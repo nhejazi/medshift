@@ -43,18 +43,12 @@ make_simulated_data <- function(n_obs = 1000, # no. observations
   # mediators to affect the outcome
   ## 1st mediator (binary)
   z1_prob <- 1 - plogis((A^2 + W[, 1]) / (A + W[, 1]^3 + 0.5))
-  z1_prob[z1_prob < 0.01] <- 0.01
-  z1_prob[z1_prob > 0.99] <- 0.99
   Z_1 <- rbinom(n_obs, 1, prob = z1_prob)
   ## 2nd mediator (binary)
   z2_prob <- plogis((A - 1)^3 + W[, 2] / (W[, 3] + 3))
-  z2_prob[z2_prob < 0.01] <- 0.01
-  z2_prob[z2_prob > 0.99] <- 0.99
   Z_2 <- rbinom(n_obs, 1, prob = z2_prob)
   ## 3rd mediator (binary)
   z3_prob <- plogis((A - 1)^2 + 2 * W[, 1]^3 - 1 / (2 * W[, 1] + 0.5))
-  z3_prob[z3_prob < 0.01] <- 0.01
-  z3_prob[z3_prob > 0.99] <- 0.99
   Z_3 <- rbinom(n_obs, 1, prob = z3_prob)
   ## build matrix of mediators
   Z <- cbind(Z_1, Z_2, Z_3)
