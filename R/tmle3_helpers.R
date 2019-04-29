@@ -42,10 +42,6 @@ stochastic_mediation_likelihood <- function(tmle_task, learner_list) {
   A_factor <- define_lf(LF_fit, "A", learner = learner_list[["A"]],
                         bound = A_bound)
 
-  # mediator re-parametrization
-  eA_factor <- define_lf(LF_fit, "eA", learner = learner_list[["eA"]],
-                         bound = "mean")
-
   # outcome
   Y_factor <- define_lf(LF_fit, "Y", learner = learner_list[["Y"]],
                         type = "mean")
@@ -56,4 +52,51 @@ stochastic_mediation_likelihood <- function(tmle_task, learner_list) {
   likelihood_def <- Likelihood$new(factor_list)
   likelihood <- likelihood_def$train(tmle_task)
   return(likelihood)
+}
+
+
+#' Make task for derived likelihood factor e(A,W)
+#'
+#' @param tmle_task ...
+#' @param likelihood ...
+#'
+#' @export
+#
+make_e_task <- function(tmle_task, likelihood) {
+  e_data <- tmle_task$internal_data
+  e_task <- sl3_Task$new(data = e_data,
+                         outcome = tmle_task$npsem[["A"]]$variables,
+                         covariates = c(tmle_task$npsem[["Z"]]$variables,
+                                        tmle_task$npsem[["W"]]$variables))
+  return(e_task)
+}
+
+#' Make task for derived likelihood factor phi(W)
+#'
+#' @param tmle_task ...
+#' @param likelihood ...
+#'
+#' @export
+#
+make_phi_task <- function(tmle_task, likelihood) {
+  # create treatment and control tasks for intervention conditions
+  treatment_task <-
+    tmle_task$generate_counterfactual_task(uuid = uuid::UUIDgenerate(),
+                                           new_data = data.table(A = 1))
+  control_task <-
+    tmle_task$generate_counterfactual_task(uuid = uuid::UUIDgenerate(),
+                                           new_data = data.table(A = 0))
+
+  # ...
+  m1 <- likelihood$get_likelihood(treatment_task, "Y")
+  m0 <- likelihood$get_likelihood(control_task, "Y")
+  m_diff <- m1 - m0
+
+  # ...
+  phi_data <- data.table::as.data.table(list(m_diff = m_diff,
+                                             tmle_task$get_tmle_node("W")))
+  phi_task <- sl3_Task$new(data = phi_data,
+                           outcome = "m_diff",
+                           covariates = tmle_task$npsem[["W"]]$variables)
+  return(phi_task)
 }

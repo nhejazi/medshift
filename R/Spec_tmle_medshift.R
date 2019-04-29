@@ -9,22 +9,22 @@
 #'
 #' @export
 #
-tmle3_Spec_ipsi_medshift <- R6::R6Class(
-  classname = "tmle3_Spec_ipsi_medshift",
+tmle3_Spec_medshift <- R6::R6Class(
+  classname = "tmle3_Spec_medshift",
   portable = TRUE,
   class = TRUE,
   inherit = tmle3_Spec,
   public = list(
-    initialize = function(shift_fxn = shift_additive_bounded,
-                              shift_fxn_inv = shift_additive_bounded_inv,
-                              shift_val = 0,
-                              max_shifted_ratio = 2,
-                              ...) {
+    initialize = function(shift_fxn = shift_ipsi,
+                          shift_val = 0,
+                          e_lrnrs,
+                          phi_lrnrs,
+                          ...) {
       options <- list(
         shift_fxn = shift_fxn,
-        shift_fxn_inv = shift_fxn_inv,
-        delta_shift = shift_val,
-        max_shifted_ratio = max_shifted_ratio,
+        delta_ipsi = shift_val,
+        e_lrnrs = e_lrnrs,
+        phi_lrnrs = phi_lrnrs,
         ...
       )
       do.call(super$initialize, options)
@@ -32,30 +32,29 @@ tmle3_Spec_ipsi_medshift <- R6::R6Class(
     make_params = function(tmle_task, likelihood) {
       # TODO: export and use sl3:::get_levels
       A_vals <- tmle_task$get_tmle_node("A")
-      if (is.factor(A_vals)) {
-        msg <- paste(
-          "This parameter is defined as a shift of a continuous",
-          "treatment. The treatment detected is NOT continuous."
-        )
-        stop(msg)
-      }
 
       # unwrap internalized arguments
       shift_fxn <- self$options$shift_fxn
-      shift_fxn_inv <- self$options$shift_fxn_inv
-      delta_shift <- self$options$delta_shift
-      max_shifted_ratio <- self$options$max_shifted_ratio
+      delta_ipsi <- self$options$delta_ipsi
+      e_lrnrs <- self$options$e_lrnrs
+      phi_lrnrs <- self$options$phi_lrnrs
 
-      # define shift intervention (additive only for now)
-      intervention <- tmle3::define_lf(LF_shift,
+      # derived likelihood factors: e(A,W) and phi(W)
+      lf_e <- tmle3::define_lf(tmle3::LF_derived, "E", e_lrnrs, likelihood,
+                               make_e_task)
+      lf_phi <- tmle3::define_lf(tmle3::LF_derived, "phi", phi_lrnrs,
+                                 likelihood, make_phi_task)
+      likelihood$add_factors(lf_e)
+      likelihood$add_factors(lf_phi)
+
+      # define incremental propensity score intervention
+      intervention <- tmle3::define_lf(LF_shift_ipsi,
         name = "A",
         original_lf = likelihood$factor_list[["A"]],
-        likelihood_base = likelihood, # initialized likelihood
-        shift_fxn, shift_fxn_inv, # shift fxns (from user)
-        shift_delta = delta_shift, # shift magnitude
-        max_shifted_ratio = max_shifted_ratio # max ratio difference
+        likelihood_base = likelihood,           # initialized likelihood
+        shift_fxn,                              # shift function (from user)
+        shift_factor = delta_ipsi               # magnitude of shift multiplier
       )
-
       shifted_mean <- tmle3::Param_TSM$new(likelihood, intervention)
 
       # output should be a list
