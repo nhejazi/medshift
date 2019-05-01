@@ -48,7 +48,7 @@ tmle3_Spec_medshift <- R6::R6Class(
       likelihood$add_factors(lf_phi)
 
       # define incremental propensity score intervention
-      intervention <- tmle3::define_lf(LF_shift_ipsi,
+      intervention <- tmle3::define_lf(LF_exptilt_ipsi,
         name = "A",
         original_lf = likelihood$factor_list[["A"]],
         likelihood_base = likelihood,           # initialized likelihood

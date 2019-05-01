@@ -1,0 +1,169 @@
+#' Parameter for mediation effect under stochastic interventions
+#'
+#' Parameter definition...
+#'
+#' @importFrom R6 R6Class
+#' @importFrom uuid UUIDgenerate
+#' @importFrom methods is
+#' @importFrom tmle3 Param_base
+#' @family Parameters
+#' @keywords data
+#'
+#' @return \code{Param_base} object
+#'
+#' @format \code{\link{R6Class}} object.
+#'
+#' @section Constructor:
+#'   \code{define_param(Param_esteqn_medshift, observed_likelihood, intervention_list, ..., outcome_node)}
+#'
+#'   \describe{
+#'     \item{\code{observed_likelihood}}{A \code{\link{Likelihood}}
+#'           corresponding to the observed likelihood.
+#'     }
+#'     \item{\code{shift_delta}}{\code{numeric}, specification of the magnitude
+#'           of the desired shift (a multiplier for the propensity score).
+#'     }
+#'     \item{\code{...}}{Not currently used.
+#'     }
+#'     \item{\code{outcome_node}}{character, the name of the node that should be treated as the outcome
+#'     }
+#'     }
+#'
+#' @section Fields:
+#' \describe{
+#'     \item{\code{cf_likelihood}}{the counterfactual likelihood under the
+#'           stochastic intervention on mediators and treatment.
+#'     }
+#' }
+#' @export
+Param_medshift <- R6::R6Class(
+  classname = "Param_medshift",
+  portable = TRUE,
+  class = TRUE,
+  inherit = tmle3::Param_base,
+  public = list(
+    initialize = function(observed_likelihood,
+                          shift_delta,
+                          outcome_node = "Y") {
+      # copied from parameter definition for ATT...
+      super$initialize(observed_likelihood, list(),
+                       outcome_node = outcome_node)
+
+      # generate counterfactual likelihood under intervention via LF_exptilt
+      lf_exptilt <- LF_exptilt_ipsi$new(name = "A",
+                                        likelihood_base = observed_likelihood,
+                                        shift_delta = shift_delta)
+
+      # store components
+      private$.cf_likelihood <- CF_Likelihood$new(observed_likelihood,
+                                                  lf_exptilt)
+      private$.lf_exptilt <- lf_exptilt
+      private$.shift_delta <- shift_delta
+      browser()
+    },
+    clever_covariates = function(tmle_task = NULL, fold_number = "full") {
+      if (is.null(tmle_task)) {
+        tmle_task <- self$observed_likelihood$training_task
+      }
+
+      # get observed likelihood
+      likelihood <- self$observed_likelihood
+      cf_likelihood <- self$cf_likelihood
+      shift_delta <- self$shift_delta
+
+      # extract various likelihood components
+      m_est <- likelihood$get_likelihood(tmle_task, "Y")
+      e_est <- likelihood$get_likelihood(tmle_task, "E")
+      phi_est <- likelihood$get_likelihood(tmle_task, "phi")
+      g_delta_est <- cf_likelihood$get_likelihood(tmle_task, "A")
+
+      browser()
+
+      # compute/extract g(1|W) for clever covariate for score of A
+      treatment_task <-
+        tmle_task$generate_counterfactual_task(uuid = uuid::UUIDgenerate(),
+                                               new_data = data.table(A = 1))
+      control_task <-
+        tmle_task$generate_counterfactual_task(uuid = uuid::UUIDgenerate(),
+                                               new_data = data.table(A = 0))
+      g1_est <- likelihood$get_likelihood(treatment_task, "A", fold_number)
+      g0_est <- likelihood$get_likelihood(control_task, "A", fold_number)
+
+      # clever covariates
+      HY <- g_delta_est / e_est
+      HA <- (shift_delta * phi_est) / ((shift_delta * g1_est) + g0_est)^2
+      return(list(Y = HY, A = HA))
+    },
+    estimates = function(tmle_task = NULL, fold_number = "full") {
+      if (is.null(tmle_task)) {
+        tmle_task <- self$observed_likelihood$training_task
+      }
+
+      # get observed likelihood
+      likelihood <- self$observed_likelihood
+      cf_likelihood <- self$cf_likelihood
+      shift_delta <- self$shift_delta
+
+      # extract various likelihood components
+      y <- tmle_task$get_tmle_node(self$outcome_node)
+      a <- tmle_task$get_tmle_node(self$lf_exptilt$name)
+      m_est <- likelihood$get_likelihood(tmle_task, "Y")
+
+      # clever_covariates happens here but this is repeated computation
+      HY <- self$clever_covariates(tmle_task,
+                                   fold_number)[[self$outcome_node]]
+      HA <- self$clever_covariates(tmle_task,
+                                   fold_number)[[self$lf_exptilt$name]]
+
+      # compute individual scores for DY, DA
+      D_Y <- HY * (y - m_est)
+      D_A <- HA * (a - g1_est)
+
+      # compute/extract g(1|W) for clever covariate for score of A
+      treatment_task <-
+        tmle_task$generate_counterfactual_task(uuid = uuid::UUIDgenerate(),
+                                               new_data = data.table(A = 1))
+      control_task <-
+        tmle_task$generate_counterfactual_task(uuid = uuid::UUIDgenerate(),
+                                               new_data = data.table(A = 0))
+      g1_delta_est <- cf_likelihood$get_likelihood(treatment_task, "A",
+                                                   fold_number)
+      g0_delta_est <- cf_likelihood$get_likelihood(control_task, "A",
+                                                   fold_number)
+      m1_est <- likelihood$get_likelihood(treatment_task, "Y", fold_number)
+      m0_est <- likelihood$get_likelihood(control_task, "Y", fold_number)
+
+      # compute score for DZW
+      D_ZW <- (g1_delta_est * m1_est) + (g0_delta_est * m0_est)
+
+      # parameter and influence function
+      theta <- mean(D_Y + D_A + D_ZW)
+      eif <- D_Y + D_A + D_ZW - theta
+
+      # output
+      result <- list(psi = theta, IC = eif)
+      return(result)
+    }
+  ),
+  active = list(
+    name = function() {
+      param_form <- sprintf(
+        "E[%s_{%s}]", self$outcome_node,
+        self$cf_likelihood$name
+      )
+      return(param_form)
+    },
+    cf_likelihood = function() {
+      return(private$.cf_likelihood)
+    },
+    update_nodes = function() {
+      return(self$outcome_node)
+    }
+  ),
+  private = list(
+    .type = "medshift_ipsi",
+    .cf_likelihood = NULL,
+    .lf_exptilt = NULL,
+    .shift_delta = NULL
+  )
+)

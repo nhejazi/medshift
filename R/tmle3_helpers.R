@@ -97,6 +97,7 @@ make_phi_task <- function(tmle_task, likelihood) {
                                              tmle_task$get_tmle_node("W")))
   phi_task <- sl3_Task$new(data = phi_data,
                            outcome = "m_diff",
-                           covariates = tmle_task$npsem[["W"]]$variables)
+                           covariates = tmle_task$npsem[["W"]]$variables,
+                           outcome_type = "continuous")
   return(phi_task)
 }

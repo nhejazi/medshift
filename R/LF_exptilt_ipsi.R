@@ -65,10 +65,10 @@ LF_exptilt_ipsi <- R6::R6Class(
       private$.likelihood_base <- likelihood_base
       private$.shift_delta <- shift_delta
     },
-    get_mean = function(tmle_task, cv_fold) {
+    get_mean = function(tmle_task, fold_number) {
       stop(paste("get_mean not supported for", class(self)[1]))
     },
-    get_density = function(tmle_task, cv_fold) {
+    get_density = function(tmle_task, fold_number = "full") {
       # create treatment and control tasks for intervention conditions
       treatment_task <-
         tmle_task$generate_counterfactual_task(uuid = uuid::UUIDgenerate(),
@@ -78,10 +78,13 @@ LF_exptilt_ipsi <- R6::R6Class(
                                                new_data = data.table(A = 0))
 
       # get shifted likelihood values for g(A,W)
-      g1 <- self$likelihood_base$get_likelihood(treatment_task, "A")
-      g0 <- self$likelihood_base$get_likelihood(control_task, "A")
+      g1 <- self$likelihood_base$get_likelihood(treatment_task, "A",
+                                                fold_number)
+      g0 <- self$likelihood_base$get_likelihood(control_task, "A",
+                                                fold_number)
       g_delta <- (exp(self$shift_delta * tmle_task$get_tmle_node("A")) *
-                  self$likelihood_base$get_likelihood(tmle_task)) /
+                  self$likelihood_base$get_likelihood(tmle_task, "A",
+                                                      fold_number)) /
         (self$shift_delta * g1 + g0)
 
       # return counterfactual likelihood for shifted propensity score
@@ -89,7 +92,9 @@ LF_exptilt_ipsi <- R6::R6Class(
       return(cf_likelihood)
     },
     cf_values = function(tmle_task) {
-      stop(paste("cf_values is not undefined for", class(self)[1]))
+      cf_values <- rep(NA, tmle_task$nrow)
+      return(cf_values)
+      #stop(paste("cf_values is undefined for", class(self)[1]))
     }
   ),
   active = list(
