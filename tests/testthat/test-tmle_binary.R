@@ -99,21 +99,25 @@ updater <- tmle3_Update$new(cvtmle = FALSE)
 likelihood_targeted <- Targeted_Likelihood$new(likelihood_init, updater)
 
 # add derived likelihood factors to targeted likelihood object
-lf_e <- tmle3::define_lf(tmle3::LF_derived, "E", fglm_binary_lrnr,
+lf_e <- tmle3::define_lf(tmle3::LF_derived, "E", hal_binary_lrnr,
                          likelihood_targeted, medshift::make_e_task)
-lf_phi <- tmle3::define_lf(tmle3::LF_derived, "phi", fglm_contin_lrnr,
+lf_phi <- tmle3::define_lf(tmle3::LF_derived, "phi", hal_contin_lrnr,
                            likelihood_targeted, medshift::make_phi_task)
 likelihood_targeted$add_factors(lf_e)
 likelihood_targeted$add_factors(lf_phi)
 
 # compute a tmle3 "by hand"
-medshift_ipsi <- define_param(Param_medshift, likelihood_targeted,
-                              shift_delta = delta)
-updater$tmle_params <- medshift_ipsi
+tmle_params <- define_param(Param_medshift, likelihood_targeted,
+                            shift_param = delta)
+updater$tmle_params <- tmle_params
 
-# test param methods
+# separately test param methods
 medshift_ipsi$clever_covariates(tmle_task)
-medshift_ipsi$estimates(tmle_task)
+theta_tmle <- medshift_ipsi$estimates(tmle_task)
+
+# fit TML estimator update
+tmle_fit <- fit_tmle3(tmle_task, likelihood_targeted, tmle_params, updater)
+
 
 if (FALSE) {
   # define data (from tmle3_Spec base class)

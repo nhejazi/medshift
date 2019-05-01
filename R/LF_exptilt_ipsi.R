@@ -24,7 +24,7 @@
 #'
 #' @section Constructor:
 #'   \code{define_lf(LF_exptilt_ipsi, name, type = "density", likelihood_base,
-#'     shift_delta, ...)}
+#'     shift_param, ...)}
 #'
 #'   \describe{
 #'     \item{\code{name}}{character, the name of the factor. Should match a node
@@ -33,7 +33,7 @@
 #'     \item{\code{likelihood_base}}{The trained \code{\link{likelihood}}
 #'           object, for use in generating a re-scaled likelihood factor.
 #'     }
-#'     \item{\code{shift_delta}}{\code{numeric}, specification of the magnitude
+#'     \item{\code{shift_param}}{\code{numeric}, specification of the magnitude
 #'           of the desired shift (a multiplier for the propensity score).
 #'     }
 #'     \item{\code{...}}{Not currently used.
@@ -45,7 +45,7 @@
 #'     \item{\code{likelihood_base}}{The trained \code{\link{likelihood}}
 #'           object, for use in generating a re-scaled likelihood factor.
 #'     }
-#'     \item{\code{shift_delta}}{\code{numeric}, specification of the magnitude
+#'     \item{\code{shift_param}}{\code{numeric}, specification of the magnitude
 #'           of the desired shift (a multiplier for the propensity score).
 #'     }
 #'     \item{\code{...}}{Additional arguments passed to the base class.
@@ -60,10 +60,10 @@ LF_exptilt_ipsi <- R6::R6Class(
   class = TRUE,
   inherit = tmle3::LF_base,
   public = list(
-    initialize = function(name, likelihood_base, shift_delta, ...) {
+    initialize = function(name, likelihood_base, shift_param, ...) {
       super$initialize(name, ..., type = "density")
       private$.likelihood_base <- likelihood_base
-      private$.shift_delta <- shift_delta
+      private$.shift_param <- shift_param
     },
     get_mean = function(tmle_task, fold_number) {
       stop(paste("get_mean not supported for", class(self)[1]))
@@ -82,10 +82,10 @@ LF_exptilt_ipsi <- R6::R6Class(
                                                 fold_number)
       g0 <- self$likelihood_base$get_likelihood(control_task, "A",
                                                 fold_number)
-      g_delta <- (exp(self$shift_delta * tmle_task$get_tmle_node("A")) *
+      g_delta <- (exp(self$shift_param * tmle_task$get_tmle_node("A")) *
                   self$likelihood_base$get_likelihood(tmle_task, "A",
                                                       fold_number)) /
-        (self$shift_delta * g1 + g0)
+        (self$shift_param * g1 + g0)
 
       # return counterfactual likelihood for shifted propensity score
       cf_likelihood <- g_delta
@@ -101,13 +101,13 @@ LF_exptilt_ipsi <- R6::R6Class(
     likelihood_base = function() {
       return(private$.likelihood_base)
     },
-    shift_delta = function() {
-      return(private$.shift_delta)
+    shift_param = function() {
+      return(private$.shift_param)
     }
   ),
   private = list(
     .name = NULL,
     .likelihood_base = NULL,
-    .shift_delta = NULL
+    .shift_param = NULL
   )
 )

@@ -17,7 +17,7 @@ LF_exptilt_ipsi
 \section{Constructor}{
 
   \code{define_lf(LF_exptilt_ipsi, name, type = "density", likelihood_base,
-    shift_delta, ...)}
+    shift_param, ...)}
 
   \describe{
     \item{\code{name}}{character, the name of the factor. Should match a node
@@ -26,7 +26,7 @@ LF_exptilt_ipsi
     \item{\code{likelihood_base}}{The trained \code{\link{likelihood}}
           object, for use in generating a re-scaled likelihood factor.
     }
-    \item{\code{shift_delta}}{\code{numeric}, specification of the magnitude
+    \item{\code{shift_param}}{\code{numeric}, specification of the magnitude
           of the desired shift (a multiplier for the propensity score).
     }
     \item{\code{...}}{Not currently used.
@@ -40,7 +40,7 @@ LF_exptilt_ipsi
     \item{\code{likelihood_base}}{The trained \code{\link{likelihood}}
           object, for use in generating a re-scaled likelihood factor.
     }
-    \item{\code{shift_delta}}{\code{numeric}, specification of the magnitude
+    \item{\code{shift_param}}{\code{numeric}, specification of the magnitude
           of the desired shift (a multiplier for the propensity score).
     }
     \item{\code{...}}{Additional arguments passed to the base class.

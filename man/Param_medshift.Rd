@@ -22,14 +22,15 @@ Parameter definition...
     \item{\code{observed_likelihood}}{A \code{\link{Likelihood}}
           corresponding to the observed likelihood.
     }
-    \item{\code{shift_delta}}{\code{numeric}, specification of the magnitude
+    \item{\code{shift_param}}{\code{numeric}, specification of the magnitude
           of the desired shift (a multiplier for the propensity score).
     }
     \item{\code{...}}{Not currently used.
     }
-    \item{\code{outcome_node}}{character, the name of the node that should be treated as the outcome
+    \item{\code{outcome_node}}{character, the name of the node that should be
+          treated as the outcome
     }
-    }
+  }
 }
 
 \section{Fields}{
