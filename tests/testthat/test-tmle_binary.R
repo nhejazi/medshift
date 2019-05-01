@@ -110,6 +110,8 @@ theta_tmle <- tmle_params$estimates(tmle_task)
 # fit TML estimator update
 tmle_fit <- fit_tmle3(tmle_task, likelihood_targeted, tmle_params, updater)
 
+
+
 # fit one-step estimator
 os_fit <- medshift(
   W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
@@ -121,6 +123,16 @@ os_fit <- medshift(
   estimator = "onestep",
 )
 
+# fit substitution estimator
+sub_fit <- medshift(
+  W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
+  delta = delta,
+  g_lrnrs = hal_binary_lrnr,
+  e_lrnrs = hal_binary_lrnr,
+  m_lrnrs = hal_contin_lrnr,
+  phi_lrnrs = hal_contin_lrnr,
+  estimator = "substitution",
+)
 
 
 # how Specs are used...

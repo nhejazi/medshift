@@ -17,7 +17,7 @@ LF_exptilt_ipsi
 \section{Constructor}{
 
   \code{define_lf(LF_exptilt_ipsi, name, type = "density", likelihood_base,
-    shift_param, ...)}
+    shift_param, treatment_task, control_task, ...)}
 
   \describe{
     \item{\code{name}}{character, the name of the factor. Should match a node
@@ -28,6 +28,12 @@ LF_exptilt_ipsi
     }
     \item{\code{shift_param}}{\code{numeric}, specification of the magnitude
           of the desired shift (a multiplier for the propensity score).
+    }
+    \item{\code{treatment_task}}{\code{\link{tmle3_Task}} object created from
+          setting the intervention to the treatment condition: do(A = 1).
+    }
+    \item{\code{control_task}}{\code{\link{tmle3_Task}} object created from
+          setting the intervention to the control condition: do(A = 0).
     }
     \item{\code{...}}{Not currently used.
     }
@@ -42,6 +48,12 @@ LF_exptilt_ipsi
     }
     \item{\code{shift_param}}{\code{numeric}, specification of the magnitude
           of the desired shift (a multiplier for the propensity score).
+    }
+    \item{\code{treatment_task}}{\code{\link{tmle3_Task}} object created from
+          setting the intervention to the treatment condition: do(A = 1).
+    }
+    \item{\code{control_task}}{\code{\link{tmle3_Task}} object created from
+          setting the intervention to the control condition: do(A = 0).
     }
     \item{\code{...}}{Additional arguments passed to the base class.
     }

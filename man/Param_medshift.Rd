@@ -39,6 +39,18 @@ Parameter definition...
     \item{\code{cf_likelihood}}{the counterfactual likelihood under the
           stochastic intervention on mediators and treatment.
     }
+    \item{\code{lf_exptilt}}{Object derived from \code{\link{LF_base}} for
+          assessing the stochastic mediation intervention.
+    }
+    \item{\code{treatment_task}}{\code{\link{tmle3_Task}} object created from
+          setting the intervention to the treatment condition: do(A = 1).
+    }
+    \item{\code{control_task}}{\code{\link{tmle3_Task}} object created from
+          setting the intervention to the control condition: do(A = 0).
+    }
+    \item{\code{shift_param}}{\code{numeric}, specification of the magnitude
+          of the desired shift (a multiplier for the propensity score).
+    }
 }
 }
 

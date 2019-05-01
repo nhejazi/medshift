@@ -109,6 +109,7 @@ Param_medshift <- R6::R6Class(
 
       # clever covariates
       HY <- g_delta_est / e_est
+      # NOTE: exp(shift_param) for generalized exponential tilting
       HA <- (shift_param * phi_est) / ((shift_param * g1_est) + g0_est)^2
       return(list(Y = HY, A = HA))
     },

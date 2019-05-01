@@ -93,10 +93,14 @@ LF_exptilt_ipsi <- R6::R6Class(
                                                 fold_number)
       g0 <- self$likelihood_base$get_likelihood(control_task, "A",
                                                 fold_number)
-      g_delta <- (exp(self$shift_param * tmle_task$get_tmle_node("A")) *
+      #g_delta <- (exp(self$shift_param * tmle_task$get_tmle_node("A")) *
+                  #self$likelihood_base$get_likelihood(tmle_task, "A",
+                                                      #fold_number)) /
+        #((exp(self$shift_param) * g1) + g0)
+      g_delta <- (self$shift_param * tmle_task$get_tmle_node("A") *
                   self$likelihood_base$get_likelihood(tmle_task, "A",
                                                       fold_number)) /
-        (self$shift_param * g1 + g0)
+        ((self$shift_param * g1) + g0)
 
       # return counterfactual likelihood for shifted propensity score
       cf_likelihood <- g_delta
