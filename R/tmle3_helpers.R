@@ -47,7 +47,7 @@ stochastic_mediation_likelihood <- function(tmle_task, learner_list) {
                         type = "mean")
 
   # construct and train likelihood
-  factor_list <- list(W_factor, A_factor, eA_factor, Y_factor)
+  factor_list <- list(W_factor, A_factor, Y_factor)
 
   likelihood_def <- Likelihood$new(factor_list)
   likelihood <- likelihood_def$train(tmle_task)

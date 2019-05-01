@@ -72,15 +72,19 @@ data <- make_simulated_data()
 z_names <- colnames(data)[str_detect(colnames(data), "Z")]
 w_names <- colnames(data)[str_detect(colnames(data), "W")]
 
-# set up TMLE components: NPSEM, likelihood
-npsem <- list(
-  define_node("W", c(
-    "W_1", "W_2", "W_3"
-  )),
-  define_node("A", c("A"), c("W")),
-  define_node("Z", c("Z_1", "Z_2", "Z_3"), c("A", "W")),
-  define_node("Y", c("Y"), c("Z", "A", "W"))
-)
+# create node list and learner list
+node_list <- list(W = c("W_1", "W_2", "W_3"),
+                  A = "A",
+                  Z = c("Z_1", "Z_2", "Z_3"),
+                  Y = "Y")
+learner_list <- list(Y = hal_contin_lrnr,
+                     A = hal_contin_lrnr)
+
+# set up TMLE components: NPSEM, likelihood, TMLE task
+npsem <- stochastic_mediation_npsem(node_list)
+tmle_task <- tmle3_Task$new(data, npsem = npsem)
+likelihood_init <- stochastic_mediation_likelihood(tmle_task, learner_list)
+likelihood_init$get_likelihoods(tmle_task)
 
 factor_list <- list(
   define_lf(LF_emp, "W"),
@@ -88,11 +92,8 @@ factor_list <- list(
   define_lf(LF_fit, "Y", hal_contin_lrnr, type = "mean")
 )
 
-# create TMLE task
-tmle_task <- tmle3_Task$new(data, npsem = npsem)
 likelihood_def <- Likelihood$new(factor_list)
 likelihood_init <- likelihood_def$train(tmle_task)
-likelihood_init$get_likelihoods(tmle_task)
 
 # NEXT, need targeted_likelihood constructor
 updater <- tmle3_Update$new(cvtmle = FALSE)
@@ -112,13 +113,26 @@ tmle_params <- define_param(Param_medshift, likelihood_targeted,
 updater$tmle_params <- tmle_params
 
 # separately test param methods
-medshift_ipsi$clever_covariates(tmle_task)
-theta_tmle <- medshift_ipsi$estimates(tmle_task)
+tmle_params$clever_covariates(tmle_task)
+theta_tmle <- tmle_params$estimates(tmle_task)
 
 # fit TML estimator update
 tmle_fit <- fit_tmle3(tmle_task, likelihood_targeted, tmle_params, updater)
 
+# fit one-step estimator
+os_fit <- medshift(
+  W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
+  delta = delta,
+  g_lrnrs = hal_binary_lrnr,
+  e_lrnrs = hal_binary_lrnr,
+  m_lrnrs = hal_contin_lrnr,
+  phi_lrnrs = hal_contin_lrnr,
+  estimator = "onestep",
+)
 
+
+
+# how Specs are used...
 if (FALSE) {
   # define data (from tmle3_Spec base class)
   tmle_task <- tmle_spec$make_tmle_task(data, node_list)
