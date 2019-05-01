@@ -35,6 +35,18 @@
 #'     \item{\code{cf_likelihood}}{the counterfactual likelihood under the
 #'           stochastic intervention on mediators and treatment.
 #'     }
+#'     \item{\code{lf_exptilt}}{Object derived from \code{\link{LF_base}} for
+#'           assessing the stochastic mediation intervention.
+#'     }
+#'     \item{\code{treatment_task}}{\code{\link{tmle3_Task}} object created from
+#'           setting the intervention to the treatment condition: do(A = 1).
+#'     }
+#'     \item{\code{control_task}}{\code{\link{tmle3_Task}} object created from
+#'           setting the intervention to the control condition: do(A = 0).
+#'     }
+#'     \item{\code{shift_param}}{\code{numeric}, specification of the magnitude
+#'           of the desired shift (a multiplier for the propensity score).
+#'     }
 #' }
 #' @export
 Param_medshift <- R6::R6Class(
@@ -50,16 +62,28 @@ Param_medshift <- R6::R6Class(
       super$initialize(observed_likelihood, list(),
                        outcome_node = outcome_node)
 
+      # counterfactual tasks
+      treatment_task <-
+        tmle_task$generate_counterfactual_task(uuid = uuid::UUIDgenerate(),
+                                               new_data = data.table(A = 1))
+      control_task <-
+        tmle_task$generate_counterfactual_task(uuid = uuid::UUIDgenerate(),
+                                               new_data = data.table(A = 0))
+
       # generate counterfactual likelihood under intervention via LF_exptilt
       lf_exptilt <- LF_exptilt_ipsi$new(name = "A",
                                         likelihood_base = observed_likelihood,
-                                        shift_param = shift_param)
+                                        shift_param = shift_param,
+                                        treatment_task = treatment_task,
+                                        control_task = control_task)
 
       # store components
       private$.cf_likelihood <- CF_Likelihood$new(observed_likelihood,
                                                   lf_exptilt)
       private$.lf_exptilt <- lf_exptilt
       private$.shift_param <- shift_param
+      private$.treatment_task <- treatment_task
+      private$.control_task <- control_task
     },
     clever_covariates = function(tmle_task = NULL, fold_number = "full") {
       if (is.null(tmle_task)) {
@@ -70,6 +94,8 @@ Param_medshift <- R6::R6Class(
       likelihood <- self$observed_likelihood
       cf_likelihood <- self$cf_likelihood
       shift_param <- self$shift_param
+      treatment_task <- self$treatment_task
+      control_task <- self$control_task
 
       # extract various likelihood components
       m_est <- likelihood$get_likelihood(tmle_task, "Y")
@@ -78,12 +104,6 @@ Param_medshift <- R6::R6Class(
       g_delta_est <- cf_likelihood$get_likelihood(tmle_task, "A")
 
       # compute/extract g(1|W) for clever covariate for score of A
-      treatment_task <-
-        tmle_task$generate_counterfactual_task(uuid = uuid::UUIDgenerate(),
-                                               new_data = data.table(A = 1))
-      control_task <-
-        tmle_task$generate_counterfactual_task(uuid = uuid::UUIDgenerate(),
-                                               new_data = data.table(A = 0))
       g1_est <- likelihood$get_likelihood(treatment_task, "A", fold_number)
       g0_est <- likelihood$get_likelihood(control_task, "A", fold_number)
 
@@ -101,6 +121,8 @@ Param_medshift <- R6::R6Class(
       likelihood <- self$observed_likelihood
       cf_likelihood <- self$cf_likelihood
       shift_param <- self$shift_param
+      treatment_task <- self$treatment_task
+      control_task <- self$control_task
 
       # extract various likelihood components
       y <- tmle_task$get_tmle_node(self$outcome_node)
@@ -108,12 +130,6 @@ Param_medshift <- R6::R6Class(
       m_est <- likelihood$get_likelihood(tmle_task, "Y")
 
       # compute/extract g(1|W) for clever covariate for score of A
-      treatment_task <-
-        tmle_task$generate_counterfactual_task(uuid = uuid::UUIDgenerate(),
-                                               new_data = data.table(A = 1))
-      control_task <-
-        tmle_task$generate_counterfactual_task(uuid = uuid::UUIDgenerate(),
-                                               new_data = data.table(A = 0))
       g1_est <- likelihood$get_likelihood(treatment_task, "A", fold_number)
       g0_est <- likelihood$get_likelihood(control_task, "A", fold_number)
       g1_delta_est <- cf_likelihood$get_likelihood(treatment_task, "A",
@@ -135,7 +151,8 @@ Param_medshift <- R6::R6Class(
       D_ZW <- (g1_delta_est * m1_est) + (g0_delta_est * m0_est)
 
       # parameter and influence function
-      theta <- mean(D_Y + D_A + D_ZW)
+      theta <- mean(D_ZW)
+      #theta <- mean(D_Y + D_A + D_ZW)
       eif <- D_Y + D_A + D_ZW - theta
 
       # output
@@ -160,6 +177,12 @@ Param_medshift <- R6::R6Class(
     shift_param = function() {
       return(private$.shift_param)
     },
+    treatment_task = function() {
+      return(private$.treatment_task)
+    },
+    control_task = function() {
+      return(private$.control_task)
+    },
     update_nodes = function() {
       return(self$outcome_node)
     }
@@ -168,6 +191,8 @@ Param_medshift <- R6::R6Class(
     .type = "medshift_ipsi",
     .cf_likelihood = NULL,
     .lf_exptilt = NULL,
-    .shift_param = NULL
+    .shift_param = NULL,
+    .treatment_task = NULL,
+    .control_task = NULL
   )
 )

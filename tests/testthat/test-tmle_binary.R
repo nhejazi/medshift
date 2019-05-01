@@ -78,22 +78,13 @@ node_list <- list(W = c("W_1", "W_2", "W_3"),
                   Z = c("Z_1", "Z_2", "Z_3"),
                   Y = "Y")
 learner_list <- list(Y = hal_contin_lrnr,
-                     A = hal_contin_lrnr)
+                     A = hal_binary_lrnr)
 
 # set up TMLE components: NPSEM, likelihood, TMLE task
 npsem <- stochastic_mediation_npsem(node_list)
 tmle_task <- tmle3_Task$new(data, npsem = npsem)
 likelihood_init <- stochastic_mediation_likelihood(tmle_task, learner_list)
 likelihood_init$get_likelihoods(tmle_task)
-
-factor_list <- list(
-  define_lf(LF_emp, "W"),
-  define_lf(LF_fit, "A", hal_binary_lrnr),
-  define_lf(LF_fit, "Y", hal_contin_lrnr, type = "mean")
-)
-
-likelihood_def <- Likelihood$new(factor_list)
-likelihood_init <- likelihood_def$train(tmle_task)
 
 # NEXT, need targeted_likelihood constructor
 updater <- tmle3_Update$new(cvtmle = FALSE)
