@@ -98,10 +98,10 @@ Param_medshift <- R6::R6Class(
       control_task <- self$control_task
 
       # extract various likelihood components
-      m_est <- likelihood$get_likelihood(tmle_task, "Y")
-      e_est <- likelihood$get_likelihood(tmle_task, "E")
-      phi_est <- likelihood$get_likelihood(tmle_task, "phi")
-      g_delta_est <- cf_likelihood$get_likelihood(tmle_task, "A")
+      m_est <- likelihood$get_likelihood(tmle_task, "Y", fold_number)
+      e_est <- likelihood$get_likelihood(tmle_task, "E", fold_number)
+      phi_est <- likelihood$get_likelihood(tmle_task, "phi", fold_number)
+      g_delta_est <- cf_likelihood$get_likelihood(tmle_task, "A", fold_number)
 
       # compute/extract g(1|W) for clever covariate for score of A
       g1_est <- likelihood$get_likelihood(treatment_task, "A", fold_number)
@@ -109,6 +109,7 @@ Param_medshift <- R6::R6Class(
 
       # clever covariates
       HY <- g_delta_est / e_est
+
       # NOTE: exp(shift_param) for generalized exponential tilting
       HA <- (shift_param * phi_est) / ((shift_param * g1_est) + g0_est)^2
       return(list(Y = HY, A = HA))
@@ -130,13 +131,14 @@ Param_medshift <- R6::R6Class(
       a <- tmle_task$get_tmle_node(self$lf_exptilt$name)
       m_est <- likelihood$get_likelihood(tmle_task, "Y")
 
+      browser()
       # compute/extract g(1|W) for clever covariate for score of A
       g1_est <- likelihood$get_likelihood(treatment_task, "A", fold_number)
       g0_est <- likelihood$get_likelihood(control_task, "A", fold_number)
-      g1_delta_est <- cf_likelihood$get_likelihood(treatment_task, "A",
-                                                   fold_number)
-      g0_delta_est <- cf_likelihood$get_likelihood(control_task, "A",
-                                                   fold_number)
+      g_delta_treatment_est <- cf_likelihood$get_likelihood(treatment_task, "A",
+                                                            fold_number)
+      g_delta_control_est <- cf_likelihood$get_likelihood(control_task, "A",
+                                                          fold_number)
       m1_est <- likelihood$get_likelihood(treatment_task, "Y", fold_number)
       m0_est <- likelihood$get_likelihood(control_task, "Y", fold_number)
 
@@ -149,11 +151,10 @@ Param_medshift <- R6::R6Class(
       # compute individual scores for DY, DA, DZW
       D_Y <- HY * (y - m_est)
       D_A <- HA * (a - g1_est)
-      D_ZW <- (g1_delta_est * m1_est) + (g0_delta_est * m0_est)
+      D_ZW <- (g_delta_est$treatment * m1_est) + (g_delta_est$control * m0_est)
 
       # parameter and influence function
       theta <- mean(D_ZW)
-      #theta <- mean(D_Y + D_A + D_ZW)
       eif <- D_Y + D_A + D_ZW - theta
 
       # output
