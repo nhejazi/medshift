@@ -93,13 +93,12 @@ LF_exptilt_ipsi <- R6::R6Class(
       # get likelihood values for counterfactual g(A,W)
       g1 <- likelihood$get_likelihood(treatment_task, "A", fold_number)
       g0 <- likelihood$get_likelihood(control_task, "A", fold_number)
-      #g_delta <- (exp(self$shift_param * tmle_task$get_tmle_node("A")) *
-                  #self$likelihood_base$get_likelihood(tmle_task, "A",
-                                                      #fold_number)) /
-        #((exp(self$shift_param) * g1) + g0)
+
       # compute values for counterfactual (shifted) treatment mechanism
-      g_delta <- (shift_param * likelihood$get_likelihood(tmle_task, "A",
-                                                          fold_number)) /
+      shift_conditional_treatment <- ifelse(tmle_task$get_tmle_node("A") == 1,
+                                            shift_param, 1)
+      g_delta <- (shift_conditional_treatment *
+                  likelihood$get_likelihood(tmle_task, "A", fold_number)) /
         ((shift_param * g1) + g0)
 
       # return counterfactual likelihood for shifted propensity score
