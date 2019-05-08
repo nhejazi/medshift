@@ -34,8 +34,6 @@ Imports:
     methods,
     data.table,
     assertthat,
-    dplyr,
-    stringr,
     origami,
     sl3,
     tmle3
@@ -43,6 +41,8 @@ Suggests:
     testthat,
     knitr,
     rmarkdown,
+    dplyr,
+    stringr,
     Rsolnp,
     nnls,
     hal9001,
