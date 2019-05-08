@@ -16,10 +16,10 @@ tmle3_Spec_medshift <- R6::R6Class(
   inherit = tmle3_Spec,
   public = list(
     initialize = function(shift_fxn = shift_ipsi,
-                          shift_val = 0,
-                          e_lrnrs,
-                          phi_lrnrs,
-                          ...) {
+                              shift_val = 0,
+                              e_lrnrs,
+                              phi_lrnrs,
+                              ...) {
       options <- list(
         shift_fxn = shift_fxn,
         delta_ipsi = shift_val,
@@ -40,10 +40,14 @@ tmle3_Spec_medshift <- R6::R6Class(
       phi_lrnrs <- self$options$phi_lrnrs
 
       # derived likelihood factors: e(A,W) and phi(W)
-      lf_e <- tmle3::define_lf(tmle3::LF_derived, "E", e_lrnrs, likelihood,
-                               make_e_task)
-      lf_phi <- tmle3::define_lf(tmle3::LF_derived, "phi", phi_lrnrs,
-                                 likelihood, make_phi_task)
+      lf_e <- tmle3::define_lf(
+        tmle3::LF_derived, "E", e_lrnrs, likelihood,
+        make_e_task
+      )
+      lf_phi <- tmle3::define_lf(
+        tmle3::LF_derived, "phi", phi_lrnrs,
+        likelihood, make_phi_task
+      )
       likelihood$add_factors(lf_e)
       likelihood$add_factors(lf_phi)
 
@@ -51,9 +55,9 @@ tmle3_Spec_medshift <- R6::R6Class(
       intervention <- tmle3::define_lf(LF_exptilt_ipsi,
         name = "A",
         original_lf = likelihood$factor_list[["A"]],
-        likelihood_base = likelihood,           # initialized likelihood
-        shift_fxn,                              # shift function (from user)
-        shift_factor = delta_ipsi               # magnitude of shift multiplier
+        likelihood_base = likelihood, # initialized likelihood
+        shift_fxn, # shift function (from user)
+        shift_factor = delta_ipsi # magnitude of shift multiplier
       )
       shifted_mean <- tmle3::Param_TSM$new(likelihood, intervention)
 

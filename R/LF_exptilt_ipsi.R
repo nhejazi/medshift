@@ -73,7 +73,7 @@ LF_exptilt_ipsi <- R6::R6Class(
   inherit = tmle3::LF_base,
   public = list(
     initialize = function(name, likelihood_base, shift_param,
-                          treatment_task, control_task, ...) {
+                              treatment_task, control_task, ...) {
       super$initialize(name, ..., type = "density")
       private$.likelihood_base <- likelihood_base
       private$.shift_param <- shift_param
@@ -96,9 +96,10 @@ LF_exptilt_ipsi <- R6::R6Class(
 
       # compute values for counterfactual (shifted) treatment mechanism
       shift_conditional_treatment <- ifelse(tmle_task$get_tmle_node("A") == 1,
-                                            shift_param, 1)
+        shift_param, 1
+      )
       g_delta <- (shift_conditional_treatment *
-                  likelihood$get_likelihood(tmle_task, "A", fold_number)) /
+        likelihood$get_likelihood(tmle_task, "A", fold_number)) /
         ((shift_param * g1) + g0)
 
       # return counterfactual likelihood for shifted propensity score
@@ -108,7 +109,7 @@ LF_exptilt_ipsi <- R6::R6Class(
     cf_values = function(tmle_task) {
       cf_values <- rep(NA, tmle_task$nrow)
       return(cf_values)
-      #stop(paste("cf_values is undefined for", class(self)[1]))
+      # stop(paste("cf_values is undefined for", class(self)[1]))
     }
   ),
   active = list(

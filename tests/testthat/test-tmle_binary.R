@@ -73,12 +73,16 @@ z_names <- colnames(data)[str_detect(colnames(data), "Z")]
 w_names <- colnames(data)[str_detect(colnames(data), "W")]
 
 # create node list and learner list
-node_list <- list(W = c("W_1", "W_2", "W_3"),
-                  A = "A",
-                  Z = c("Z_1", "Z_2", "Z_3"),
-                  Y = "Y")
-learner_list <- list(Y = hal_contin_lrnr,
-                     A = hal_binary_lrnr)
+node_list <- list(
+  W = c("W_1", "W_2", "W_3"),
+  A = "A",
+  Z = c("Z_1", "Z_2", "Z_3"),
+  Y = "Y"
+)
+learner_list <- list(
+  Y = hal_contin_lrnr,
+  A = hal_binary_lrnr
+)
 
 # set up TMLE components: NPSEM, likelihood, TMLE task
 do_tmle <- function() {
@@ -92,16 +96,21 @@ do_tmle <- function() {
   likelihood_targeted <- Targeted_Likelihood$new(likelihood_init, updater)
 
   # add derived likelihood factors to targeted likelihood object
-  lf_e <- tmle3::define_lf(tmle3::LF_derived, "E", hal_binary_lrnr,
-                           likelihood_targeted, medshift::make_e_task)
-  lf_phi <- tmle3::define_lf(tmle3::LF_derived, "phi", hal_contin_lrnr,
-                             likelihood_targeted, medshift::make_phi_task)
+  lf_e <- tmle3::define_lf(
+    tmle3::LF_derived, "E", hal_binary_lrnr,
+    likelihood_targeted, medshift::make_e_task
+  )
+  lf_phi <- tmle3::define_lf(
+    tmle3::LF_derived, "phi", hal_contin_lrnr,
+    likelihood_targeted, medshift::make_phi_task
+  )
   likelihood_targeted$add_factors(lf_e)
   likelihood_targeted$add_factors(lf_phi)
 
   # compute a tmle3 "by hand"
   tmle_params <- define_param(Param_medshift, likelihood_targeted,
-                              shift_param = delta)
+    shift_param = delta
+  )
   updater$tmle_params <- tmle_params
 
   # separately test param methods
@@ -162,4 +171,3 @@ if (FALSE) {
   # extract results from tmle3_Fit object
   tmle_fit
 }
-

@@ -56,30 +56,39 @@ Param_medshift <- R6::R6Class(
   inherit = tmle3::Param_base,
   public = list(
     initialize = function(observed_likelihood,
-                          shift_param,
-                          outcome_node = "Y") {
+                              shift_param,
+                              outcome_node = "Y") {
       # copied from parameter definition for ATT...
       super$initialize(observed_likelihood, list(),
-                       outcome_node = outcome_node)
+        outcome_node = outcome_node
+      )
 
       # counterfactual tasks
       treatment_task <-
-        tmle_task$generate_counterfactual_task(uuid = uuid::UUIDgenerate(),
-                                               new_data = data.table(A = 1))
+        tmle_task$generate_counterfactual_task(
+          uuid = uuid::UUIDgenerate(),
+          new_data = data.table(A = 1)
+        )
       control_task <-
-        tmle_task$generate_counterfactual_task(uuid = uuid::UUIDgenerate(),
-                                               new_data = data.table(A = 0))
+        tmle_task$generate_counterfactual_task(
+          uuid = uuid::UUIDgenerate(),
+          new_data = data.table(A = 0)
+        )
 
       # generate counterfactual likelihood under intervention via LF_exptilt
-      lf_exptilt <- LF_exptilt_ipsi$new(name = "A",
-                                        likelihood_base = observed_likelihood,
-                                        shift_param = shift_param,
-                                        treatment_task = treatment_task,
-                                        control_task = control_task)
+      lf_exptilt <- LF_exptilt_ipsi$new(
+        name = "A",
+        likelihood_base = observed_likelihood,
+        shift_param = shift_param,
+        treatment_task = treatment_task,
+        control_task = control_task
+      )
 
       # store components
-      private$.cf_likelihood <- CF_Likelihood$new(observed_likelihood,
-                                                  lf_exptilt)
+      private$.cf_likelihood <- CF_Likelihood$new(
+        observed_likelihood,
+        lf_exptilt
+      )
       private$.lf_exptilt <- lf_exptilt
       private$.shift_param <- shift_param
       private$.treatment_task <- treatment_task
@@ -136,18 +145,26 @@ Param_medshift <- R6::R6Class(
       # compute/extract g(1|W) for clever covariate for score of A
       g1_est <- likelihood$get_likelihood(treatment_task, "A", fold_number)
       g0_est <- likelihood$get_likelihood(control_task, "A", fold_number)
-      g1_delta_est <- cf_likelihood$get_likelihood(treatment_task, "A",
-                                                   fold_number)
-      g0_delta_est <- cf_likelihood$get_likelihood(control_task, "A",
-                                                   fold_number)
+      g1_delta_est <- cf_likelihood$get_likelihood(
+        treatment_task, "A",
+        fold_number
+      )
+      g0_delta_est <- cf_likelihood$get_likelihood(
+        control_task, "A",
+        fold_number
+      )
       m1_est <- likelihood$get_likelihood(treatment_task, "Y", fold_number)
       m0_est <- likelihood$get_likelihood(control_task, "Y", fold_number)
 
       # clever_covariates happens here but this is repeated computation
-      HY <- self$clever_covariates(tmle_task,
-                                   fold_number)[[self$outcome_node]]
-      HA <- self$clever_covariates(tmle_task,
-                                   fold_number)[[self$lf_exptilt$name]]
+      HY <- self$clever_covariates(
+        tmle_task,
+        fold_number
+      )[[self$outcome_node]]
+      HA <- self$clever_covariates(
+        tmle_task,
+        fold_number
+      )[[self$lf_exptilt$name]]
 
       # compute individual scores for DY, DA, DZW
       D_Y <- HY * (y - m_est)

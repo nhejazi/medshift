@@ -32,19 +32,23 @@ stochastic_mediation_likelihood <- function(tmle_task, learner_list) {
   A_type <- tmle_task$npsem[["A"]]$variable_type
   if (A_type$type == "continuous") {
     A_bound <- c(1 / tmle_task$nrow, Inf)
-  } else if (A_type$type %in% c("binomial","categorical")) {
+  } else if (A_type$type %in% c("binomial", "categorical")) {
     A_bound <- 0.025
   } else {
     A_bound <- NULL
   }
 
   # treatment
-  A_factor <- define_lf(LF_fit, "A", learner = learner_list[["A"]],
-                        bound = A_bound)
+  A_factor <- define_lf(LF_fit, "A",
+    learner = learner_list[["A"]],
+    bound = A_bound
+  )
 
   # outcome
-  Y_factor <- define_lf(LF_fit, "Y", learner = learner_list[["Y"]],
-                        type = "mean")
+  Y_factor <- define_lf(LF_fit, "Y",
+    learner = learner_list[["Y"]],
+    type = "mean"
+  )
 
   # construct and train likelihood
   factor_list <- list(W_factor, A_factor, Y_factor)
@@ -64,10 +68,14 @@ stochastic_mediation_likelihood <- function(tmle_task, learner_list) {
 #
 make_e_task <- function(tmle_task, likelihood) {
   e_data <- tmle_task$internal_data
-  e_task <- sl3_Task$new(data = e_data,
-                         outcome = tmle_task$npsem[["A"]]$variables,
-                         covariates = c(tmle_task$npsem[["Z"]]$variables,
-                                        tmle_task$npsem[["W"]]$variables))
+  e_task <- sl3_Task$new(
+    data = e_data,
+    outcome = tmle_task$npsem[["A"]]$variables,
+    covariates = c(
+      tmle_task$npsem[["Z"]]$variables,
+      tmle_task$npsem[["W"]]$variables
+    )
+  )
   return(e_task)
 }
 
@@ -81,11 +89,15 @@ make_e_task <- function(tmle_task, likelihood) {
 make_phi_task <- function(tmle_task, likelihood) {
   # create treatment and control tasks for intervention conditions
   treatment_task <-
-    tmle_task$generate_counterfactual_task(uuid = uuid::UUIDgenerate(),
-                                           new_data = data.table(A = 1))
+    tmle_task$generate_counterfactual_task(
+      uuid = uuid::UUIDgenerate(),
+      new_data = data.table(A = 1)
+    )
   control_task <-
-    tmle_task$generate_counterfactual_task(uuid = uuid::UUIDgenerate(),
-                                           new_data = data.table(A = 0))
+    tmle_task$generate_counterfactual_task(
+      uuid = uuid::UUIDgenerate(),
+      new_data = data.table(A = 0)
+    )
 
   # ...
   m1 <- likelihood$get_likelihood(treatment_task, "Y")
@@ -93,11 +105,15 @@ make_phi_task <- function(tmle_task, likelihood) {
   m_diff <- m1 - m0
 
   # ...
-  phi_data <- data.table::as.data.table(list(m_diff = m_diff,
-                                             tmle_task$get_tmle_node("W")))
-  phi_task <- sl3_Task$new(data = phi_data,
-                           outcome = "m_diff",
-                           covariates = tmle_task$npsem[["W"]]$variables,
-                           outcome_type = "continuous")
+  phi_data <- data.table::as.data.table(list(
+    m_diff = m_diff,
+    tmle_task$get_tmle_node("W")
+  ))
+  phi_task <- sl3_Task$new(
+    data = phi_data,
+    outcome = "m_diff",
+    covariates = tmle_task$npsem[["W"]]$variables,
+    outcome_type = "continuous"
+  )
   return(phi_task)
 }
