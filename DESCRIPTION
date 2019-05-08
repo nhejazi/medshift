@@ -28,6 +28,8 @@ Description: Estimators of a parameter arising in the decomposition of the
     and Hejazi; 2019 (submitted); <https://arxiv.org/abs/1901.02776>).
 Depends: R (>= 3.2.0)
 Imports:
+    R6,
+    uuid,
     stats,
     methods,
     data.table,
@@ -36,9 +38,7 @@ Imports:
     stringr,
     origami,
     sl3,
-    tmle3,
-    simcausal,
-    condensier
+    tmle3
 Suggests:
     testthat,
     knitr,
