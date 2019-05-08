@@ -81,38 +81,42 @@ learner_list <- list(Y = hal_contin_lrnr,
                      A = hal_binary_lrnr)
 
 # set up TMLE components: NPSEM, likelihood, TMLE task
-npsem <- stochastic_mediation_npsem(node_list)
-tmle_task <- tmle3_Task$new(data, npsem = npsem)
-likelihood_init <- stochastic_mediation_likelihood(tmle_task, learner_list)
-likelihood_init$get_likelihoods(tmle_task)
+do_tmle <- function() {
+  npsem <- stochastic_mediation_npsem(node_list)
+  tmle_task <- tmle3_Task$new(data, npsem = npsem)
+  likelihood_init <- stochastic_mediation_likelihood(tmle_task, learner_list)
+  likelihood_init$get_likelihoods(tmle_task)
 
-# NEXT, need targeted_likelihood constructor
-updater <- tmle3_Update$new(cvtmle = FALSE)
-likelihood_targeted <- Targeted_Likelihood$new(likelihood_init, updater)
+  # NEXT, need targeted_likelihood constructor
+  updater <- tmle3_Update$new(cvtmle = FALSE)
+  likelihood_targeted <- Targeted_Likelihood$new(likelihood_init, updater)
 
-# add derived likelihood factors to targeted likelihood object
-lf_e <- tmle3::define_lf(tmle3::LF_derived, "E", hal_binary_lrnr,
-                         likelihood_targeted, medshift::make_e_task)
-lf_phi <- tmle3::define_lf(tmle3::LF_derived, "phi", hal_contin_lrnr,
-                           likelihood_targeted, medshift::make_phi_task)
-likelihood_targeted$add_factors(lf_e)
-likelihood_targeted$add_factors(lf_phi)
+  # add derived likelihood factors to targeted likelihood object
+  lf_e <- tmle3::define_lf(tmle3::LF_derived, "E", hal_binary_lrnr,
+                           likelihood_targeted, medshift::make_e_task)
+  lf_phi <- tmle3::define_lf(tmle3::LF_derived, "phi", hal_contin_lrnr,
+                             likelihood_targeted, medshift::make_phi_task)
+  likelihood_targeted$add_factors(lf_e)
+  likelihood_targeted$add_factors(lf_phi)
 
-# compute a tmle3 "by hand"
-tmle_params <- define_param(Param_medshift, likelihood_targeted,
-                            shift_param = delta)
-updater$tmle_params <- tmle_params
+  # compute a tmle3 "by hand"
+  tmle_params <- define_param(Param_medshift, likelihood_targeted,
+                              shift_param = delta)
+  updater$tmle_params <- tmle_params
 
-# separately test param methods
-tmle_params$clever_covariates(tmle_task)
-theta_tmle <- tmle_params$estimates(tmle_task)
+  # separately test param methods
+  tmle_params$clever_covariates(tmle_task)
+  theta_tmle <- tmle_params$estimates(tmle_task)
 
-# fit TML estimator update
-tmle_fit <- fit_tmle3(tmle_task, likelihood_targeted, tmle_params, updater)
-
-
+  # fit TML estimator update
+  tmle_fit <- fit_tmle3(tmle_task, likelihood_targeted, tmle_params, updater)
+  return(tmle_fit)
+}
+set.seed(71281)
+tmle_fit <- do_tmle()
 
 # fit one-step estimator
+set.seed(71281)
 os_fit <- medshift(
   W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
   delta = delta,
@@ -124,6 +128,7 @@ os_fit <- medshift(
 )
 
 # fit substitution estimator
+set.seed(71281)
 sub_fit <- medshift(
   W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
   delta = delta,
