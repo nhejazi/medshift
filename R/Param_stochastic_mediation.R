@@ -62,7 +62,7 @@ Param_medshift <- R6::R6Class(
       super$initialize(observed_likelihood, list(),
         outcome_node = outcome_node
       )
-
+      tmle_task <- observed_likelihood$training_task
       # counterfactual tasks
       treatment_task <-
         tmle_task$generate_counterfactual_task(
@@ -204,7 +204,7 @@ Param_medshift <- R6::R6Class(
       return(private$.control_task)
     },
     update_nodes = function() {
-      return(self$outcome_node)
+      return(c(self$outcome_node,"A")) # TODO: stop hardcoding A everywhere
     }
   ),
   private = list(
