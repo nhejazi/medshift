@@ -92,7 +92,8 @@ do_tmle <- function() {
   likelihood_init$get_likelihoods(tmle_task)
 
   # NEXT, need targeted_likelihood constructor
-  updater <- tmle3_Update$new(cvtmle = FALSE)
+  #updater <- tmle3_Update$new(cvtmle = FALSE, constrain_step = T, maxit = 1e4, delta_epsilon = 1e-3, verbose=TRUE)
+  updater <- tmle3_Update$new(cvtmle = FALSE, verbose=TRUE)
   likelihood_targeted <- Targeted_Likelihood$new(likelihood_init, updater)
 
   # add derived likelihood factors to targeted likelihood object
