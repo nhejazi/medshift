@@ -24,6 +24,8 @@ hal_binary_lrnr <- Lrnr_hal9001$new(
   fit_type = "glmnet", n_folds = 5,
   family = "binomial"
 )
+cv_hal_contin_lrnr <- Lrnr_cv$new(hal_contin_lrnr, full_fit = TRUE)
+cv_hal_binary_lrnr <- Lrnr_cv$new(hal_binary_lrnr, full_fit = TRUE)
 
 ################################################################################
 # setup data and simulate to test with estimators
@@ -80,8 +82,8 @@ node_list <- list(
   Y = "Y"
 )
 learner_list <- list(
-  Y = hal_contin_lrnr,
-  A = hal_binary_lrnr
+  Y = cv_hal_contin_lrnr,
+  A = cv_hal_binary_lrnr
 )
 
 # set up TMLE components: NPSEM, likelihood, TMLE task
@@ -92,17 +94,17 @@ do_tmle <- function() {
   likelihood_init$get_likelihoods(tmle_task)
 
   # NEXT, need targeted_likelihood constructor
-  #updater <- tmle3_Update$new(cvtmle = FALSE, constrain_step = T, maxit = 1e4, delta_epsilon = 1e-3, verbose=TRUE)
-  updater <- tmle3_Update$new(cvtmle = FALSE, verbose=TRUE)
+  updater <- tmle3_Update$new(one_dimensional = TRUE, constrain_step = TRUE,
+                              maxit = 1e3, delta_epsilon = 1e-4, cvtmle = TRUE)
   likelihood_targeted <- Targeted_Likelihood$new(likelihood_init, updater)
 
   # add derived likelihood factors to targeted likelihood object
   lf_e <- tmle3::define_lf(
-    tmle3::LF_derived, "E", hal_binary_lrnr,
+    tmle3::LF_derived, "E", cv_hal_binary_lrnr,
     likelihood_targeted, medshift::make_e_task
   )
   lf_phi <- tmle3::define_lf(
-    tmle3::LF_derived, "phi", hal_contin_lrnr,
+    tmle3::LF_derived, "phi", cv_hal_contin_lrnr,
     likelihood_targeted, medshift::make_phi_task
   )
   likelihood_targeted$add_factors(lf_e)
@@ -124,6 +126,7 @@ do_tmle <- function() {
 }
 set.seed(71281)
 tmle_fit <- do_tmle()
+tmle_fit
 
 # fit one-step estimator
 set.seed(71281)
@@ -136,6 +139,7 @@ os_fit <- medshift(
   phi_lrnrs = hal_contin_lrnr,
   estimator = "onestep",
 )
+summary(os_fit)
 
 # fit substitution estimator
 set.seed(71281)
@@ -148,7 +152,7 @@ sub_fit <- medshift(
   phi_lrnrs = hal_contin_lrnr,
   estimator = "substitution",
 )
-
+summary(sub_fit)
 
 # how Specs are used...
 if (FALSE) {
@@ -172,3 +176,58 @@ if (FALSE) {
   # extract results from tmle3_Fit object
   tmle_fit
 }
+
+
+
+################################################################################
+get_sim_truth <- function(n_obs = 1e7,    # number of observations
+                          n_w = 3,        # number of baseline covariates
+                          delta = 0.5) {  # value of shift parameter
+
+  # compute large data set for true values
+  data <- make_simulated_data(n_obs = n_obs,
+                              n_w = n_w,
+                              delta = delta)
+  w_names <- str_subset(colnames(data), "W")
+  z_names <- str_subset(colnames(data), "Z")
+  W <- data[, ..w_names]
+  Z <- data[, ..z_names]
+  Y <- data$Y
+
+  # compute TRUE G under counterfactual regimes
+  g_Ais1 <- rowSums(W) / 4 + 0.1
+  g_Ais0 <- 1 - g_Ais1
+
+  # compute TRUE SHIFTED G under counterfactual regimes
+  g_shifted_Ais1 <- (delta * g_Ais1) / (delta * g_Ais1 + g_Ais0)
+  g_shifted_Ais0 <- 1 - g_shifted_Ais1
+
+  # compute TRUE M under counterfactual regimes
+  m_Ais1 <- Z$Z_1 + Z$Z_2 - Z$Z_3 + 1 - 0.1 * rowSums(W)^2
+  m_Ais0 <- Z$Z_1 + Z$Z_2 - Z$Z_3 + 0 - 0.1 * rowSums(W)^2
+
+  # output: true values of nuisance parameters
+  return(list(g_obs_true = data.table(A1 = g_Ais1,
+                                      A0 = g_Ais0),
+              g_shifted_true = data.table(A1 = g_shifted_Ais1,
+                                          A0 = g_shifted_Ais0),
+              m_true = data.table(A1 = m_Ais1,
+                                  A0 = m_Ais0),
+              EY_true = mean(Y)
+             )
+        )
+}
+
+# simulate data and extract components for computing true parameter value
+sim_truth <- get_sim_truth()
+m_A1 <- sim_truth$m_true$A1
+m_A0 <- sim_truth$m_true$A0
+g_shifted_A1 <- sim_truth$g_shifted_true$A1
+g_shifted_A0 <- sim_truth$g_shifted_true$A0
+EY <- sim_truth$EY_true
+
+# compute true parameter value based on the substitution estimator
+true_param <- mean(m_A1 * g_shifted_A1) + mean(m_A0 * g_shifted_A0)
+
+# compute the natural direct effect (NDE) as the difference of Y and parameter
+nde_true <- EY - true_param
