@@ -81,7 +81,8 @@ Param_medshift <- R6::R6Class(
         likelihood_base = observed_likelihood,
         shift_param = shift_param,
         treatment_task = treatment_task,
-        control_task = control_task
+        control_task = control_task,
+        cache = FALSE
       )
 
       # store components
