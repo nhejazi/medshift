@@ -40,6 +40,7 @@ fit_g_mech <- function(data, valid_data = NULL,
 
   # fit and predict
   g_fit_stack <- lrnr_stack$train(g_task)
+  g_pred_natural <- g_fit_stack$predict()
 
   # use full data for counterfactual prediction if no validation data provided
   if (is.null(valid_data)) {
@@ -84,6 +85,7 @@ fit_g_mech <- function(data, valid_data = NULL,
   # output
   out <- list(
     g_est = data.table::data.table(cbind(
+      g_pred_natural = g_pred_natural,
       g_pred_A1 = g_pred_A1,
       g_pred_A0 = g_pred_A0,
       g_pred_shifted_A1 = g_pred_shifted_A1,
@@ -132,6 +134,7 @@ fit_e_mech <- function(data, valid_data = NULL,
 
   # fit and predict
   e_fit_stack <- lrnr_stack$train(e_task)
+  e_pred_natural <- e_fit_stack$predict()
 
   # use full data for counterfactual prediction if no validation data provided
   if (is.null(valid_data)) {
@@ -167,6 +170,7 @@ fit_e_mech <- function(data, valid_data = NULL,
   # output
   out <- list(
     e_est = data.table::data.table(cbind(
+      e_pred_natural = e_pred_natural,
       e_pred_A1 = e_pred_A1,
       e_pred_A0 = e_pred_A0
     )),
@@ -213,6 +217,7 @@ fit_m_mech <- function(data, valid_data = NULL,
 
   # fit and predict
   m_fit_stack <- lrnr_stack$train(m_task)
+  m_pred_natural <- m_fit_stack$predict()
 
   # use full data for counterfactual prediction if no validation data provided
   if (is.null(valid_data)) {
@@ -246,6 +251,7 @@ fit_m_mech <- function(data, valid_data = NULL,
   # output
   out <- list(
     m_pred = data.table::data.table(cbind(
+      m_pred_natural = m_pred_natural,
       m_pred_A1 = m_pred_A1,
       m_pred_A0 = m_pred_A0
     )),

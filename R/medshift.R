@@ -116,9 +116,11 @@ medshift <- function(W,
     # TARGETED MAXIMUM LIKELIHOOD ESTIMATOR
     node_list <- list(W = w_names, A = "A", Z = z_names, Y = "Y")
     learner_list <- list(Y = m_lrnrs, A = g_lrnrs)
-    tmle_spec <- tmle_medshift(delta = delta,
-                               e_learners = e_lrnrs,
-                               phi_learners = phi_lrnrs)
+    tmle_spec <- tmle_medshift(
+      delta = delta,
+      e_learners = e_lrnrs,
+      phi_learners = phi_lrnrs
+    )
     est_out <- tmle3::tmle3(tmle_spec, data, node_list, learner_list)
   }
 

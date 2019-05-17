@@ -13,7 +13,7 @@ tmle3_Spec_medshift <- R6::R6Class(
   inherit = tmle3_Spec,
   public = list(
     initialize = function(shift_type = "exptilt", delta = 0,
-                          e_learners, phi_learners, ...) {
+                              e_learners, phi_learners, ...) {
       options <- list(
         shift_type = shift_type,
         delta_shift = delta,
@@ -54,11 +54,13 @@ tmle3_Spec_medshift <- R6::R6Class(
       return(tmle_params)
     },
     make_updater = function() {
-      updater <- tmle3_Update$new(one_dimensional = TRUE,
-                                  constrain_step = TRUE,
-                                  maxit = 1e4,
-                                  delta_epsilon = 1e-4,
-                                  cvtmle = TRUE)
+      updater <- tmle3_Update$new(
+        one_dimensional = TRUE,
+        constrain_step = TRUE,
+        maxit = 1e4,
+        delta_epsilon = 1e-4,
+        cvtmle = TRUE
+      )
     }
   ),
   active = list(),

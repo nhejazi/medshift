@@ -142,57 +142,66 @@ sub_fit <- medshift(
 )
 summary(sub_fit)
 
-################################################################################
-get_sim_truth <- function(n_obs = 1e7,    # number of observations
-                          n_w = 3,        # number of baseline covariates
-                          delta = 0.5) {  # value of shift parameter
-
-  # compute large data set for true values
-  data <- make_simulated_data(n_obs = n_obs,
-                              n_w = n_w,
-                              delta = delta)
-  w_names <- str_subset(colnames(data), "W")
-  z_names <- str_subset(colnames(data), "Z")
-  W <- data[, ..w_names]
-  Z <- data[, ..z_names]
-  Y <- data$Y
-
-  # compute TRUE G under counterfactual regimes
-  g_Ais1 <- rowSums(W) / 4 + 0.1
-  g_Ais0 <- 1 - g_Ais1
-
-  # compute TRUE SHIFTED G under counterfactual regimes
-  g_shifted_Ais1 <- (delta * g_Ais1) / (delta * g_Ais1 + g_Ais0)
-  g_shifted_Ais0 <- 1 - g_shifted_Ais1
-
-  # compute TRUE M under counterfactual regimes
-  m_Ais1 <- Z$Z_1 + Z$Z_2 - Z$Z_3 + 1 - 0.1 * rowSums(W)^2
-  m_Ais0 <- Z$Z_1 + Z$Z_2 - Z$Z_3 + 0 - 0.1 * rowSums(W)^2
-
-  # output: true values of nuisance parameters
-  return(list(g_obs_true = data.table(A1 = g_Ais1,
-                                      A0 = g_Ais0),
-              g_shifted_true = data.table(A1 = g_shifted_Ais1,
-                                          A0 = g_shifted_Ais0),
-              m_true = data.table(A1 = m_Ais1,
-                                  A0 = m_Ais0),
-              EY_true = mean(Y)
-             )
-        )
-}
-
-# simulate data and extract components for computing true parameter value
-sim_truth <- get_sim_truth()
-m_A1 <- sim_truth$m_true$A1
-m_A0 <- sim_truth$m_true$A0
-g_shifted_A1 <- sim_truth$g_shifted_true$A1
-g_shifted_A0 <- sim_truth$g_shifted_true$A0
-EY <- sim_truth$EY_true
-
-# compute true parameter value based on the substitution estimator
-true_param <- mean(m_A1 * g_shifted_A1) + mean(m_A0 * g_shifted_A0)
-
-# test --- covers?
-test_that("TML estimate covers truth by chance", {
-
+# test --- what exactly?
+test_that("TML estimate...", {
 })
+
+################################################################################
+if (FALSE) {
+  get_sim_truth <- function(n_obs = 1e7, # number of observations
+                              n_w = 3, # number of baseline covariates
+                              delta = 0.5) { # value of shift parameter
+
+    # compute large data set for true values
+    data <- make_simulated_data(
+      n_obs = n_obs,
+      n_w = n_w,
+      delta = delta
+    )
+    w_names <- str_subset(colnames(data), "W")
+    z_names <- str_subset(colnames(data), "Z")
+    W <- data[, ..w_names]
+    Z <- data[, ..z_names]
+    Y <- data$Y
+
+    # compute TRUE G under counterfactual regimes
+    g_Ais1 <- rowSums(W) / 4 + 0.1
+    g_Ais0 <- 1 - g_Ais1
+
+    # compute TRUE SHIFTED G under counterfactual regimes
+    g_shifted_Ais1 <- (delta * g_Ais1) / (delta * g_Ais1 + g_Ais0)
+    g_shifted_Ais0 <- 1 - g_shifted_Ais1
+
+    # compute TRUE M under counterfactual regimes
+    m_Ais1 <- Z$Z_1 + Z$Z_2 - Z$Z_3 + 1 - 0.1 * rowSums(W)^2
+    m_Ais0 <- Z$Z_1 + Z$Z_2 - Z$Z_3 + 0 - 0.1 * rowSums(W)^2
+
+    # output: true values of nuisance parameters
+    return(list(
+      g_obs_true = data.table(
+        A1 = g_Ais1,
+        A0 = g_Ais0
+      ),
+      g_shifted_true = data.table(
+        A1 = g_shifted_Ais1,
+        A0 = g_shifted_Ais0
+      ),
+      m_true = data.table(
+        A1 = m_Ais1,
+        A0 = m_Ais0
+      ),
+      EY_true = mean(Y)
+    ))
+  }
+
+  # simulate data and extract components for computing true parameter value
+  sim_truth <- get_sim_truth()
+  m_A1 <- sim_truth$m_true$A1
+  m_A0 <- sim_truth$m_true$A0
+  g_shifted_A1 <- sim_truth$g_shifted_true$A1
+  g_shifted_A0 <- sim_truth$g_shifted_true$A0
+  EY <- sim_truth$EY_true
+
+  # compute true parameter value based on the substitution estimator
+  true_param <- mean(m_A1 * g_shifted_A1) + mean(m_A0 * g_shifted_A0)
+}

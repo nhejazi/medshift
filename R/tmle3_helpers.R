@@ -14,11 +14,14 @@ stochastic_mediation_npsem <- function(node_list, variable_types = NULL) {
   npsem <- list(
     tmle3::define_node("W", node_list$W, variable_type = variable_types$W),
     tmle3::define_node("A", node_list$A, c("W"),
-                       variable_type = variable_types$A),
+      variable_type = variable_types$A
+    ),
     tmle3::define_node("Z", node_list$Z, c("A", "W"),
-                       variable_type = variable_types$Z),
+      variable_type = variable_types$Z
+    ),
     tmle3::define_node("Y", node_list$Y, c("Z", "A", "W"),
-                       variable_type = variable_types$Y, scale = TRUE)
+      variable_type = variable_types$Y, scale = TRUE
+    )
   )
   return(npsem)
 }

@@ -4,6 +4,7 @@ library(data.table)
 library(stringr)
 library(hal9001)
 library(sl3)
+library(tmle3)
 set.seed(7128816)
 delta <- 0.5
 
@@ -22,6 +23,8 @@ hal_binary_lrnr <- Lrnr_hal9001$new(
   fit_type = "glmnet", n_folds = 5,
   family = "binomial"
 )
+cv_hal_contin_lrnr <- Lrnr_cv$new(hal_contin_lrnr, full_fit = TRUE)
+cv_hal_binary_lrnr <- Lrnr_cv$new(hal_binary_lrnr, full_fit = TRUE)
 
 ################################################################################
 # setup data and simulate to test with estimators
@@ -74,6 +77,7 @@ w_names <- colnames(data)[str_detect(colnames(data), "W")]
 ################################################################################
 # test different estimators
 ################################################################################
+set.seed(7128816)
 theta_sub <- medshift(
   W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
   delta = delta,
@@ -85,6 +89,7 @@ theta_sub <- medshift(
 )
 theta_sub
 
+set.seed(7128816)
 theta_re <- medshift(
   W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
   delta = delta,
@@ -96,7 +101,8 @@ theta_re <- medshift(
 )
 theta_re
 
-theta_eff <- medshift(
+set.seed(7128816)
+theta_os <- medshift(
   W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
   delta = delta,
   g_lrnrs = hal_binary_lrnr,
@@ -105,16 +111,28 @@ theta_eff <- medshift(
   phi_lrnrs = hal_contin_lrnr,
   estimator = "onestep",
 )
-theta_eff
+theta_os
+
+set.seed(7128816)
+theta_tmle <- medshift(
+  W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
+  delta = delta,
+  g_lrnrs = cv_hal_binary_lrnr,
+  e_lrnrs = cv_hal_binary_lrnr,
+  m_lrnrs = cv_hal_contin_lrnr,
+  phi_lrnrs = cv_hal_contin_lrnr,
+  estimator = "tmle",
+)
+theta_tmle
 
 test_that("Substitution and re-weighted estimator agree", {
-  expect_equal(theta_sub$theta, theta_re$theta, tol = 1e-2)
+  expect_equal(theta_sub$theta, theta_re$theta, tol = 1e-3)
 })
 
 test_that("Substitution and efficient one-step estimator agree", {
-  expect_equal(theta_sub$theta, theta_eff$theta, tol = 1e-2)
+  expect_equal(theta_sub$theta, theta_os$theta, tol = 1e-1)
 })
 
 test_that("Re-weighted and efficient one-step estimator agree", {
-  expect_equal(theta_re$theta, theta_eff$theta, tol = 1e-2)
+  expect_equal(theta_re$theta, theta_os$theta, tol = 1e-1)
 })

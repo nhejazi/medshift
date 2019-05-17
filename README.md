@@ -9,6 +9,9 @@ Status](https://travis-ci.org/nhejazi/medshift.svg?branch=master)](https://travi
 Status](https://ci.appveyor.com/api/projects/status/github/nhejazi/medshift?branch=master&svg=true)](https://ci.appveyor.com/project/nhejazi/medshift)
 [![Coverage
 Status](https://img.shields.io/codecov/c/github/nhejazi/medshift/master.svg)](https://codecov.io/github/nhejazi/medshift?branch=master)
+[![CRAN](http://www.r-pkg.org/badges/version/medshift)](http://www.r-pkg.org/pkg/medshift)
+[![CRAN
+downloads](https://cranlogs.r-pkg.org/badges/medshift)](https://CRAN.R-project.org/package=medshift)
 [![Project Status: WIP – Initial development is in progress, but there
 has not yet been a stable, usable release suitable for the
 public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
@@ -89,9 +92,9 @@ aipw_medshift <- medshift(W = example_data$W, A = example_data$A,
                           estimator_args = list(cv_folds = 3))
 summary(aipw_medshift)
 #>             lwr_ci          param_est             upr_ci 
-#>           0.740072           0.788103           0.836135 
+#>             0.7401           0.788136           0.836172 
 #>          param_var           eif_mean          estimator 
-#>           0.000601      -3.501778e-17 one-step efficient
+#>           0.000601       3.379762e-17 one-step efficient
 ```
 
 For details on how to use data adaptive regression (machine learning)

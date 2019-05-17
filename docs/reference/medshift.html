@@ -17,7 +17,8 @@ with stochastic interventions — medshift • medshift</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
@@ -66,7 +67,7 @@ with stochastic interventions" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">medshift</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9</span>
       </span>
     </div>
 
@@ -74,7 +75,7 @@ with stochastic interventions" />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -98,7 +99,7 @@ with stochastic interventions" />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/nhejazi/medshift">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -127,11 +128,12 @@ with stochastic interventions</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>medshift</span>(<span class='no'>W</span>, <span class='no'>A</span>, <span class='no'>Z</span>, <span class='no'>Y</span>, <span class='no'>delta</span>, <span class='kw'>g_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='https://www.rdocumentation.org/packages/sl3/topics/Lrnr_glm_fast'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(<span class='kw'>family</span> <span class='kw'>=</span>
-  <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/family'>binomial</a></span>()), <span class='kw'>e_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='https://www.rdocumentation.org/packages/sl3/topics/Lrnr_glm_fast'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(<span class='kw'>family</span> <span class='kw'>=</span>
-  <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/family'>binomial</a></span>()), <span class='kw'>m_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='https://www.rdocumentation.org/packages/sl3/topics/Lrnr_glm_fast'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(),
-  <span class='kw'>phi_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='https://www.rdocumentation.org/packages/sl3/topics/Lrnr_glm_fast'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(), <span class='kw'>estimator</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"onestep"</span>,
-  <span class='st'>"substitution"</span>, <span class='st'>"reweighted"</span>), <span class='kw'>estimator_args</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>cv_folds</span> <span class='kw'>=</span> <span class='fl'>10</span>))</pre>
+    <pre class="usage"><span class='fu'>medshift</span>(<span class='no'>W</span>, <span class='no'>A</span>, <span class='no'>Z</span>, <span class='no'>Y</span>, <span class='no'>delta</span>, <span class='kw'>g_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='https://tlverse.org/sl3/reference/Lrnr_glm_fast.html'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(<span class='kw'>family</span> <span class='kw'>=</span>
+  <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/family.html'>binomial</a></span>()), <span class='kw'>e_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='https://tlverse.org/sl3/reference/Lrnr_glm_fast.html'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(<span class='kw'>family</span> <span class='kw'>=</span>
+  <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/family.html'>binomial</a></span>()), <span class='kw'>m_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='https://tlverse.org/sl3/reference/Lrnr_glm_fast.html'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(),
+  <span class='kw'>phi_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='https://tlverse.org/sl3/reference/Lrnr_glm_fast.html'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(), <span class='kw'>estimator</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"onestep"</span>,
+  <span class='st'>"tmle"</span>, <span class='st'>"substitution"</span>, <span class='st'>"reweighted"</span>), <span class='kw'>estimator_args</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>cv_folds</span> <span class='kw'>=</span>
+  <span class='fl'>10</span>))</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -210,7 +212,9 @@ is so chosen as to allow the number of folds used in computing the AIPW
 estimator to be easily tweaked. Refer to the documentation for functions
 <code><a href='est_onestep.html'>est_onestep</a></code>, <code><a href='est_ipw.html'>est_ipw</a></code>, and
 <code><a href='est_substitution.html'>est_substitution</a></code> for details on what other arguments may be
-specified through this mechanism.</p></td>
+specified through this mechanism. For the option <code>"tmle"</code>, the
+implementation references helper functions in this package as well as the
+architecture provide by the <code>tmle3</code> package.</p></td>
     </tr>
     </table>
     
@@ -231,7 +235,7 @@ specified through this mechanism.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.9000.</p>
 </div>
       </footer>
    </div>

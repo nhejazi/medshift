@@ -206,7 +206,7 @@ Param_medshift <- R6::R6Class(
       return(private$.control_task)
     },
     update_nodes = function() {
-      return(c(self$outcome_node,"A")) # TODO: stop hardcoding A everywhere
+      return(c(self$outcome_node, "A")) # TODO: stop hardcoding A everywhere
     }
   ),
   private = list(

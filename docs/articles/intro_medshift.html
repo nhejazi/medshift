@@ -7,7 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Causal Mediation Analysis for Stochastic Interventions • medshift</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/readable/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="Causal Mediation Analysis for Stochastic Interventions">
 <meta property="og:description" content="">
@@ -30,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">medshift</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9</span>
       </span>
     </div>
 
@@ -38,7 +39,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -61,7 +62,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/nhejazi/medshift">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -82,7 +83,7 @@
 <a href="https://nimahejazi.org">Nima Hejazi</a> and <a href="https://www.idiaz.xyz/">Iván Díaz</a>
 </h4>
             
-            <h4 class="date">2019-01-10</h4>
+            <h4 class="date">2019-05-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nhejazi/medshift/blob/master/vignettes/intro_medshift.Rmd"><code>vignettes/intro_medshift.Rmd</code></a></small>
       <div class="hidden name"><code>intro_medshift.Rmd</code></div>
@@ -97,18 +98,18 @@
 <p>We are interested in assessing the direct effect (DE) and the indirect effect (IE), based on the decomposition of the population mediated intervention mean given in <span class="citation">Díaz and Hejazi (2019)</span>.</p>
 <p>To proceed, we’ll use as our running example a simple data set from an observational study of the relationship between BMI and kids behavior, distributed as part of the <a href="https://CRAN.R-project.org/package=mma"><code>mma</code> R package on CRAN</a>. First, let’s load the packages we’ll be using and set a seed; then, load this data set and take a quick look at it</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="co"># preliminaries</span></a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(data.table)</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(dplyr)</a>
-<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(sl3)</a>
-<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(medshift)</a>
-<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(mma)</a>
-<a class="sourceLine" id="cb1-7" data-line-number="7"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Random">set.seed</a></span>(<span class="dv">429153</span>)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(data.table)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(dplyr)</a>
+<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(sl3)</a>
+<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(medshift)</a>
+<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(mma)</a>
+<a class="sourceLine" id="cb1-7" data-line-number="7"><span class="kw"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="dv">429153</span>)</a>
 <a class="sourceLine" id="cb1-8" data-line-number="8"></a>
 <a class="sourceLine" id="cb1-9" data-line-number="9"><span class="co"># load and examine data</span></a>
-<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/data">data</a></span>(weight_behavior)</a>
-<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/dim">dim</a></span>(weight_behavior)</a></code></pre></div>
+<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(weight_behavior)</a>
+<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="kw"><a href="https://rdrr.io/r/base/dim.html">dim</a></span>(weight_behavior)</a></code></pre></div>
 <pre><code>## [1] 691  15</code></pre>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(weight_behavior)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(weight_behavior)</a></code></pre></div>
 <pre><code>##        bmi  age sex  race numpeople car gotosch snack tvhours cmpthours
 ## 1 18.20665 12.2   F OTHER         5   3       2     1       4         0
 ## 2 22.78401 12.8   M OTHER         4   3       2     1       4         2
@@ -158,7 +159,7 @@
 <a class="sourceLine" id="cb9-5" data-line-number="5">                                    <span class="dt">nfolds =</span> <span class="dv">3</span>)</a>
 <a class="sourceLine" id="cb9-6" data-line-number="6">lasso_contin_lrnr &lt;-<span class="st"> </span>Lrnr_glmnet<span class="op">$</span><span class="kw">new</span>(<span class="dt">alpha =</span> <span class="dv">1</span>, <span class="dt">family =</span> <span class="st">"gaussian"</span>,</a>
 <a class="sourceLine" id="cb9-7" data-line-number="7">                                     <span class="dt">nfolds =</span> <span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb9-8" data-line-number="8">fglm_contin_lrnr &lt;-<span class="st"> </span>Lrnr_glm_fast<span class="op">$</span><span class="kw">new</span>(<span class="dt">family =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/family">gaussian</a></span>())</a>
+<a class="sourceLine" id="cb9-8" data-line-number="8">fglm_contin_lrnr &lt;-<span class="st"> </span>Lrnr_glm_fast<span class="op">$</span><span class="kw">new</span>(<span class="dt">family =</span> <span class="kw"><a href="https://rdrr.io/r/stats/family.html">gaussian</a></span>())</a>
 <a class="sourceLine" id="cb9-9" data-line-number="9">contin_lrnr_lib &lt;-<span class="st"> </span>Stack<span class="op">$</span><span class="kw">new</span>(enet_contin_lrnr, lasso_contin_lrnr,</a>
 <a class="sourceLine" id="cb9-10" data-line-number="10">                             fglm_contin_lrnr, xgb_contin_lrnr,</a>
 <a class="sourceLine" id="cb9-11" data-line-number="11">                             hal_contin_lrnr)</a>
@@ -173,7 +174,7 @@
 <a class="sourceLine" id="cb9-20" data-line-number="20">                                    <span class="dt">nfolds =</span> <span class="dv">3</span>)</a>
 <a class="sourceLine" id="cb9-21" data-line-number="21">lasso_binary_lrnr &lt;-<span class="st"> </span>Lrnr_glmnet<span class="op">$</span><span class="kw">new</span>(<span class="dt">alpha =</span> <span class="dv">1</span>, <span class="dt">family =</span> <span class="st">"binomial"</span>,</a>
 <a class="sourceLine" id="cb9-22" data-line-number="22">                                     <span class="dt">nfolds =</span> <span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb9-23" data-line-number="23">fglm_binary_lrnr &lt;-<span class="st"> </span>Lrnr_glm_fast<span class="op">$</span><span class="kw">new</span>(<span class="dt">family =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/family">binomial</a></span>())</a>
+<a class="sourceLine" id="cb9-23" data-line-number="23">fglm_binary_lrnr &lt;-<span class="st"> </span>Lrnr_glm_fast<span class="op">$</span><span class="kw">new</span>(<span class="dt">family =</span> <span class="kw"><a href="https://rdrr.io/r/stats/family.html">binomial</a></span>())</a>
 <a class="sourceLine" id="cb9-24" data-line-number="24">binary_lrnr_lib &lt;-<span class="st"> </span>Stack<span class="op">$</span><span class="kw">new</span>(enet_binary_lrnr, lasso_binary_lrnr,</a>
 <a class="sourceLine" id="cb9-25" data-line-number="25">                             fglm_binary_lrnr, xgb_binary_lrnr,</a>
 <a class="sourceLine" id="cb9-26" data-line-number="26">                             hal_binary_lrnr)</a>
@@ -214,12 +215,12 @@ d\nu(a, z, w),
 <a class="sourceLine" id="cb10-6" data-line-number="6">                      <span class="dt">m =</span> sl_contin_lrnr,</a>
 <a class="sourceLine" id="cb10-7" data-line-number="7">                      <span class="dt">phi =</span> fglm_contin_lrnr,</a>
 <a class="sourceLine" id="cb10-8" data-line-number="8">                      <span class="dt">estimator =</span> <span class="st">"onestep"</span>,</a>
-<a class="sourceLine" id="cb10-9" data-line-number="9">                      <span class="dt">estimator_args =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">cv_folds =</span> <span class="dv">2</span>))</a>
-<a class="sourceLine" id="cb10-10" data-line-number="10"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/summary">summary</a></span>(theta_eff)</a></code></pre></div>
+<a class="sourceLine" id="cb10-9" data-line-number="9">                      <span class="dt">estimator_args =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cv_folds =</span> <span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb10-10" data-line-number="10"><span class="kw"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(theta_eff)</a></code></pre></div>
 <pre><code>##             lwr_ci          param_est             upr_ci 
-##          18.758434           19.10965          19.460867 
+##          18.762863          19.117474          19.472084 
 ##          param_var           eif_mean          estimator 
-##           0.032111      -1.538315e-15 one-step efficient</code></pre>
+##           0.032735       8.155036e-17 one-step efficient</code></pre>
 </div>
 <div id="estimating-the-direct-effect" class="section level2">
 <h2 class="hasAnchor">
@@ -232,29 +233,29 @@ d\nu(a, z, w),
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="co"># convenience function to compute inference via delta method: EY1 - EY0</span></a>
 <a class="sourceLine" id="cb12-2" data-line-number="2">linear_contrast &lt;-<span class="st"> </span><span class="cf">function</span>(params, eifs, <span class="dt">ci_level =</span> <span class="fl">0.95</span>) {</a>
 <a class="sourceLine" id="cb12-3" data-line-number="3">  <span class="co"># bounds for confidence interval</span></a>
-<a class="sourceLine" id="cb12-4" data-line-number="4">  ci_norm_bounds &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/MathFun">abs</a></span>(stats<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">qnorm</a></span>(<span class="dt">p =</span> (<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>ci_level) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb12-4" data-line-number="4">  ci_norm_bounds &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(stats<span class="op">::</span><span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">qnorm</a></span>(<span class="dt">p =</span> (<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>ci_level) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>))</a>
 <a class="sourceLine" id="cb12-5" data-line-number="5">  param_est &lt;-<span class="st"> </span>params[[<span class="dv">1</span>]] <span class="op">-</span><span class="st"> </span>params[[<span class="dv">2</span>]]</a>
 <a class="sourceLine" id="cb12-6" data-line-number="6">  eif &lt;-<span class="st"> </span>eifs[[<span class="dv">1</span>]] <span class="op">-</span><span class="st"> </span>eifs[[<span class="dv">2</span>]]</a>
-<a class="sourceLine" id="cb12-7" data-line-number="7">  se_eif &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/MathFun">sqrt</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/cor">var</a></span>(eif) <span class="op">/</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(eif))</a>
+<a class="sourceLine" id="cb12-7" data-line-number="7">  se_eif &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span>(<span class="kw"><a href="https://rdrr.io/r/stats/cor.html">var</a></span>(eif) <span class="op">/</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(eif))</a>
 <a class="sourceLine" id="cb12-8" data-line-number="8">  param_ci &lt;-<span class="st"> </span>param_est <span class="op">+</span><span class="st"> </span>ci_norm_bounds <span class="op">*</span><span class="st"> </span>se_eif</a>
 <a class="sourceLine" id="cb12-9" data-line-number="9">  <span class="co"># parameter and inference</span></a>
-<a class="sourceLine" id="cb12-10" data-line-number="10">  out &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(param_ci[<span class="dv">1</span>], param_est, param_ci[<span class="dv">2</span>])</a>
-<a class="sourceLine" id="cb12-11" data-line-number="11">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(out) &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"lwr_ci"</span>, <span class="st">"param_est"</span>, <span class="st">"upr_ci"</span>)</a>
-<a class="sourceLine" id="cb12-12" data-line-number="12">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/function">return</a></span>(out)</a>
+<a class="sourceLine" id="cb12-10" data-line-number="10">  out &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(param_ci[<span class="dv">1</span>], param_est, param_ci[<span class="dv">2</span>])</a>
+<a class="sourceLine" id="cb12-11" data-line-number="11">  <span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(out) &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"lwr_ci"</span>, <span class="st">"param_est"</span>, <span class="st">"upr_ci"</span>)</a>
+<a class="sourceLine" id="cb12-12" data-line-number="12">  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span>(out)</a>
 <a class="sourceLine" id="cb12-13" data-line-number="13">}</a></code></pre></div>
 <p>With the above convenience function in hand, we’ll construct or extract the necessary components from existing objects and simply apply the function:</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="co"># parameter estimates and EIFs for components of direct effect</span></a>
-<a class="sourceLine" id="cb13-2" data-line-number="2">EY &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(Y)</a>
+<a class="sourceLine" id="cb13-2" data-line-number="2">EY &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(Y)</a>
 <a class="sourceLine" id="cb13-3" data-line-number="3">eif_EY &lt;-<span class="st"> </span>Y <span class="op">-</span><span class="st"> </span>EY</a>
-<a class="sourceLine" id="cb13-4" data-line-number="4">params_de &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(EY, theta_eff<span class="op">$</span>theta)</a>
-<a class="sourceLine" id="cb13-5" data-line-number="5">eifs_de &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(eif_EY, theta_eff<span class="op">$</span>eif)</a>
+<a class="sourceLine" id="cb13-4" data-line-number="4">params_de &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(EY, theta_eff<span class="op">$</span>theta)</a>
+<a class="sourceLine" id="cb13-5" data-line-number="5">eifs_de &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(eif_EY, theta_eff<span class="op">$</span>eif)</a>
 <a class="sourceLine" id="cb13-6" data-line-number="6"></a>
 <a class="sourceLine" id="cb13-7" data-line-number="7"><span class="co"># direct effect = EY - estimated quantity</span></a>
 <a class="sourceLine" id="cb13-8" data-line-number="8">de_est &lt;-<span class="st"> </span><span class="kw">linear_contrast</span>(params_de, eifs_de)</a>
 <a class="sourceLine" id="cb13-9" data-line-number="9">de_est</a></code></pre></div>
-<pre><code>##      lwr_ci   param_est      upr_ci 
-## -0.45834907  0.01745764  0.49326435</code></pre>
-<p>As given above, we have for our estimate of the direct effect <span class="math inline">\(\hat{\beta}_{\text{DE}}({\delta}) =\)</span> 0.017.</p>
+<pre><code>##       lwr_ci    param_est       upr_ci 
+## -0.477461047  0.009634432  0.496729910</code></pre>
+<p>As given above, we have for our estimate of the direct effect <span class="math inline">\(\hat{\beta}_{\text{DE}}({\delta}) =\)</span> 0.01.</p>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="hasAnchor">
@@ -302,7 +303,7 @@ d\nu(a, z, w),
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.9000.</p>
 </div>
       </footer>
 </div>

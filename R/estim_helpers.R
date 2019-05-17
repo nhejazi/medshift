@@ -180,6 +180,7 @@ cv_eif <- function(fold,
   # compute component Da from nuisance parameters
   g_pred_A1 <- g_out$g_est$g_pred_A1
   g_pred_A0 <- g_out$g_est$g_pred_A0
+  g_pred_obs <- g_out$g_est$g_pred_natural
   Da_numerator <- delta * phi_est * (valid_data$A - g_pred_A1)
   Da_denominator <- (delta * g_pred_A1 + g_pred_A0)^2
   Da <- Da_numerator / Da_denominator
