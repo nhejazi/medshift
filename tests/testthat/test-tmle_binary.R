@@ -7,7 +7,7 @@ library(hal9001)
 library(sl3)
 library(tmle3)
 set.seed(7128816)
-delta <- 0.5
+delta_ipsi <- 0.5
 
 ################################################################################
 # setup learners for the nuisance parameters
@@ -86,47 +86,34 @@ learner_list <- list(
   A = cv_hal_binary_lrnr
 )
 
-# set up TMLE components: NPSEM, likelihood, TMLE task
-do_tmle <- function() {
-  npsem <- stochastic_mediation_npsem(node_list)
-  tmle_task <- tmle3_Task$new(data, npsem = npsem)
-  likelihood_init <- stochastic_mediation_likelihood(tmle_task, learner_list)
-  likelihood_init$get_likelihoods(tmle_task)
+## instantiate tmle3 spec for stochastic mediation
+tmle_spec <- tmle_medshift(
+  delta = delta_ipsi,
+)
 
-  # NEXT, need targeted_likelihood constructor
-  updater <- tmle3_Update$new(one_dimensional = TRUE, constrain_step = TRUE,
-                              maxit = 1e3, delta_epsilon = 1e-4, cvtmle = TRUE)
-  likelihood_targeted <- Targeted_Likelihood$new(likelihood_init, updater)
+## define data (from tmle3_Spec base class)
+tmle_task <- tmle_spec$make_tmle_task(data, node_list)
 
-  # add derived likelihood factors to targeted likelihood object
-  lf_e <- tmle3::define_lf(
-    tmle3::LF_derived, "E", cv_hal_binary_lrnr,
-    likelihood_targeted, medshift::make_e_task
-  )
-  lf_phi <- tmle3::define_lf(
-    tmle3::LF_derived, "phi", cv_hal_contin_lrnr,
-    likelihood_targeted, medshift::make_phi_task
-  )
-  likelihood_targeted$add_factors(lf_e)
-  likelihood_targeted$add_factors(lf_phi)
+## define likelihood (from tmle3_Spec base class)
+likelihood_init <- tmle_spec$make_initial_likelihood(tmle_task, learner_list)
 
-  # compute a tmle3 "by hand"
-  tmle_params <- define_param(Param_medshift, likelihood_targeted,
-    shift_param = delta
-  )
-  updater$tmle_params <- tmle_params
+## define update method (submodel and loss function)
+updater <- tmle_spec$make_updater()
+likelihood_targeted <- Targeted_Likelihood$new(likelihood_init, updater)
 
-  # separately test param methods
-  tmle_params$clever_covariates(tmle_task)
-  theta_tmle <- tmle_params$estimates(tmle_task)
+## define param
+tmle_params <- tmle_spec$make_params(tmle_task, likelihood_targeted)
+updater$tmle_params <- tmle_params
 
-  # fit TML estimator update
-  tmle_fit <- fit_tmle3(tmle_task, likelihood_targeted, tmle_params, updater)
-  return(tmle_fit)
-}
+## fit tmle update
+tmle_fit <- fit_tmle3(tmle_task, likelihood_targeted, tmle_params, updater)
+
+
+## one-line call with faster with tmle3 wrapper
 set.seed(71281)
-tmle_fit <- do_tmle()
+tmle_fit <- tmle3(tmle_spec, data, node_list, learner_list)
 tmle_fit
+
 
 # fit one-step estimator
 set.seed(71281)
@@ -153,31 +140,6 @@ sub_fit <- medshift(
   estimator = "substitution",
 )
 summary(sub_fit)
-
-# how Specs are used...
-if (FALSE) {
-  # define data (from tmle3_Spec base class)
-  tmle_task <- tmle_spec$make_tmle_task(data, node_list)
-
-  # define likelihood (from tmle3_Spec base class)
-  likelihood_init <- tmle_spec$make_initial_likelihood(tmle_task, learner_list)
-
-  # define update method (fluctuation submodel and loss function)
-  updater <- tmle_spec$make_updater()
-  likelihood_targeted <- Targeted_Likelihood$new(likelihood_init, updater)
-
-  # invoke params specified in spec
-  tmle_params <- tmle_spec$make_params(tmle_task, likelihood_targeted)
-  updater$tmle_params <- tmle_params
-
-  # fit TML estimator update
-  tmle_fit <- fit_tmle3(tmle_task, likelihood_targeted, tmle_params, updater)
-
-  # extract results from tmle3_Fit object
-  tmle_fit
-}
-
-
 
 ################################################################################
 get_sim_truth <- function(n_obs = 1e7,    # number of observations
@@ -229,5 +191,7 @@ EY <- sim_truth$EY_true
 # compute true parameter value based on the substitution estimator
 true_param <- mean(m_A1 * g_shifted_A1) + mean(m_A0 * g_shifted_A0)
 
-# compute the natural direct effect (NDE) as the difference of Y and parameter
-nde_true <- EY - true_param
+# test --- covers?
+test_that("TML estimate covers truth by chance", {
+
+})
