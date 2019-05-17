@@ -2,7 +2,6 @@ context("TML estimator for incremental propensity score interventions")
 
 library(data.table)
 library(stringr)
-library(future)
 library(hal9001)
 library(sl3)
 library(tmle3)

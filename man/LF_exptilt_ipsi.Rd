@@ -4,15 +4,15 @@
 \name{LF_exptilt_ipsi}
 \alias{LF_exptilt_ipsi}
 \title{Exponential Tilt Likelihood Factor for Incremental Propensity Scores}
-\format{\code{\link{R6Class}} object.}
+\format{\code{R6::R6Class} object.}
 \usage{
 LF_exptilt_ipsi
 }
 \value{
-\code{LF_base} object
+\code{tmle3::LF_base} object
 }
 \description{
-...
+Exponential Tilt Likelihood Factor for Incremental Propensity Scores
 }
 \section{Constructor}{
 
@@ -21,18 +21,18 @@ LF_exptilt_ipsi
 
   \describe{
     \item{\code{name}}{character, the name of the factor. Should match a node
-          name in the nodes specified by \code{\link{tmle3_Task}$npsem}.
+          name in the nodes specified by \code{tmle3::tmle3_Task$npsem}.
     }
-    \item{\code{likelihood_base}}{The trained \code{\link{likelihood}}
+    \item{\code{likelihood_base}}{The trained \code{tmle3::Likelihood}
           object, for use in generating a re-scaled likelihood factor.
     }
     \item{\code{shift_param}}{\code{numeric}, specification of the magnitude
           of the desired shift (a multiplier for the propensity score).
     }
-    \item{\code{treatment_task}}{\code{\link{tmle3_Task}} object created from
+    \item{\code{treatment_task}}{\code{tmle3::tmle3_Task} object created from
           setting the intervention to the treatment condition: do(A = 1).
     }
-    \item{\code{control_task}}{\code{\link{tmle3_Task}} object created from
+    \item{\code{control_task}}{\code{tmle3::tmle3_Task} object created from
           setting the intervention to the control condition: do(A = 0).
     }
     \item{\code{...}}{Not currently used.
@@ -43,16 +43,16 @@ LF_exptilt_ipsi
 \section{Fields}{
 
 \describe{
-    \item{\code{likelihood_base}}{The trained \code{\link{likelihood}}
+    \item{\code{likelihood_base}}{The trained \code{tmle3::Likelihood}
           object, for use in generating a re-scaled likelihood factor.
     }
     \item{\code{shift_param}}{\code{numeric}, specification of the magnitude
           of the desired shift (a multiplier for the propensity score).
     }
-    \item{\code{treatment_task}}{\code{\link{tmle3_Task}} object created from
+    \item{\code{treatment_task}}{\code{tmle3::tmle3_Task} object created from
           setting the intervention to the treatment condition: do(A = 1).
     }
-    \item{\code{control_task}}{\code{\link{tmle3_Task}} object created from
+    \item{\code{control_task}}{\code{tmle3::tmle3_Task} object created from
           setting the intervention to the control condition: do(A = 0).
     }
     \item{\code{...}}{Additional arguments passed to the base class.

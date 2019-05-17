@@ -7,9 +7,11 @@
 stochastic_mediation_npsem(node_list, variable_types = NULL)
 }
 \arguments{
-\item{node_list}{...}
+\item{node_list}{A \code{list} object specifying the different nodes in the
+nonparametric structural equation model.}
 
-\item{variable_types}{...}
+\item{variable_types}{Used to define how variables are handled. No need for
+user specification of this argument.}
 }
 \description{
 Stochastic Mediation NPSEM

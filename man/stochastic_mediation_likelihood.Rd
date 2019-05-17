@@ -7,9 +7,11 @@
 stochastic_mediation_likelihood(tmle_task, learner_list)
 }
 \arguments{
-\item{tmle_task}{...}
+\item{tmle_task}{A \code{tmle3_Task} object specifying the data and the
+NPSEM for use in constructing elements of TML estimator.}
 
-\item{learner_list}{...}
+\item{learner_list}{A \code{list} specifying which learners are to be applied
+for each of the regression tasks required for the TML estimator.}
 }
 \description{
 Stochastic Mediation Likelihood Factors

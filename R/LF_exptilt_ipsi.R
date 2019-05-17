@@ -1,7 +1,5 @@
 #' Exponential Tilt Likelihood Factor for Incremental Propensity Scores
 #'
-#' ...
-#'
 #' @references
 #' \describe{
 #'   \item{"Nonparametric Causal Effects Based on Incremental Propensity Score
@@ -18,9 +16,9 @@
 #'
 #' @keywords data
 #'
-#' @return \code{LF_base} object
+#' @return \code{tmle3::LF_base} object
 #'
-#' @format \code{\link{R6Class}} object.
+#' @format \code{R6::R6Class} object.
 #'
 #' @section Constructor:
 #'   \code{define_lf(LF_exptilt_ipsi, name, type = "density", likelihood_base,
@@ -28,18 +26,18 @@
 #'
 #'   \describe{
 #'     \item{\code{name}}{character, the name of the factor. Should match a node
-#'           name in the nodes specified by \code{\link{tmle3_Task}$npsem}.
+#'           name in the nodes specified by \code{tmle3::tmle3_Task$npsem}.
 #'     }
-#'     \item{\code{likelihood_base}}{The trained \code{\link{likelihood}}
+#'     \item{\code{likelihood_base}}{The trained \code{tmle3::Likelihood}
 #'           object, for use in generating a re-scaled likelihood factor.
 #'     }
 #'     \item{\code{shift_param}}{\code{numeric}, specification of the magnitude
 #'           of the desired shift (a multiplier for the propensity score).
 #'     }
-#'     \item{\code{treatment_task}}{\code{\link{tmle3_Task}} object created from
+#'     \item{\code{treatment_task}}{\code{tmle3::tmle3_Task} object created from
 #'           setting the intervention to the treatment condition: do(A = 1).
 #'     }
-#'     \item{\code{control_task}}{\code{\link{tmle3_Task}} object created from
+#'     \item{\code{control_task}}{\code{tmle3::tmle3_Task} object created from
 #'           setting the intervention to the control condition: do(A = 0).
 #'     }
 #'     \item{\code{...}}{Not currently used.
@@ -48,16 +46,16 @@
 #'
 #' @section Fields:
 #' \describe{
-#'     \item{\code{likelihood_base}}{The trained \code{\link{likelihood}}
+#'     \item{\code{likelihood_base}}{The trained \code{tmle3::Likelihood}
 #'           object, for use in generating a re-scaled likelihood factor.
 #'     }
 #'     \item{\code{shift_param}}{\code{numeric}, specification of the magnitude
 #'           of the desired shift (a multiplier for the propensity score).
 #'     }
-#'     \item{\code{treatment_task}}{\code{\link{tmle3_Task}} object created from
+#'     \item{\code{treatment_task}}{\code{tmle3::tmle3_Task} object created from
 #'           setting the intervention to the treatment condition: do(A = 1).
 #'     }
-#'     \item{\code{control_task}}{\code{\link{tmle3_Task}} object created from
+#'     \item{\code{control_task}}{\code{tmle3::tmle3_Task} object created from
 #'           setting the intervention to the control condition: do(A = 0).
 #'     }
 #'     \item{\code{...}}{Additional arguments passed to the base class.

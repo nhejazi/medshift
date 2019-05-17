@@ -45,6 +45,7 @@ Suggests:
     stringr,
     Rsolnp,
     nnls,
+    speedglm,
     hal9001,
     xgboost,
     mma

@@ -7,9 +7,11 @@
 make_e_task(tmle_task, likelihood)
 }
 \arguments{
-\item{tmle_task}{...}
+\item{tmle_task}{A \code{tmle3_Task} object specifying the data and the
+NPSEM for use in constructing elements of TML estimator.}
 
-\item{likelihood}{...}
+\item{likelihood}{A trained \code{Likelihood} object from \code{tmle3},
+constructed via the helper function \code{stochastic_mediation_likelihood}.}
 }
 \description{
 Make task for derived likelihood factor e(A,W)
