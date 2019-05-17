@@ -38,7 +38,7 @@ build_script:
   - travis-tool.sh install_github tlverse/origami
   - travis-tool.sh install_github tlverse/hal9001
   - travis-tool.sh install_github tlverse/sl3
-  - travis-tool.sh install_github tlverse/tmle3
+  - travis-tool.sh install_github tlverse/tmle3@convergence
 
 test_script:
   - travis-tool.sh run_tests
