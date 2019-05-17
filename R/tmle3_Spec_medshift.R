@@ -12,10 +12,13 @@ tmle3_Spec_medshift <- R6::R6Class(
   class = TRUE,
   inherit = tmle3_Spec,
   public = list(
-    initialize = function(shift_type = "exptilt", delta = 0, ...) {
+    initialize = function(shift_type = "exptilt", delta = 0,
+                          e_learners, phi_learners, ...) {
       options <- list(
         shift_type = shift_type,
         delta_shift = delta,
+        e_learners = e_learners,
+        phi_learners = phi_learners,
         ...
       )
       do.call(super$initialize, options)
@@ -33,11 +36,11 @@ tmle3_Spec_medshift <- R6::R6Class(
     make_params = function(tmle_task, targeted_likelihood) {
       # add derived likelihood factors to targeted likelihood object
       lf_e <- tmle3::define_lf(
-        tmle3::LF_derived, "E", cv_hal_binary_lrnr,
+        tmle3::LF_derived, "E", self$options$e_learners,
         targeted_likelihood, make_e_task
       )
       lf_phi <- tmle3::define_lf(
-        tmle3::LF_derived, "phi", cv_hal_contin_lrnr,
+        tmle3::LF_derived, "phi", self$options$phi_learners,
         targeted_likelihood, make_phi_task
       )
       targeted_likelihood$add_factors(lf_e)
@@ -76,15 +79,25 @@ tmle3_Spec_medshift <- R6::R6Class(
 #'  to the treatment. By default, this is an exponential tilt intervention.
 #' @param delta A \code{numeric}, specification of the magnitude of the
 #'  desired shift.
+#' @param e_learners A \code{Stack} object, or other learner class (inheriting
+#'  from \code{Lrnr_base}), containing a single or set of instantiated learners
+#'  from the \code{sl3} package, to be used in fitting a cleverly parameterized
+#'  propensity score that includes the mediators, i.e., e = P(A | Z, W).
+#' @param phi_learners A \code{Stack} object, or other learner class (inheriting
+#'  from \code{Lrnr_base}), containing a single or set of instantiated learners
+#'  from the \code{sl3} package, to be used in fitting a reduced regression
+#'  useful for computing the efficient one-step estimator, i.e., phi(W) =
+#'  E[m(A = 1, Z, W) - m(A = 0, Z, W) | W).
 ##' @param ... Additional arguments (currently unused).
 #'
 #' @export
 #
 tmle_medshift <- function(shift_type = "exptilt",
-                          delta = 1, ...) {
+                          delta = 1, e_learners, phi_learners, ...) {
   # this is a factory function
   tmle3_Spec_medshift$new(
     shift_type, delta,
+    e_learners, phi_learners,
     ...
   )
 }

@@ -4,7 +4,8 @@
 \alias{tmle_medshift}
 \title{Outcome under Joint Stochastic Intervention on Treatment and Mediator}
 \usage{
-tmle_medshift(shift_type = "exptilt", delta = 1, ...)
+tmle_medshift(shift_type = "exptilt", delta = 1, e_learners,
+  phi_learners, ...)
 }
 \arguments{
 \item{shift_type}{A \code{character} defining the type of shift to be applied
@@ -12,6 +13,17 @@ to the treatment. By default, this is an exponential tilt intervention.}
 
 \item{delta}{A \code{numeric}, specification of the magnitude of the
 desired shift.}
+
+\item{e_learners}{A \code{Stack} object, or other learner class (inheriting
+from \code{Lrnr_base}), containing a single or set of instantiated learners
+from the \code{sl3} package, to be used in fitting a cleverly parameterized
+propensity score that includes the mediators, i.e., e = P(A | Z, W).}
+
+\item{phi_learners}{A \code{Stack} object, or other learner class (inheriting
+from \code{Lrnr_base}), containing a single or set of instantiated learners
+from the \code{sl3} package, to be used in fitting a reduced regression
+useful for computing the efficient one-step estimator, i.e., phi(W) =
+E[m(A = 1, Z, W) - m(A = 0, Z, W) | W).}
 
 \item{...}{Additional arguments (currently unused).}
 }

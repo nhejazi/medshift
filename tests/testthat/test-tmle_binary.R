@@ -88,6 +88,8 @@ learner_list <- list(
 ## instantiate tmle3 spec for stochastic mediation
 tmle_spec <- tmle_medshift(
   delta = delta_ipsi,
+  e_learners = cv_hal_binary_lrnr,
+  phi_learners = cv_hal_contin_lrnr
 )
 
 ## define data (from tmle3_Spec base class)
@@ -118,7 +120,7 @@ tmle_fit
 set.seed(71281)
 os_fit <- medshift(
   W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
-  delta = delta,
+  delta = delta_ipsi,
   g_lrnrs = hal_binary_lrnr,
   e_lrnrs = hal_binary_lrnr,
   m_lrnrs = hal_contin_lrnr,
@@ -131,7 +133,7 @@ summary(os_fit)
 set.seed(71281)
 sub_fit <- medshift(
   W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
-  delta = delta,
+  delta = delta_ipsi,
   g_lrnrs = hal_binary_lrnr,
   e_lrnrs = hal_binary_lrnr,
   m_lrnrs = hal_contin_lrnr,

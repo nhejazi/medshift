@@ -43,11 +43,14 @@
 #'  estimator to be easily tweaked. Refer to the documentation for functions
 #'  \code{\link{est_onestep}}, \code{\link{est_ipw}}, and
 #'  \code{\link{est_substitution}} for details on what other arguments may be
-#'  specified through this mechanism.
+#'  specified through this mechanism. For the option \code{"tmle"}, the
+#'  implementation references helper functions in this package as well as the
+#'  architecture provide by the \code{tmle3} package.
 #'
 #' @importFrom data.table as.data.table setnames
 #' @importFrom origami make_folds cross_validate
 #' @importFrom sl3 Lrnr_glm_fast
+#' @importFrom tmle3 tmle3
 #' @importFrom stats binomial
 #'
 #' @export
@@ -64,7 +67,9 @@ medshift <- function(W,
                      m_lrnrs = sl3::Lrnr_glm_fast$new(),
                      phi_lrnrs = sl3::Lrnr_glm_fast$new(),
                      estimator = c(
-                       "onestep", "substitution",
+                       "onestep",
+                       "tmle",
+                       "substitution",
                        "reweighted"
                      ),
                      estimator_args = list(cv_folds = 10)) {
@@ -107,9 +112,19 @@ medshift <- function(W,
       z_names = z_names, estimator_args
     )
     est_out <- do.call(est_onestep, aipw_est_args)
+  } else if (estimator == "tmle") {
+    # TARGETED MAXIMUM LIKELIHOOD ESTIMATOR
+    node_list <- list(W = w_names, A = "A", Z = z_names, Y = "Y")
+    learner_list <- list(Y = m_lrnrs, A = g_lrnrs)
+    tmle_spec <- tmle_medshift(delta = delta,
+                               e_learners = e_lrnrs,
+                               phi_learners = phi_lrnrs)
+    est_out <- tmle3::tmle3(tmle_spec, data, node_list, learner_list)
   }
 
   # lazily create output as S3 class
-  class(est_out) <- "medshiftx"
+  if (estimator != "tmle") {
+    class(est_out) <- "medshift"
+  }
   return(est_out)
 }
