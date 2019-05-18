@@ -75,8 +75,8 @@ compute_Dzw <- function(g_output, m_output) {
   g_shifted_A0 <- g_output$g_est$g_pred_shifted_A0
 
   # get m components from output for that nuisance parameter
-  m_pred_A1 <- m_output$m_pred$m_pred_A1
-  m_pred_A0 <- m_output$m_pred$m_pred_A0
+  m_pred_A1 <- m_output$m_est$m_pred_A1
+  m_pred_A0 <- m_output$m_est$m_pred_A0
 
   # compute component Dzw from nuisance parameters
   Dzw_A1 <- g_shifted_A1 * m_pred_A1

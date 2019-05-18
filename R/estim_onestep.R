@@ -98,7 +98,7 @@ est_onestep <- function(data,
     theta = estim_onestep_param,
     var = estim_onestep_var,
     eif = (estim_eif - estim_onestep_param),
-    type = "one-step efficient"
+    type = "one-step"
   )
   return(estim_onestep_out)
 }
@@ -185,10 +185,10 @@ cv_eif <- function(fold,
     z_names = z_names, w_names = w_names
   )
 
-  browser()
-  ## 4) difference-reduced dimension regression for phi
+  ## 4) difference-reduced dimension regression with pseudo-outcome
   phi_est <- fit_phi_mech(
-    data = valid_data, lrnr_stack = lrnr_stack_phi,
+    train_data = train_data, valid_data = valid_data,
+    lrnr_stack = lrnr_stack_phi,
     m_output = m_out, w_names = w_names
   )
 
@@ -216,11 +216,10 @@ cv_eif <- function(fold,
     idx_treat = idx_A1, idx_cntrl = idx_A0
   )
   m_pred_obs <- rep(NA, nrow(valid_data))
-  m_pred_A1_obs <- m_out$m_pred$m_pred_A1[idx_A1]
-  m_pred_A0_obs <- m_out$m_pred$m_pred_A0[idx_A0]
-  m_pred_obs[idx_A1] <- m_pred_A1_obs
-  m_pred_obs[idx_A0] <- m_pred_A0_obs
-  # stabilize weights in AIPW by dividing by sample average since E[g/e] = 1
+  m_pred_obs[idx_A1] <- m_out$m_est$m_pred_A1[idx_A1]
+  m_pred_obs[idx_A0] <- m_out$m_est$m_pred_A0[idx_A0]
+
+  # stabilize weights in A-IPW by dividing by sample average, n.b., E[g/e] = 1
   mean_aipw <- ipw_groupwise$mean_aipw
   g_shifted <- ipw_groupwise$g_shifted
   e_pred <- ipw_groupwise$e_pred

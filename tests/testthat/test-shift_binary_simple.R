@@ -122,7 +122,11 @@ theta_tmle <- medshift(
   e_lrnrs = cv_hal_binary_lrnr,
   m_lrnrs = cv_hal_contin_lrnr,
   phi_lrnrs = cv_hal_contin_lrnr,
-  estimator = "tmle"
+  estimator = "tmle",
+  estimator_args = list(
+    max_iter = 100,
+    step_size = 1e-5
+  )
 )
 theta_tmle
 

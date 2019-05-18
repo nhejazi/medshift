@@ -221,6 +221,27 @@ fit_m_mech <- function(data, valid_data = NULL,
     # copy only validation data
     data_A1 <- data.table::copy(valid_data)
     data_A0 <- data.table::copy(valid_data)
+
+    # NOTE: to fit nuisance regression phi, we need estimates on training set
+    # to construct the relevant pseudo-outcome, i.e., m(Z,A=1,W) - m(Z,A=0,W)
+    data_train_A1 <- data.table::copy(data)
+    data_train_A1[, A := 1]
+    m_task_train_A1 <- sl3::sl3_Task$new(
+      data = data_train_A1,
+      covariates = c("A", z_names, w_names),
+      outcome = "Y"
+    )
+    m_pred_train_A1 <- m_fit_stack$predict(m_task_train_A1)
+
+    # repeat for A = 0 case
+    data_train_A0 <- data.table::copy(data)
+    data_train_A0[, A := 0]
+    m_task_train_A0 <- sl3::sl3_Task$new(
+      data = data_train_A0,
+      covariates = c("A", z_names, w_names),
+      outcome = "Y"
+    )
+    m_pred_train_A0 <- m_fit_stack$predict(m_task_train_A0)
   }
 
   # copy data and set intervention A = 1
@@ -243,9 +264,23 @@ fit_m_mech <- function(data, valid_data = NULL,
 
   # output
   out <- list(
-    m_pred = data.table::data.table(cbind(
+    m_est = data.table::data.table(cbind(
       m_pred_A1 = m_pred_A1,
       m_pred_A0 = m_pred_A0
+    )),
+    m_est_training = data.table::data.table(cbind(
+      m_pred_A1 =
+        if (!is.null(valid_data)) {
+          m_pred_train_A1
+        } else {
+          rep(NA, nrow(data))
+        },
+      m_pred_A0 =
+        if (!is.null(valid_data)) {
+          m_pred_train_A0
+        } else {
+          rep(NA, nrow(data))
+        }
     )),
     m_fit_sl = m_fit_stack
   )
@@ -256,12 +291,15 @@ fit_m_mech <- function(data, valid_data = NULL,
 
 #' Fit intervention-specific exponential tilt nuisance parameter
 #'
-#' @param data A \code{data.table} containing the observed data, with columns
-#'  in the order specified by the NPSEM (Y, Z, A, W), with column names set
-#'  appropriately based on the original input data. Such a structure is merely
-#'  a convenience utility to passing data around to the various core estimation
+#' @param train_data A \code{data.table} containing the observed data, with
+#'  columns in the order specified by the NPSEM (Y, Z, A, W), with column names
+#'  set appropriately based on the input data. Such a structure is merely a
+#'  convenience utility to passing data around to the various core estimation
 #'  routines and is automatically generated as part of a call to the user-facing
 #'  wrapper function \code{medshift}.
+#' @param valid_data A holdout data set, with columns exactly matching those
+#'  appearing in the preceding argument \code{train_data}, to be used for
+#'  estimation via cross-fitting. Not optional for this nuisance parameter.
 #' @param lrnr_stack A \code{Stack} object, or other learner class (inheriting
 #'  from \code{Lrnr_base}), containing a single or set of instantiated learners
 #'  from the \code{sl3} package, to be used in fitting a cleverly parameterized
@@ -275,23 +313,48 @@ fit_m_mech <- function(data, valid_data = NULL,
 #' @importFrom data.table data.table as.data.table
 #' @importFrom sl3 sl3_Task
 #
-fit_phi_mech <- function(data, lrnr_stack, m_output, w_names) {
-  # difference-reduced dimension regression for phi
-  m_pred_A1 <- m_output$m_pred$m_pred_A1
-  m_pred_A0 <- m_output$m_pred$m_pred_A0
-  m_pred_diff <- m_pred_A1 - m_pred_A0
+fit_phi_mech <- function(train_data, valid_data, lrnr_stack, m_output,
+                         w_names) {
+  # regression on pseudo-outcome for this nuisance parameter
+  # NOTE: first, learn the regression model using the training data
+  m_pred_train_A1 <- m_output$m_est_training$m_pred_A1
+  m_pred_train_A0 <- m_output$m_est_training$m_pred_A0
+  m_pred_train_diff <- m_pred_train_A1 - m_pred_train_A0
 
   # construct data structure for use with task objects
-  phi_data <- data.table::data.table(m_diff = m_pred_diff, data[, ..w_names])
-  phi_task <- sl3::sl3_Task$new(
-    data = phi_data,
+  phi_train_data <- data.table::data.table(
+    m_diff = m_pred_train_diff,
+    train_data[, ..w_names]
+  )
+  phi_train_task <- sl3::sl3_Task$new(
+    data = phi_train_data,
     covariates = w_names,
     outcome = "m_diff",
     outcome_type = "continuous"
   )
 
-  # fit stack of learners and predict on the same data set
-  phi_fit <- lrnr_stack$train(phi_task)
-  phi_est <- phi_fit$predict()
+  # fit stack of learners to learn the regression model for phi
+  phi_fit <- lrnr_stack$train(phi_train_task)
+
+  # NOW, predict on the validation data
+  # NOTE: first, as before, must construct the pseudo-outcome
+  m_pred_valid_A1 <- m_output$m_est$m_pred_A1
+  m_pred_valid_A0 <- m_output$m_est$m_pred_A0
+  m_pred_valid_diff <- m_pred_valid_A1 - m_pred_valid_A0
+
+  # construct data structure for use with task objects
+  phi_valid_data <- data.table::data.table(
+    m_diff = m_pred_valid_diff,
+    valid_data[, ..w_names]
+  )
+  phi_valid_task <- sl3::sl3_Task$new(
+    data = phi_valid_data,
+    covariates = w_names,
+    outcome = "m_diff",
+    outcome_type = "continuous"
+  )
+
+  # predict and return for validation set only
+  phi_est <- phi_fit$predict(phi_valid_task)
   return(phi_est)
 }

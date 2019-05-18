@@ -71,9 +71,11 @@ medshift <- function(W,
                        "substitution",
                        "reweighted"
                      ),
-                     estimator_args = list(cv_folds = 10,
-                                           max_iter = 1e4,
-                                           step_size = 1e-6)) {
+                     estimator_args = list(
+                       cv_folds = 10,
+                       max_iter = 1e4,
+                       step_size = 1e-6
+                     )) {
   # set defaults
   estimator <- match.arg(estimator)
   estimator_args <- unlist(estimator_args, recursive = FALSE)

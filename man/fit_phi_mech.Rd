@@ -4,15 +4,19 @@
 \alias{fit_phi_mech}
 \title{Fit intervention-specific exponential tilt nuisance parameter}
 \usage{
-fit_phi_mech(data, lrnr_stack, m_output, w_names)
+fit_phi_mech(train_data, valid_data, lrnr_stack, m_output, w_names)
 }
 \arguments{
-\item{data}{A \code{data.table} containing the observed data, with columns
-in the order specified by the NPSEM (Y, Z, A, W), with column names set
-appropriately based on the original input data. Such a structure is merely
-a convenience utility to passing data around to the various core estimation
+\item{train_data}{A \code{data.table} containing the observed data, with
+columns in the order specified by the NPSEM (Y, Z, A, W), with column names
+set appropriately based on the input data. Such a structure is merely a
+convenience utility to passing data around to the various core estimation
 routines and is automatically generated as part of a call to the user-facing
 wrapper function \code{medshift}.}
+
+\item{valid_data}{A holdout data set, with columns exactly matching those
+appearing in the preceding argument \code{train_data}, to be used for
+estimation via cross-fitting. Not optional for this nuisance parameter.}
 
 \item{lrnr_stack}{A \code{Stack} object, or other learner class (inheriting
 from \code{Lrnr_base}), containing a single or set of instantiated learners
