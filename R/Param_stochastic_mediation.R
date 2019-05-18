@@ -1,6 +1,6 @@
 #' Parameter for mediation effect under stochastic interventions
 #'
-#' Parameter definition...
+#' Parameter definition class. See https://arxiv.org/abs/1901.02776
 #'
 #' @importFrom R6 R6Class
 #' @importFrom uuid UUIDgenerate
@@ -14,7 +14,7 @@
 #' @format \code{\link{R6Class}} object.
 #'
 #' @section Constructor:
-#'   \code{define_param(Param_esteqn_medshift, observed_likelihood, intervention_list, ..., outcome_node)}
+#'   \code{define_param(Param_medshift, shift_param, ..., outcome_node)}
 #'
 #'   \describe{
 #'     \item{\code{observed_likelihood}}{A \code{\link{Likelihood}}
@@ -57,9 +57,10 @@ Param_medshift <- R6::R6Class(
   public = list(
     initialize = function(observed_likelihood,
                               shift_param,
+                              ...,
                               outcome_node = "Y") {
-      # copied from parameter definition for ATT...
-      super$initialize(observed_likelihood, list(),
+      # copied from standard parameter definitions
+      super$initialize(observed_likelihood, list(...),
         outcome_node = outcome_node
       )
       tmle_task <- observed_likelihood$training_task
@@ -206,7 +207,8 @@ Param_medshift <- R6::R6Class(
       return(private$.control_task)
     },
     update_nodes = function() {
-      return(c(self$outcome_node, "A")) # TODO: stop hardcoding A everywhere
+      # TODO: stop hard-coding A everywhere
+      return(c(self$outcome_node, "A"))
     }
   ),
   private = list(

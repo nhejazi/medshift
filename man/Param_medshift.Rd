@@ -12,11 +12,11 @@ Param_medshift
 \code{Param_base} object
 }
 \description{
-Parameter definition...
+Parameter definition class. See https://arxiv.org/abs/1901.02776
 }
 \section{Constructor}{
 
-  \code{define_param(Param_esteqn_medshift, observed_likelihood, intervention_list, ..., outcome_node)}
+  \code{define_param(Param_medshift, shift_param, ..., outcome_node)}
 
   \describe{
     \item{\code{observed_likelihood}}{A \code{\link{Likelihood}}
