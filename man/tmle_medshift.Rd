@@ -4,8 +4,8 @@
 \alias{tmle_medshift}
 \title{Outcome under Joint Stochastic Intervention on Treatment and Mediator}
 \usage{
-tmle_medshift(shift_type = "exptilt", delta = 1, e_learners,
-  phi_learners, ...)
+tmle_medshift(shift_type = "exptilt", delta, e_learners, phi_learners,
+  max_iter = 10000, step_size = 1e-06, ...)
 }
 \arguments{
 \item{shift_type}{A \code{character} defining the type of shift to be applied
@@ -24,6 +24,13 @@ from \code{Lrnr_base}), containing a single or set of instantiated learners
 from the \code{sl3} package, to be used in fitting a reduced regression
 useful for computing the efficient one-step estimator, i.e., phi(W) =
 E[m(A = 1, Z, W) - m(A = 0, Z, W) | W).}
+
+\item{max_iter}{A \code{numeric} setting the total number of iterations to be
+used in the targeted procedure based on universal least favorable submodels.}
+
+\item{step_size}{A \code{numeric} giving the step size (\code{delta_epsilon}
+in \code{tmle3}) to be used in the targeted procedure based on universal
+least favorable submodels.}
 
 \item{...}{Additional arguments (currently unused).}
 }

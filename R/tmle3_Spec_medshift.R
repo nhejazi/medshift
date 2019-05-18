@@ -12,13 +12,17 @@ tmle3_Spec_medshift <- R6::R6Class(
   class = TRUE,
   inherit = tmle3_Spec,
   public = list(
-    initialize = function(shift_type = "exptilt", delta = 0,
-                              e_learners, phi_learners, ...) {
+    initialize = function(shift_type = "exptilt", delta,
+                              e_learners, phi_learners,
+                              max_iter = 1e4, step_size = 1e-6,
+                              ...) {
       options <- list(
         shift_type = shift_type,
         delta_shift = delta,
         e_learners = e_learners,
         phi_learners = phi_learners,
+        max_iter = max_iter,
+        step_size = step_size,
         ...
       )
       do.call(super$initialize, options)
@@ -64,8 +68,8 @@ tmle3_Spec_medshift <- R6::R6Class(
       updater <- tmle3_Update$new(
         one_dimensional = TRUE,
         constrain_step = TRUE,
-        maxit = 1e5,
-        delta_epsilon = 1e-6,
+        maxit = self$options$max_iter,
+        delta_epsilon = self$options$step_size,
         cvtmle = TRUE
       )
     }
@@ -97,16 +101,24 @@ tmle3_Spec_medshift <- R6::R6Class(
 #'  from the \code{sl3} package, to be used in fitting a reduced regression
 #'  useful for computing the efficient one-step estimator, i.e., phi(W) =
 #'  E[m(A = 1, Z, W) - m(A = 0, Z, W) | W).
-##' @param ... Additional arguments (currently unused).
+#' @param max_iter A \code{numeric} setting the total number of iterations to be
+#'  used in the targeted procedure based on universal least favorable submodels.
+#' @param step_size A \code{numeric} giving the step size (\code{delta_epsilon}
+#'  in \code{tmle3}) to be used in the targeted procedure based on universal
+#'  least favorable submodels.
+#' @param ... Additional arguments (currently unused).
 #'
 #' @export
 #
 tmle_medshift <- function(shift_type = "exptilt",
-                          delta = 1, e_learners, phi_learners, ...) {
+                          delta, e_learners, phi_learners,
+                          max_iter = 1e4, step_size = 1e-6,
+                          ...) {
   # this is a factory function
   tmle3_Spec_medshift$new(
     shift_type, delta,
     e_learners, phi_learners,
+    max_iter, step_size,
     ...
   )
 }

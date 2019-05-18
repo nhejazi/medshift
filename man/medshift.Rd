@@ -10,7 +10,7 @@ medshift(W, A, Z, Y, delta, g_lrnrs = sl3::Lrnr_glm_fast$new(family =
   stats::binomial()), m_lrnrs = sl3::Lrnr_glm_fast$new(),
   phi_lrnrs = sl3::Lrnr_glm_fast$new(), estimator = c("onestep",
   "tmle", "substitution", "reweighted"), estimator_args = list(cv_folds =
-  10))
+  10, max_iter = 10000, step_size = 1e-06))
 }
 \arguments{
 \item{W}{A \code{matrix}, \code{data.frame}, or similar corresponding to a
@@ -65,9 +65,8 @@ is so chosen as to allow the number of folds used in computing the AIPW
 estimator to be easily tweaked. Refer to the documentation for functions
 \code{\link{est_onestep}}, \code{\link{est_ipw}}, and
 \code{\link{est_substitution}} for details on what other arguments may be
-specified through this mechanism. For the option \code{"tmle"}, the
-implementation references helper functions in this package as well as the
-architecture provide by the \code{tmle3} package.}
+specified through this mechanism. For the option \code{"tmle"}, there is
+heavy reliance on the architecture provided by the \code{tmle3} package.}
 }
 \description{
 Nonparametric estimation of decomposition term for causal mediation analysis

@@ -185,6 +185,7 @@ cv_eif <- function(fold,
     z_names = z_names, w_names = w_names
   )
 
+  browser()
   ## 4) difference-reduced dimension regression for phi
   phi_est <- fit_phi_mech(
     data = valid_data, lrnr_stack = lrnr_stack_phi,
