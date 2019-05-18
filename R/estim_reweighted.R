@@ -1,4 +1,4 @@
-#' Inverse probability (re-)weighted estimator
+#' Inverse probability re/IP-weighted estimator
 #'
 #' @param data A \code{data.table} containing the observed data, with columns
 #'  in the order specified by the NPSEM (Y, Z, A, W), with column names set
@@ -66,4 +66,52 @@ est_ipw <- function(data,
   # output
   estim_ipw_out <- list(theta = estim_ipw, type = "re-weighted (IPW)")
   return(estim_ipw_out)
+}
+
+################################################################################
+
+#' Get inverse probability weighted (IPW) estimate from nuisance parameters
+#'
+#' @param g_output Object containing results from fitting the propensity score
+#'  regression, as produced by a call to \code{fit_g_mech}.
+#' @param e_output Object containing results from fitting the propensity score
+#'  regression while conditioning on mediators, as produced by a call to
+#'  \code{fit_e_mech}.
+#' @param idx_treat A \code{numeric} vector providing the indices corresponding
+#'  to units that received treatment (A = 1), for a binary intervention.
+#' @param idx_cntrl A \code{numeric} vector providing the indices corresponding
+#'  to units that did not receive treatment (A = 0), for a binary intervention.
+#'
+#' @keywords internal
+#
+compute_ipw <- function(g_output, e_output, idx_treat, idx_cntrl) {
+  # compute components for A = 0 based on symmetry with A = 1 case
+  g_shifted_A1 <- g_output$g_est$g_pred_shifted_A1
+  g_shifted_A0 <- g_output$g_est$g_pred_shifted_A0
+  e_pred_A1 <- e_output$e_est$e_pred_A1
+  e_pred_A0 <- e_output$e_est$e_pred_A0
+
+  # subset computed components based on observed treatment status for g
+  g_shifted_obs <- rep(NA, length(idx_treat) + length(idx_cntrl))
+  g_shifted_A1_obs <- g_shifted_A1[idx_treat]
+  g_shifted_A0_obs <- g_shifted_A0[idx_cntrl]
+  g_shifted_obs[idx_treat] <- g_shifted_A1_obs
+  g_shifted_obs[idx_cntrl] <- g_shifted_A0_obs
+
+  # subset computed components based on observed treatment status for e
+  e_pred_obs <- rep(NA, length(idx_treat) + length(idx_cntrl))
+  e_pred_A1_obs <- e_pred_A1[idx_treat]
+  e_pred_A0_obs <- e_pred_A0[idx_cntrl]
+  e_pred_obs[idx_treat] <- e_pred_A1_obs
+  e_pred_obs[idx_cntrl] <- e_pred_A0_obs
+
+  # stabilize weights in A-IPW by dividing by sample average since E[g/e] = 1
+  mean_aipw <- mean(g_shifted_obs / e_pred_obs)
+
+  # output as simple list
+  return(list(
+    g_shifted = g_shifted_obs,
+    e_pred = e_pred_obs,
+    mean_aipw = mean_aipw
+  ))
 }

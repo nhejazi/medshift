@@ -19,6 +19,8 @@ knitr::opts_chunk$set(
 [![Travis-CI Build Status](https://travis-ci.org/nhejazi/medshift.svg?branch=master)](https://travis-ci.org/nhejazi/medshift)
 [![AppVeyor Build  Status](https://ci.appveyor.com/api/projects/status/github/nhejazi/medshift?branch=master&svg=true)](https://ci.appveyor.com/project/nhejazi/medshift)
 [![Coverage Status](https://img.shields.io/codecov/c/github/nhejazi/medshift/master.svg)](https://codecov.io/github/nhejazi/medshift?branch=master)
+[![CRAN](http://www.r-pkg.org/badges/version/medshift)](http://www.r-pkg.org/pkg/medshift)
+[![CRAN downloads](https://cranlogs.r-pkg.org/badges/medshift)](https://CRAN.R-project.org/package=medshift)
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 
@@ -35,7 +37,17 @@ The `medshift` R package is designed to provide facilities for estimating a
 parameter that arises in a decomposition of the population intervention causal
 effect into the (in)direct effects under stochastic interventions in the setting
 of mediation analysis. `medshift` is designed as an implementation to accompany
-the methodology described in @diaz2019causal.
+the methodology described in @diaz2019causal. Implemented estimators include the
+classical substitution (G-computation) estimator, an inverse probability
+weighted (IPW) estimator, an efficient one-step (AIPW) estimator using
+cross-fitting [@pfanzagl1985contributions; @zheng2011cross;
+@chernozhukov2018double], and a one-step cross-validated targeted maximum
+likelihood (TML) estimator based on the method of universal least favorable
+submodels [@vdl2011targeted; @zheng2011cross; @vdl2016onestep]. Facilities for
+constructing estimators using ensemble machine learning are provided through the
+[`sl3` R package](https://github.com/tlverse/sl3) [@coyle2018sl3], and the TML
+estimator is implemented using the architecture system exposed by the [`tmle3` R
+package](https://github.com/tlverse/tmle3).
 
 ---
 
@@ -87,18 +99,18 @@ make_simple_mediation_data <- function(n_obs = 1000) {
 set.seed(75681)
 example_data <- make_simple_mediation_data()
 
-# compute AIPW estimate based on an incremental propensity score intervention
+# compute one-step estimate for an incremental propensity score intervention
 # that triples (delta = 3) the individual-specific odds of receiving treatment
-aipw_medshift <- medshift(W = example_data$W, A = example_data$A,
-                          Z = example_data$Z, Y = example_data$Y,
-                          delta = 3, estimator = "onestep",
-                          estimator_args = list(cv_folds = 3))
-summary(aipw_medshift)
+os_medshift <- medshift(W = example_data$W, A = example_data$A,
+                        Z = example_data$Z, Y = example_data$Y,
+                        delta = 3, estimator = "onestep",
+                        estimator_args = list(cv_folds = 3))
+summary(os_medshift)
 ```
 
 For details on how to use data adaptive regression (machine learning) techniques
 in the estimation of nuisance parameters, consider consulting the vignette that
-accompanies the package.
+accompanies this package.
 
 ---
 
@@ -141,7 +153,7 @@ After using the `medshift` R package, please cite the following:
             interventions in {R}},
           year  = {2019},
           url = {https://github.com/nhejazi/medshift},
-          note = {R package version 0.0.8}
+          note = {R package version 0.0.9}
         }
 
 ---

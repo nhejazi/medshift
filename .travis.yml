@@ -28,14 +28,14 @@ r_packages:
 
 r_github_packages:
   - r-lib/sessioninfo
-  - Rdatatable/data.table
-  - jimhester/covr
+  - r-lib/covr
   - osofr/simcausal
   - osofr/condensier
   - tlverse/delayed
   - tlverse/origami
   - tlverse/hal9001
   - tlverse/sl3
+  - tlverse/tmle3
 
 after_success:
   ## coverage
@@ -48,4 +48,3 @@ notifications:
   email:
     on_success: change
     on_failure: change
-

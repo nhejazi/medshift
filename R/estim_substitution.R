@@ -57,3 +57,34 @@ est_substitution <- function(data,
   estim_sub_out <- list(theta = estim_sub, type = "substitution")
   return(estim_sub_out)
 }
+
+################################################################################
+
+#' Get Dzw component of efficient influence function from nuisance parameters
+#'
+#' @param g_output Object containing results from fitting the propensity score
+#'  regression, as produced by a call to \code{fit_g_mech}.
+#' @param m_output Object containing results from fitting the outcome
+#'  regression, as produced by a call to \code{fit_m_mech}.
+#'
+#' @keywords internal
+#
+compute_Dzw <- function(g_output, m_output) {
+  # get g components from output for that nuisance parameter
+  g_shifted_A1 <- g_output$g_est$g_pred_shifted_A1
+  g_shifted_A0 <- g_output$g_est$g_pred_shifted_A0
+
+  # get m components from output for that nuisance parameter
+  m_pred_A1 <- m_output$m_pred$m_pred_A1
+  m_pred_A0 <- m_output$m_pred$m_pred_A0
+
+  # compute component Dzw from nuisance parameters
+  Dzw_A1 <- g_shifted_A1 * m_pred_A1
+  Dzw_A0 <- g_shifted_A0 * m_pred_A0
+
+  # output as simple list
+  return(list(
+    dzw_cntrl = Dzw_A0,
+    dzw_treat = Dzw_A1
+  ))
+}

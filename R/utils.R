@@ -15,14 +15,14 @@
 #' @importFrom stats qnorm
 #' @importFrom assertthat assert_that
 #'
-#' @method confint medshiftx
+#' @method confint medshift
 #'
 #' @export
 #
-confint.medshiftx <- function(object,
-                              parm = seq_len(object$psi),
-                              level = 0.95,
-                              ...) {
+confint.medshift <- function(object,
+                             parm = seq_len(object$psi),
+                             level = 0.95,
+                             ...) {
   # inference is currently limited to the one-step efficient estimator
   # TODO: allow use for TML estimators once impelemented
   assertthat::assert_that(object$type == "one-step efficient")
@@ -58,13 +58,13 @@ confint.medshiftx <- function(object,
 #'
 #' @importFrom stats confint
 #'
-#' @method summary medshiftx
+#' @method summary medshift
 #'
 #' @export
 #
-summary.medshiftx <- function(object,
-                              ...,
-                              ci_level = 0.95) {
+summary.medshift <- function(object,
+                             ...,
+                             ci_level = 0.95) {
   # inference is currently limited to the one-step efficient estimator
   # TODO: allow use for TML estimators once impelemented
   if (object$type == "one-step efficient") {
@@ -97,11 +97,11 @@ summary.medshiftx <- function(object,
 #' @param x An object of class \code{medshift}.
 #' @param ... Other options (not currently used).
 #'
-#' @method print medshiftx
+#' @method print medshift
 #'
 #' @export
 #
-print.medshiftx <- function(x, ...) {
+print.medshift <- function(x, ...) {
   # inference is currently limited to the one-step efficient estimator
   # TODO: allow use for TML estimators once impelemented
   if (x$type == "one-step efficient") {

@@ -4,6 +4,12 @@
     <loc>https://code.nimahejazi.org/medshift/index.html</loc>
   </url>
   <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/LF_exptilt_ipsi.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/Param_medshift.html</loc>
+  </url>
+  <url>
     <loc>https://code.nimahejazi.org/medshift/reference/bound_precision.html</loc>
   </url>
   <url>
@@ -16,7 +22,7 @@
     <loc>https://code.nimahejazi.org/medshift/reference/compute_ipw.html</loc>
   </url>
   <url>
-    <loc>https://code.nimahejazi.org/medshift/reference/confint.medshiftx.html</loc>
+    <loc>https://code.nimahejazi.org/medshift/reference/confint.medshift.html</loc>
   </url>
   <url>
     <loc>https://code.nimahejazi.org/medshift/reference/cv_eif.html</loc>
@@ -43,13 +49,31 @@
     <loc>https://code.nimahejazi.org/medshift/reference/fit_phi_mech.html</loc>
   </url>
   <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/make_e_task.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/make_phi_task.html</loc>
+  </url>
+  <url>
     <loc>https://code.nimahejazi.org/medshift/reference/medshift.html</loc>
   </url>
   <url>
-    <loc>https://code.nimahejazi.org/medshift/reference/print.medshiftx.html</loc>
+    <loc>https://code.nimahejazi.org/medshift/reference/print.medshift.html</loc>
   </url>
   <url>
-    <loc>https://code.nimahejazi.org/medshift/reference/summary.medshiftx.html</loc>
+    <loc>https://code.nimahejazi.org/medshift/reference/stochastic_mediation_likelihood.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/stochastic_mediation_npsem.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/summary.medshift.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/tmle3_Spec_medshift.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/tmle_medshift.html</loc>
   </url>
   <url>
     <loc>https://code.nimahejazi.org/medshift/articles/intro_medshift.html</loc>
