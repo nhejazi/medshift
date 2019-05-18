@@ -32,7 +32,18 @@ estimating a parameter that arises in a decomposition of the population
 intervention causal effect into the (in)direct effects under stochastic
 interventions in the setting of mediation analysis. `medshift` is
 designed as an implementation to accompany the methodology described in
-Díaz and Hejazi (2019).
+Díaz and Hejazi (2019). Implemented estimators include the classical
+substitution (G-computation) estimator, an inverse probability weighted
+(IPW) estimator, an efficient one-step (AIPW) estimator using
+cross-fitting (Pfanzagl and Wefelmeyer 1985; Zheng and van der Laan
+2011; Chernozhukov et al. 2018), and a one-step cross-validated targeted
+maximum likelihood (TML) estimator based on the method of universal
+least favorable submodels (van der Laan and Rose 2011; Zheng and van der
+Laan 2011; van der Laan and Gruber 2016). Facilities for constructing
+estimators using ensemble machine learning are provided through the
+[`sl3` R package](https://github.com/tlverse/sl3) (Coyle et al. 2018),
+and the TML estimator is implemented using the architecture system
+exposed by the [`tmle3` R package](https://github.com/tlverse/tmle3).
 
 -----
 
@@ -84,13 +95,13 @@ make_simple_mediation_data <- function(n_obs = 1000) {
 set.seed(75681)
 example_data <- make_simple_mediation_data()
 
-# compute AIPW estimate based on an incremental propensity score intervention
+# compute one-step estimate for an incremental propensity score intervention
 # that triples (delta = 3) the individual-specific odds of receiving treatment
-aipw_medshift <- medshift(W = example_data$W, A = example_data$A,
-                          Z = example_data$Z, Y = example_data$Y,
-                          delta = 3, estimator = "onestep",
-                          estimator_args = list(cv_folds = 3))
-summary(aipw_medshift)
+os_medshift <- medshift(W = example_data$W, A = example_data$A,
+                        Z = example_data$Z, Y = example_data$Y,
+                        delta = 3, estimator = "onestep",
+                        estimator_args = list(cv_folds = 3))
+summary(os_medshift)
 #>             lwr_ci          param_est             upr_ci 
 #>             0.7401           0.788136           0.836172 
 #>          param_var           eif_mean          estimator 
@@ -99,7 +110,7 @@ summary(aipw_medshift)
 
 For details on how to use data adaptive regression (machine learning)
 techniques in the estimation of nuisance parameters, consider consulting
-the vignette that accompanies the package.
+the vignette that accompanies this package.
 
 -----
 
@@ -143,7 +154,7 @@ After using the `medshift` R package, please cite the following:
         interventions in {R}},
       year  = {2019},
       url = {https://github.com/nhejazi/medshift},
-      note = {R package version 0.0.8}
+      note = {R package version 0.0.9}
     }
 ```
 
@@ -184,11 +195,62 @@ See below for details:
 
 <div id="refs" class="references">
 
+<div id="ref-chernozhukov2018double">
+
+Chernozhukov, Victor, Denis Chetverikov, Mert Demirer, Esther Duflo,
+Christian Hansen, Whitney Newey, and James Robins. 2018.
+“Double/Debiased Machine Learning for Treatment and Structural
+Parameters.” *The Econometrics Journal* 21 (1).
+<https://doi.org/10.1111/ectj.12097>.
+
+</div>
+
+<div id="ref-coyle2018sl3">
+
+Coyle, Jeremy R, Nima S Hejazi, Ivana Malenica, and Oleg Sofrygin. 2018.
+“sl3: Modern Pipelines for Machine Learning and Super Learning.”
+<https://github.com/tlverse/sl3>.
+<https://doi.org/10.5281/zenodo.1342294>.
+
+</div>
+
 <div id="ref-diaz2019causal">
 
 Díaz, Iván, and Nima S Hejazi. 2019. “Causal Mediation Analysis for
 Stochastic Interventions.” *Submitted*.
 <https://arxiv.org/abs/1901.02776>.
+
+</div>
+
+<div id="ref-pfanzagl1985contributions">
+
+Pfanzagl, J, and W Wefelmeyer. 1985. “Contributions to a General
+Asymptotic Statistical Theory.” *Statistics & Risk Modeling* 3 (3-4):
+379–88.
+
+</div>
+
+<div id="ref-vdl2016onestep">
+
+van der Laan, Mark J, and Susan Gruber. 2016. “One-Step Targeted Minimum
+Loss-Based Estimation Based on Universal Least Favorable One-Dimensional
+Submodels.” *The International Journal of Biostatistics* 12 (1): 351–78.
+
+</div>
+
+<div id="ref-vdl2011targeted">
+
+van der Laan, Mark J, and Sherri Rose. 2011. *Targeted Learning: Causal
+Inference for Observational and Experimental Data*. Springer Science &
+Business Media.
+
+</div>
+
+<div id="ref-zheng2011cross">
+
+Zheng, Wenjing, and Mark J van der Laan. 2011. “Cross-Validated Targeted
+Minimum-Loss-Based Estimation.” In *Targeted Learning*, 459–74.
+Springer.
 
 </div>
 

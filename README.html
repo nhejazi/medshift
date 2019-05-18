@@ -610,7 +610,7 @@ body {
 <p><strong>Authors:</strong> <a href="https://nimahejazi.org">Nima Hejazi</a> and <a href="https://idiaz.xyz">Iván Díaz</a></p>
 <hr />
 <h2 id="whats-medshift">What’s <code>medshift</code>?</h2>
-<p>The <code>medshift</code> R package is designed to provide facilities for estimating a parameter that arises in a decomposition of the population intervention causal effect into the (in)direct effects under stochastic interventions in the setting of mediation analysis. <code>medshift</code> is designed as an implementation to accompany the methodology described in Díaz and Hejazi (2019).</p>
+<p>The <code>medshift</code> R package is designed to provide facilities for estimating a parameter that arises in a decomposition of the population intervention causal effect into the (in)direct effects under stochastic interventions in the setting of mediation analysis. <code>medshift</code> is designed as an implementation to accompany the methodology described in Díaz and Hejazi (2019). Implemented estimators include the classical substitution (G-computation) estimator, an inverse probability weighted (IPW) estimator, an efficient one-step (AIPW) estimator using cross-fitting (Pfanzagl and Wefelmeyer 1985; Zheng and van der Laan 2011; Chernozhukov et al. 2018), and a one-step cross-validated targeted maximum likelihood (TML) estimator based on the method of universal least favorable submodels (van der Laan and Rose 2011; Zheng and van der Laan 2011; van der Laan and Gruber 2016). Facilities for constructing estimators using ensemble machine learning are provided through the <a href="https://github.com/tlverse/sl3"><code>sl3</code> R package</a> (Coyle et al. 2018), and the TML estimator is implemented using the architecture system exposed by the <a href="https://github.com/tlverse/tmle3"><code>tmle3</code> R package</a>.</p>
 <hr />
 <h2 id="installation">Installation</h2>
 <p>Install the most recent <em>stable release</em> from GitHub via <a href="https://www.rstudio.com/products/rpackages/devtools/"><code>devtools</code></a>:</p>
@@ -648,18 +648,18 @@ body {
 <a class="sourceLine" id="cb2-28" data-line-number="28"><span class="kw">set.seed</span>(<span class="dv">75681</span>)</a>
 <a class="sourceLine" id="cb2-29" data-line-number="29">example_data &lt;-<span class="st"> </span><span class="kw">make_simple_mediation_data</span>()</a>
 <a class="sourceLine" id="cb2-30" data-line-number="30"></a>
-<a class="sourceLine" id="cb2-31" data-line-number="31"><span class="co"># compute AIPW estimate based on an incremental propensity score intervention</span></a>
+<a class="sourceLine" id="cb2-31" data-line-number="31"><span class="co"># compute one-step estimate for an incremental propensity score intervention</span></a>
 <a class="sourceLine" id="cb2-32" data-line-number="32"><span class="co"># that triples (delta = 3) the individual-specific odds of receiving treatment</span></a>
-<a class="sourceLine" id="cb2-33" data-line-number="33">aipw_medshift &lt;-<span class="st"> </span><span class="kw">medshift</span>(<span class="dt">W =</span> example_data<span class="op">$</span>W, <span class="dt">A =</span> example_data<span class="op">$</span>A,</a>
-<a class="sourceLine" id="cb2-34" data-line-number="34">                          <span class="dt">Z =</span> example_data<span class="op">$</span>Z, <span class="dt">Y =</span> example_data<span class="op">$</span>Y,</a>
-<a class="sourceLine" id="cb2-35" data-line-number="35">                          <span class="dt">delta =</span> <span class="dv">3</span>, <span class="dt">estimator =</span> <span class="st">&quot;onestep&quot;</span>,</a>
-<a class="sourceLine" id="cb2-36" data-line-number="36">                          <span class="dt">estimator_args =</span> <span class="kw">list</span>(<span class="dt">cv_folds =</span> <span class="dv">3</span>))</a>
-<a class="sourceLine" id="cb2-37" data-line-number="37"><span class="kw">summary</span>(aipw_medshift)</a>
+<a class="sourceLine" id="cb2-33" data-line-number="33">os_medshift &lt;-<span class="st"> </span><span class="kw">medshift</span>(<span class="dt">W =</span> example_data<span class="op">$</span>W, <span class="dt">A =</span> example_data<span class="op">$</span>A,</a>
+<a class="sourceLine" id="cb2-34" data-line-number="34">                        <span class="dt">Z =</span> example_data<span class="op">$</span>Z, <span class="dt">Y =</span> example_data<span class="op">$</span>Y,</a>
+<a class="sourceLine" id="cb2-35" data-line-number="35">                        <span class="dt">delta =</span> <span class="dv">3</span>, <span class="dt">estimator =</span> <span class="st">&quot;onestep&quot;</span>,</a>
+<a class="sourceLine" id="cb2-36" data-line-number="36">                        <span class="dt">estimator_args =</span> <span class="kw">list</span>(<span class="dt">cv_folds =</span> <span class="dv">3</span>))</a>
+<a class="sourceLine" id="cb2-37" data-line-number="37"><span class="kw">summary</span>(os_medshift)</a>
 <a class="sourceLine" id="cb2-38" data-line-number="38"><span class="co">#&gt;             lwr_ci          param_est             upr_ci </span></a>
 <a class="sourceLine" id="cb2-39" data-line-number="39"><span class="co">#&gt;             0.7401           0.788136           0.836172 </span></a>
 <a class="sourceLine" id="cb2-40" data-line-number="40"><span class="co">#&gt;          param_var           eif_mean          estimator </span></a>
 <a class="sourceLine" id="cb2-41" data-line-number="41"><span class="co">#&gt;           0.000601       3.379762e-17 one-step efficient</span></a></code></pre></div>
-<p>For details on how to use data adaptive regression (machine learning) techniques in the estimation of nuisance parameters, consider consulting the vignette that accompanies the package.</p>
+<p>For details on how to use data adaptive regression (machine learning) techniques in the estimation of nuisance parameters, consider consulting the vignette that accompanies this package.</p>
 <hr />
 <h2 id="issues">Issues</h2>
 <p>If you encounter any bugs or have any specific feature requests, please <a href="https://github.com/nhejazi/medshift/issues">file an issue</a>.</p>
@@ -688,7 +688,7 @@ body {
         interventions in {R}},
       year  = {2019},
       url = {https://github.com/nhejazi/medshift},
-      note = {R package version 0.0.8}
+      note = {R package version 0.0.9}
     }
 </code></pre>
 <hr />
@@ -721,9 +721,39 @@ SOFTWARE.
 <h2 id="references">References</h2>
 <div id="refs" class="references">
 
+<div id="ref-chernozhukov2018double">
+
+<p>Chernozhukov, Victor, Denis Chetverikov, Mert Demirer, Esther Duflo, Christian Hansen, Whitney Newey, and James Robins. 2018. “Double/Debiased Machine Learning for Treatment and Structural Parameters.” <em>The Econometrics Journal</em> 21 (1). <a href="https://doi.org/10.1111/ectj.12097" class="uri">https://doi.org/10.1111/ectj.12097</a>.</p>
+</div>
+
+<div id="ref-coyle2018sl3">
+
+<p>Coyle, Jeremy R, Nima S Hejazi, Ivana Malenica, and Oleg Sofrygin. 2018. “sl3: Modern Pipelines for Machine Learning and Super Learning.” <a href="https://github.com/tlverse/sl3" class="uri">https://github.com/tlverse/sl3</a>. <a href="https://doi.org/10.5281/zenodo.1342294" class="uri">https://doi.org/10.5281/zenodo.1342294</a>.</p>
+</div>
+
 <div id="ref-diaz2019causal">
 
 <p>Díaz, Iván, and Nima S Hejazi. 2019. “Causal Mediation Analysis for Stochastic Interventions.” <em>Submitted</em>. <a href="https://arxiv.org/abs/1901.02776" class="uri">https://arxiv.org/abs/1901.02776</a>.</p>
+</div>
+
+<div id="ref-pfanzagl1985contributions">
+
+<p>Pfanzagl, J, and W Wefelmeyer. 1985. “Contributions to a General Asymptotic Statistical Theory.” <em>Statistics &amp; Risk Modeling</em> 3 (3-4): 379–88.</p>
+</div>
+
+<div id="ref-vdl2016onestep">
+
+<p>van der Laan, Mark J, and Susan Gruber. 2016. “One-Step Targeted Minimum Loss-Based Estimation Based on Universal Least Favorable One-Dimensional Submodels.” <em>The International Journal of Biostatistics</em> 12 (1): 351–78.</p>
+</div>
+
+<div id="ref-vdl2011targeted">
+
+<p>van der Laan, Mark J, and Sherri Rose. 2011. <em>Targeted Learning: Causal Inference for Observational and Experimental Data</em>. Springer Science &amp; Business Media.</p>
+</div>
+
+<div id="ref-zheng2011cross">
+
+<p>Zheng, Wenjing, and Mark J van der Laan. 2011. “Cross-Validated Targeted Minimum-Loss-Based Estimation.” In <em>Targeted Learning</em>, 459–74. Springer.</p>
 </div>
 
 </div>

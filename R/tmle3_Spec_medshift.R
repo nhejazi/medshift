@@ -64,8 +64,8 @@ tmle3_Spec_medshift <- R6::R6Class(
       updater <- tmle3_Update$new(
         one_dimensional = TRUE,
         constrain_step = TRUE,
-        maxit = 1e4,
-        delta_epsilon = 1e-4,
+        maxit = 1e5,
+        delta_epsilon = 1e-6,
         cvtmle = TRUE
       )
     }

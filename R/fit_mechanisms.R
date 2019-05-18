@@ -44,20 +44,19 @@ fit_g_mech <- function(data, valid_data = NULL,
   # use full data for counterfactual prediction if no validation data provided
   if (is.null(valid_data)) {
     # copy full data
-    data_A1 <- data.table::copy(data)
+    data_pred <- data.table::copy(data)
   } else {
     # copy only validation data
-    data_A1 <- data.table::copy(valid_data)
+    data_pred <- data.table::copy(valid_data)
   }
 
-  # set intervention A = 1
-  data_A1[, A := 1]
-  g_task_A1 <- sl3::sl3_Task$new(
-    data = data_A1,
+  # create task for estimating propensity score P(A = 1 | W)
+  g_task_pred <- sl3::sl3_Task$new(
+    data = data_pred,
     covariates = w_names,
     outcome = "A"
   )
-  g_pred_A1 <- g_fit_stack$predict(g_task_A1)
+  g_pred_A1 <- g_fit_stack$predict(g_task_pred)
 
   # compute A = 0 case by symmetry
   g_pred_A0 <- 1 - g_pred_A1
@@ -136,22 +135,21 @@ fit_e_mech <- function(data, valid_data = NULL,
   # use full data for counterfactual prediction if no validation data provided
   if (is.null(valid_data)) {
     # copy full data
-    data_A1 <- data.table::copy(data)
+    data_pred <- data.table::copy(data)
   } else {
     # copy only validation data
-    data_A1 <- data.table::copy(valid_data)
+    data_pred <- data.table::copy(valid_data)
   }
 
-  # set intervention A = 1 in validation data or full data
-  data_A1[, A := 1]
-  e_task_A1 <- sl3::sl3_Task$new(
-    data = data_A1,
+  # create task for estimating propensity score P(A = 1 | W)
+  e_task_pred <- sl3::sl3_Task$new(
+    data = data_pred,
     covariates = c(z_names, w_names),
     outcome = "A"
   )
 
   # predict from trained model on counterfactual data
-  e_pred_A1 <- e_fit_stack$predict(e_task_A1)
+  e_pred_A1 <- e_fit_stack$predict(e_task_pred)
 
   # get values of nuisance parameter E for A = 0 by symmetry with A = 1 case
   e_pred_A0 <- 1 - e_pred_A1

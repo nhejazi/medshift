@@ -110,6 +110,7 @@ theta_os <- medshift(
   m_lrnrs = hal_contin_lrnr,
   phi_lrnrs = hal_contin_lrnr,
   estimator = "onestep",
+  estimator_args = list(cv_folds = 10)
 )
 theta_os
 
@@ -121,18 +122,30 @@ theta_tmle <- medshift(
   e_lrnrs = cv_hal_binary_lrnr,
   m_lrnrs = cv_hal_contin_lrnr,
   phi_lrnrs = cv_hal_contin_lrnr,
-  estimator = "tmle",
+  estimator = "tmle"
 )
 theta_tmle
 
 test_that("Substitution and re-weighted estimator agree", {
-  expect_equal(theta_sub$theta, theta_re$theta, tol = 1e-3)
+  expect_equal(theta_sub$theta, theta_re$theta, tol = 1e-2)
 })
 
-test_that("Substitution and efficient one-step estimator agree", {
-  expect_equal(theta_sub$theta, theta_os$theta, tol = 1e-1)
+test_that("Substitution and one-step estimator agree", {
+  expect_equal(theta_sub$theta, theta_os$theta, tol = 1e-2)
 })
 
-test_that("Re-weighted and efficient one-step estimator agree", {
-  expect_equal(theta_re$theta, theta_os$theta, tol = 1e-1)
+test_that("Re-weighted and one-step estimator agree", {
+  expect_equal(theta_re$theta, theta_os$theta, tol = 1e-2)
+})
+
+test_that("Substitution and TML estimator agree", {
+  expect_equal(theta_sub$theta, theta_tmle$summary$psi, tol = 1e-2)
+})
+
+test_that("Re-weighted and TML estimator agree", {
+  expect_equal(theta_re$theta, theta_tmle$summary$psi, tol = 1e-2)
+})
+
+test_that("One-step and TML estimator agree", {
+  expect_equal(theta_re$theta, theta_tmle$summary$psi, tol = 1e-2)
 })

@@ -145,9 +145,7 @@ Param_medshift <- R6::R6Class(
       m_est <- likelihood$get_likelihood(tmle_task, "Y", fold_number)
 
       # compute/extract g(1|W) for clever covariate for score of A
-      g_est <- likelihood$get_likelihood(tmle_task, "A", fold_number)
       g1_est <- likelihood$get_likelihood(treatment_task, "A", fold_number)
-      g0_est <- likelihood$get_likelihood(control_task, "A", fold_number)
       g1_delta_est <- cf_likelihood$get_likelihood(
         treatment_task, "A",
         fold_number
@@ -171,7 +169,7 @@ Param_medshift <- R6::R6Class(
 
       # compute individual scores for DY, DA, DZW
       D_Y <- HY * (y - m_est)
-      D_A <- HA * (a - g_est)
+      D_A <- HA * (a - g1_est)
       D_ZW <- (g1_delta_est * m1_est) + (g0_delta_est * m0_est)
 
       # parameter and influence function
