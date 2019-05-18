@@ -83,7 +83,7 @@
 <a href="https://nimahejazi.org">Nima Hejazi</a> and <a href="https://www.idiaz.xyz/">Iván Díaz</a>
 </h4>
             
-            <h4 class="date">2019-05-16</h4>
+            <h4 class="date">2019-05-18</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nhejazi/medshift/blob/master/vignettes/intro_medshift.Rmd"><code>vignettes/intro_medshift.Rmd</code></a></small>
       <div class="hidden name"><code>intro_medshift.Rmd</code></div>
@@ -218,9 +218,9 @@ d\nu(a, z, w),
 <a class="sourceLine" id="cb10-9" data-line-number="9">                      <span class="dt">estimator_args =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cv_folds =</span> <span class="dv">2</span>))</a>
 <a class="sourceLine" id="cb10-10" data-line-number="10"><span class="kw"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(theta_eff)</a></code></pre></div>
 <pre><code>##             lwr_ci          param_est             upr_ci 
-##          18.762863          19.117474          19.472084 
+##           18.74823          19.105712          19.463194 
 ##          param_var           eif_mean          estimator 
-##           0.032735       8.155036e-17 one-step efficient</code></pre>
+##           0.033267       1.474477e-16 one-step efficient</code></pre>
 </div>
 <div id="estimating-the-direct-effect" class="section level2">
 <h2 class="hasAnchor">
@@ -253,9 +253,9 @@ d\nu(a, z, w),
 <a class="sourceLine" id="cb13-7" data-line-number="7"><span class="co"># direct effect = EY - estimated quantity</span></a>
 <a class="sourceLine" id="cb13-8" data-line-number="8">de_est &lt;-<span class="st"> </span><span class="kw">linear_contrast</span>(params_de, eifs_de)</a>
 <a class="sourceLine" id="cb13-9" data-line-number="9">de_est</a></code></pre></div>
-<pre><code>##       lwr_ci    param_est       upr_ci 
-## -0.477461047  0.009634432  0.496729910</code></pre>
-<p>As given above, we have for our estimate of the direct effect <span class="math inline">\(\hat{\beta}_{\text{DE}}({\delta}) =\)</span> 0.01.</p>
+<pre><code>##      lwr_ci   param_est      upr_ci 
+## -0.46920076  0.02139574  0.51199225</code></pre>
+<p>As given above, we have for our estimate of the direct effect <span class="math inline">\(\hat{\beta}_{\text{DE}}({\delta}) =\)</span> 0.021.</p>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="hasAnchor">

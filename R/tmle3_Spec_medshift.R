@@ -121,7 +121,7 @@ tmle_medshift <- function(shift_type = "exptilt",
 #'
 #' @importFrom tmle3 define_node
 #'
-#' @export
+#' @keywords internal
 #
 stochastic_mediation_npsem <- function(node_list, variable_types = NULL) {
   # make tmle_task
@@ -151,7 +151,7 @@ stochastic_mediation_npsem <- function(node_list, variable_types = NULL) {
 #'
 #' @importFrom tmle3 define_lf LF_emp LF_fit Likelihood
 #'
-#' @export
+#' @keywords internal
 #
 stochastic_mediation_likelihood <- function(tmle_task, learner_list) {
   # covariates
@@ -198,7 +198,7 @@ stochastic_mediation_likelihood <- function(tmle_task, learner_list) {
 #'
 #' @importFrom sl3 sl3_Task
 #'
-#' @export
+#' @keywords internal
 #
 make_e_task <- function(tmle_task, likelihood) {
   e_data <- tmle_task$internal_data
@@ -226,7 +226,7 @@ make_e_task <- function(tmle_task, likelihood) {
 #' @importFrom uuid UUIDgenerate
 #' @importFrom sl3 sl3_Task
 #'
-#' @export
+#' @keywords internal
 #
 make_phi_task <- function(tmle_task, likelihood) {
   # create treatment and control tasks for intervention conditions

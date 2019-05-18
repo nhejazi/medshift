@@ -16,3 +16,4 @@ constructed via the helper function \code{stochastic_mediation_likelihood}.}
 \description{
 Make task for derived likelihood factor phi(W)
 }
+\keyword{internal}
