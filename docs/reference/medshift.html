@@ -133,7 +133,7 @@ with stochastic interventions</p>
   <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/family.html'>binomial</a></span>()), <span class='kw'>m_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='https://tlverse.org/sl3/reference/Lrnr_glm_fast.html'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(),
   <span class='kw'>phi_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='https://tlverse.org/sl3/reference/Lrnr_glm_fast.html'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(), <span class='kw'>estimator</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"onestep"</span>,
   <span class='st'>"tmle"</span>, <span class='st'>"substitution"</span>, <span class='st'>"reweighted"</span>), <span class='kw'>estimator_args</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>cv_folds</span> <span class='kw'>=</span>
-  <span class='fl'>10</span>))</pre>
+  <span class='fl'>10</span>, <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>10000</span>, <span class='kw'>step_size</span> <span class='kw'>=</span> <span class='fl'>1e-06</span>))</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -212,9 +212,8 @@ is so chosen as to allow the number of folds used in computing the AIPW
 estimator to be easily tweaked. Refer to the documentation for functions
 <code><a href='est_onestep.html'>est_onestep</a></code>, <code><a href='est_ipw.html'>est_ipw</a></code>, and
 <code><a href='est_substitution.html'>est_substitution</a></code> for details on what other arguments may be
-specified through this mechanism. For the option <code>"tmle"</code>, the
-implementation references helper functions in this package as well as the
-architecture provide by the <code>tmle3</code> package.</p></td>
+specified through this mechanism. For the option <code>"tmle"</code>, there is
+heavy reliance on the architecture provided by the <code>tmle3</code> package.</p></td>
     </tr>
     </table>
     
