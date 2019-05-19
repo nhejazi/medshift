@@ -64,7 +64,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">medshift</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
@@ -123,19 +123,25 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>fit_phi_mech</span>(<span class='no'>data</span>, <span class='no'>lrnr_stack</span>, <span class='no'>m_output</span>, <span class='no'>w_names</span>)</pre>
+    <pre class="usage"><span class='fu'>fit_phi_mech</span>(<span class='no'>train_data</span>, <span class='no'>valid_data</span>, <span class='no'>lrnr_stack</span>, <span class='no'>m_output</span>, <span class='no'>w_names</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>data</th>
-      <td><p>A <code>data.table</code> containing the observed data, with columns
-in the order specified by the NPSEM (Y, Z, A, W), with column names set
-appropriately based on the original input data. Such a structure is merely
-a convenience utility to passing data around to the various core estimation
+      <th>train_data</th>
+      <td><p>A <code>data.table</code> containing the observed data, with
+columns in the order specified by the NPSEM (Y, Z, A, W), with column names
+set appropriately based on the input data. Such a structure is merely a
+convenience utility to passing data around to the various core estimation
 routines and is automatically generated as part of a call to the user-facing
 wrapper function <code>medshift</code>.</p></td>
+    </tr>
+    <tr>
+      <th>valid_data</th>
+      <td><p>A holdout data set, with columns exactly matching those
+appearing in the preceding argument <code>train_data</code>, to be used for
+estimation via cross-fitting. Not optional for this nuisance parameter.</p></td>
     </tr>
     <tr>
       <th>lrnr_stack</th>

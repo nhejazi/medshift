@@ -43,9 +43,8 @@
 #'  estimator to be easily tweaked. Refer to the documentation for functions
 #'  \code{\link{est_onestep}}, \code{\link{est_ipw}}, and
 #'  \code{\link{est_substitution}} for details on what other arguments may be
-#'  specified through this mechanism. For the option \code{"tmle"}, the
-#'  implementation references helper functions in this package as well as the
-#'  architecture provide by the \code{tmle3} package.
+#'  specified through this mechanism. For the option \code{"tmle"}, there is
+#'  heavy reliance on the architecture provided by the \code{tmle3} package.
 #'
 #' @importFrom data.table as.data.table setnames
 #' @importFrom origami make_folds cross_validate
@@ -72,7 +71,11 @@ medshift <- function(W,
                        "substitution",
                        "reweighted"
                      ),
-                     estimator_args = list(cv_folds = 10)) {
+                     estimator_args = list(
+                       cv_folds = 10,
+                       max_iter = 1e4,
+                       step_size = 1e-6
+                     )) {
   # set defaults
   estimator <- match.arg(estimator)
   estimator_args <- unlist(estimator_args, recursive = FALSE)
@@ -90,26 +93,27 @@ medshift <- function(W,
   if (estimator == "substitution") {
     # SUBSTITUTION ESTIMATOR
     sub_est_args <- list(
-      data = data, delta = delta, g_lrnrs = g_lrnrs,
-      m_lrnrs = m_lrnrs, w_names = w_names, z_names = z_names,
-      estimator_args
+      data = data, delta = delta,
+      g_lrnrs = g_lrnrs, m_lrnrs = m_lrnrs,
+      w_names = w_names, z_names = z_names
     )
     est_out <- do.call(est_substitution, sub_est_args)
   } else if (estimator == "reweighted") {
     # INVERSE PROBABILITY RE-WEIGHTED ESTIMATOR
     ipw_est_args <- list(
-      data = data, delta = delta, g_lrnrs = g_lrnrs,
-      e_lrnrs = e_lrnrs, w_names = w_names, z_names = z_names,
-      estimator_args
+      data = data, delta = delta,
+      g_lrnrs = g_lrnrs, e_lrnrs = e_lrnrs,
+      w_names = w_names, z_names = z_names
     )
     est_out <- do.call(est_ipw, ipw_est_args)
   } else if (estimator == "onestep") {
     # EFFICIENT ONE-STEP ESTIMATOR
     aipw_est_args <- list(
-      data = data, delta = delta, g_lrnrs = g_lrnrs,
-      e_lrnrs = e_lrnrs, m_lrnrs = m_lrnrs,
-      phi_lrnrs = phi_lrnrs, w_names = w_names,
-      z_names = z_names, estimator_args
+      data = data, delta = delta,
+      g_lrnrs = g_lrnrs, e_lrnrs = e_lrnrs,
+      m_lrnrs = m_lrnrs, phi_lrnrs = phi_lrnrs,
+      w_names = w_names, z_names = z_names,
+      cv_folds = estimator_args[["cv_folds"]]
     )
     est_out <- do.call(est_onestep, aipw_est_args)
   } else if (estimator == "tmle") {
@@ -119,12 +123,14 @@ medshift <- function(W,
     tmle_spec <- tmle_medshift(
       delta = delta,
       e_learners = e_lrnrs,
-      phi_learners = phi_lrnrs
+      phi_learners = phi_lrnrs,
+      max_iter = estimator_args[["max_iter"]],
+      step_size = estimator_args[["step_size"]]
     )
     est_out <- tmle3::tmle3(tmle_spec, data, node_list, learner_list)
   }
 
-  # lazily create output as S3 class
+  # lazily create output as S3 class, except for tmle3 output
   if (estimator != "tmle") {
     class(est_out) <- "medshift"
   }

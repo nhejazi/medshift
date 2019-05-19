@@ -12,9 +12,9 @@ Status](https://img.shields.io/codecov/c/github/nhejazi/medshift/master.svg)](ht
 [![CRAN](http://www.r-pkg.org/badges/version/medshift)](http://www.r-pkg.org/pkg/medshift)
 [![CRAN
 downloads](https://cranlogs.r-pkg.org/badges/medshift)](https://CRAN.R-project.org/package=medshift)
-[![Project Status: WIP – Initial development is in progress, but there
-has not yet been a stable, usable release suitable for the
-public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
+[![Project Status: Active – The project has reached a stable, usable
+state and is being actively
+developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![MIT
 license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 
@@ -42,8 +42,8 @@ least favorable submodels (van der Laan and Rose 2011; Zheng and van der
 Laan 2011; van der Laan and Gruber 2016). Facilities for constructing
 estimators using ensemble machine learning are provided through the
 [`sl3` R package](https://github.com/tlverse/sl3) (Coyle et al. 2018),
-and the TML estimator is implemented using the architecture system
-exposed by the [`tmle3` R package](https://github.com/tlverse/tmle3).
+and the TML estimator is implemented using the architecture exposed by
+the [`tmle3` R package](https://github.com/tlverse/tmle3).
 
 -----
 
@@ -78,8 +78,6 @@ make_simple_mediation_data <- function(n_obs = 1000) {
 
   # single mediator to affect the outcome
   z1_prob <- 1 - plogis((A^2 + W) / (A + W^3 + 0.5))
-  z1_prob[z1_prob < 0.01] <- 0.01
-  z1_prob[z1_prob > 0.99] <- 0.99
   Z <- rbinom(n_obs, 1, prob = z1_prob)
 
   # create outcome as a linear function of A, W + white noise
@@ -102,10 +100,8 @@ os_medshift <- medshift(W = example_data$W, A = example_data$A,
                         delta = 3, estimator = "onestep",
                         estimator_args = list(cv_folds = 3))
 summary(os_medshift)
-#>             lwr_ci          param_est             upr_ci 
-#>             0.7401           0.788136           0.836172 
-#>          param_var           eif_mean          estimator 
-#>           0.000601       3.379762e-17 one-step efficient
+#> param_est estimator 
+#>  0.788136  one-step
 ```
 
 For details on how to use data adaptive regression (machine learning)
@@ -154,7 +150,7 @@ After using the `medshift` R package, please cite the following:
         interventions in {R}},
       year  = {2019},
       url = {https://github.com/nhejazi/medshift},
-      note = {R package version 0.0.9}
+      note = {R package version 0.1.0}
     }
 ```
 
