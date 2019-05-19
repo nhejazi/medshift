@@ -151,7 +151,7 @@ After using the `medshift` R package, please cite the following:
             interventions in {R}},
           year  = {2019},
           url = {https://github.com/nhejazi/medshift},
-          note = {R package version 0.0.9}
+          note = {R package version 0.1.0}
         }
 
 ---

@@ -100,10 +100,8 @@ os_medshift <- medshift(W = example_data$W, A = example_data$A,
                         delta = 3, estimator = "onestep",
                         estimator_args = list(cv_folds = 3))
 summary(os_medshift)
-#>             lwr_ci          param_est             upr_ci 
-#>             0.7401           0.788136           0.836172 
-#>          param_var           eif_mean          estimator 
-#>           0.000601       3.379762e-17 one-step efficient
+#> param_est estimator 
+#>  0.788136  one-step
 ```
 
 For details on how to use data adaptive regression (machine learning)
@@ -152,7 +150,7 @@ After using the `medshift` R package, please cite the following:
         interventions in {R}},
       year  = {2019},
       url = {https://github.com/nhejazi/medshift},
-      note = {R package version 0.0.9}
+      note = {R package version 0.1.0}
     }
 ```
 
