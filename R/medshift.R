@@ -107,17 +107,17 @@ medshift <- function(W,
     )
     est_out <- do.call(est_ipw, ipw_est_args)
   } else if (estimator == "onestep") {
-    # EFFICIENT ONE-STEP ESTIMATOR
-    aipw_est_args <- list(
+    # CROSS-FITTED ONE-STEP ESTIMATOR
+    os_est_args <- list(
       data = data, delta = delta,
       g_lrnrs = g_lrnrs, e_lrnrs = e_lrnrs,
       m_lrnrs = m_lrnrs, phi_lrnrs = phi_lrnrs,
       w_names = w_names, z_names = z_names,
       cv_folds = estimator_args[["cv_folds"]]
     )
-    est_out <- do.call(est_onestep, aipw_est_args)
+    est_out <- do.call(est_onestep, os_est_args)
   } else if (estimator == "tmle") {
-    # TARGETED MAXIMUM LIKELIHOOD ESTIMATOR
+    # CROSS-VALIDATED TARGETED MINIMUM LOSS ESTIMATOR
     node_list <- list(W = w_names, A = "A", Z = z_names, Y = "Y")
     learner_list <- list(Y = m_lrnrs, A = g_lrnrs)
     tmle_spec <- tmle_medshift(

@@ -41,12 +41,12 @@ the methodology described in @diaz2019causal. Implemented estimators include the
 classical substitution (G-computation) estimator, an inverse probability
 weighted (IPW) estimator, an efficient one-step (AIPW) estimator using
 cross-fitting [@pfanzagl1985contributions; @zheng2011cross;
-@chernozhukov2018double], and a one-step cross-validated targeted maximum
-likelihood (TML) estimator based on the method of universal least favorable
-submodels [@vdl2011targeted; @zheng2011cross; @vdl2016onestep]. Facilities for
-constructing estimators using ensemble machine learning are provided through the
-[`sl3` R package](https://github.com/tlverse/sl3) [@coyle2018sl3], and the TML
-estimator is implemented using the architecture exposed by the [`tmle3` R
+@chernozhukov2018double], and a one-step cross-validated targeted minimum
+loss (TML) estimator based on the method of universal least favorable submodels
+[@vdl2011targeted; @zheng2011cross; @vdl2016onestep]. `medshift` integrates with
+the [`sl3` R package](https://github.com/tlverse/sl3) [@coyle2018sl3] to allow
+constructed estimators to leverage machine learning and implements its TML
+estimator via the architecture exposed by the [`tmle3` R
 package](https://github.com/tlverse/tmle3).
 
 ---

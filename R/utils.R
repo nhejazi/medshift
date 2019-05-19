@@ -25,7 +25,7 @@ confint.medshift <- function(object,
                              ...) {
   # inference is currently limited to the one-step efficient estimator
   # TODO: allow use for TML estimators once impelemented
-  assertthat::assert_that(object$type == "one-step efficient")
+  assertthat::assert_that(object$type == "one-step")
 
   # first, let's get Z_(1 - alpha)
   ci_norm_bounds <- c(-1, 1) * abs(stats::qnorm(p = (1 - level) / 2))
@@ -67,7 +67,7 @@ summary.medshift <- function(object,
                              ci_level = 0.95) {
   # inference is currently limited to the one-step efficient estimator
   # TODO: allow use for TML estimators once impelemented
-  if (object$type == "one-step efficient") {
+  if (object$type == "one-step") {
     # compute confidence interval using the pre-defined method
     ci <- stats::confint(object, level = ci_level)
 
@@ -104,7 +104,7 @@ summary.medshift <- function(object,
 print.medshift <- function(x, ...) {
   # inference is currently limited to the one-step efficient estimator
   # TODO: allow use for TML estimators once impelemented
-  if (x$type == "one-step efficient") {
+  if (x$type == "one-step") {
     print(x[c("theta", "var", "type")])
   } else {
     print(x[c("theta", "type")])
