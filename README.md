@@ -100,8 +100,10 @@ os_medshift <- medshift(W = example_data$W, A = example_data$A,
                         delta = 3, estimator = "onestep",
                         estimator_args = list(cv_folds = 3))
 summary(os_medshift)
-#> param_est estimator 
-#>  0.788136  one-step
+#>       lwr_ci    param_est       upr_ci    param_var     eif_mean 
+#>       0.7401     0.788136     0.836172     0.000601 4.408236e-17 
+#>    estimator 
+#>     one-step
 ```
 
 For details on how to use data adaptive regression (machine learning)
