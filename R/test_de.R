@@ -44,7 +44,7 @@ test_de <- function(W,
                     A,
                     Z,
                     Y,
-                    delta_grid,
+                    delta_grid = seq(0.1, 0.9, 0.2),
                     n_mult = 10000,
                     mult_type = c("rademacher", "gaussian"),
                     ...,
@@ -58,13 +58,24 @@ test_de <- function(W,
   mult_type <- match.arg(mult_type)
   estimator <- match.arg(estimator)
 
-  # compute E[Y] for half of direct effect
+  # compute E[Y] for half of direct effect and size of observed data
   EY <- mean(Y)
+  n_obs <- length(Y)
 
-  # use `medshift` wrapper function for other half of direct effect
-  de_est <- lapply(delta_grid, function(delta) {
+  # generate multipliers
+  if (mult_type == "rademacher") {
+    mult_boot <- stats::rbinom(n_obs, 1, 0.5)
+    mult_boot[mult_boot == 0] <- -1
+  } else if (mult_type == "gaussian") {
+    mult_boot <- stats::rnorm(n_obs)
+  }
+
+  # construct process M(delta) by using multiplier bootstrap
+  test_de_est <- lapply(delta_grid, function(delta) {
+    # use `medshift` wrapper function for other half of direct effect
     theta_est <- medshift(W = W, A = A, Z = Z, Y = Y,
-                          delta = delta, ...,
+                          delta = delta,
+                          ...,
                           estimator = estimator,
                           estimator_args = estimator_args)
 
@@ -78,21 +89,13 @@ test_de <- function(W,
     eif_de_diff <- eif_est - beta_est
 
     # estimated variance for current shift
-    se_eif <- sqrt(stats::var(eif_de_diff) / length(Y))
+    se_eif <- sqrt(stats::var(eif_de_diff) / n_obs)
 
-    # output: need influence function difference and estimated standard error
-    out <- list(eif_de_diff = eif_de_diff, se_eif = se_eif)
-    return(out)
+    # compute process M(delta) using multipliers
+    m_process <- mean((mult_boot * eif_de_diff) / se_eif) / sqrt(n_obs)
+    return(m_process)
   })
 
-  # generate multipliers
-  if (mult_type == "rademacher") {
-    rade_mult <- stats::rbinom(n_mult, 1, 0.5)
-    rade_mult[rade_mult == 0] <- -1
-  } else if (mult_type == "gaussian") {
-    norm_mult <- stats::rnorm(n_mult)
-  }
-
-  # ...
+  # need Pr(sup_{delta} M(delta) <= t | O_1,...,O_n)
 
 }
