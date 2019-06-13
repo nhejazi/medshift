@@ -35,7 +35,7 @@ test_de <- function(W,
                     delta_grid = seq(0.1, 0.9, 0.2),
                     n_mult = 10000,
                     mult_type = c("rademacher", "gaussian"),
-                    error_level = 0.05,
+                    ci_level = 0.95,
                     ...) {
   # set default arguments
   mult_type <- match.arg(mult_type)
@@ -109,6 +109,6 @@ test_de <- function(W,
   })
 
   # need Pr(sup_{delta} M(delta) <= t | O_1,...,O_n)
-  t_est <- quantile(rho_est, sig_levels)
+  c_alpha <- unname(stats::quantile(rho_est, ci_level))
 
 }
