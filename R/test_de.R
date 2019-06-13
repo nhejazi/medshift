@@ -22,19 +22,6 @@
 #'  used in the multiplier bootstrap. Choices are limited to \code{"rademacher"}
 #'  or \code{"gaussian"}, with the default being the former.
 #' @param ... Other arguments to be passed to \code{\link{medshift}}.
-#' @param estimator The desired estimator of the natural direct effect to be
-#'  computed. Currently, choices are limited to a substitution estimator, a
-#'  re-weighted estimator, and an efficient one-step estimator. The interested
-#'  user should consider consulting Díaz & Hejazi (2019+) for a comparative
-#'  investigation of each of these estimators.
-#' @param estimator_args A \code{list} of extra arguments to be passed (via
-#'  \code{...}) to the function call for the specified estimator. The default
-#'  is so chosen as to allow the number of folds used in computing the AIPW
-#'  estimator to be easily tweaked. Refer to the documentation for functions
-#'  \code{\link{est_onestep}}, \code{\link{est_ipw}}, and
-#'  \code{\link{est_substitution}} for details on what other arguments may be
-#'  specified through this mechanism. For the option \code{"tmle"}, there is
-#'  heavy reliance on the architecture provided by the \code{tmle3} package.
 #'
 #' @importFrom stats var rbinom rnorm
 #'
@@ -47,16 +34,20 @@ test_de <- function(W,
                     delta_grid = seq(0.1, 0.9, 0.2),
                     n_mult = 10000,
                     mult_type = c("rademacher", "gaussian"),
-                    ...,
-                    estimator = c("onestep", "tmle"),
-                    estimator_args = list(
-                       cv_folds = 10,
-                       max_iter = 1e4,
-                       step_size = 1e-6
-                   )) {
+                    ...) {
   # set default arguments
   mult_type <- match.arg(mult_type)
   estimator <- match.arg(estimator)
+
+  # construct input data structure
+  data <- data.table::as.data.table(cbind(Y, Z, A, W))
+  w_names <- paste("W", seq_len(dim(data.table::as.data.table(W))[2]),
+    sep = "_"
+  )
+  z_names <- paste("Z", seq_len(dim(data.table::as.data.table(Z))[2]),
+    sep = "_"
+  )
+  data.table::setnames(data, c("Y", z_names, "A", w_names))
 
   # compute E[Y] for half of direct effect and size of observed data
   EY <- mean(Y)
@@ -64,26 +55,37 @@ test_de <- function(W,
 
   # generate multipliers
   if (mult_type == "rademacher") {
-    mult_boot <- stats::rbinom(n_obs, 1, 0.5)
-    mult_boot[mult_boot == 0] <- -1
+    mult_boot <- lapply(seq_len(n_mult), function(iter) {
+      mults <- stats::rbinom(n_obs, 1, 0.5)
+      mults[mults == 0] <- -1
+      return(mults)
+    })
   } else if (mult_type == "gaussian") {
-    mult_boot <- stats::rnorm(n_obs)
+    mult_boot <- lapply(seq_len(n_mult), function(iter) {
+      mults <- stats::rnorm(n_obs)
+      return(mults)
+    })
   }
+  mult_boot_mat <- do.call(cbind, mult_boot)
+
+  # use estimate one-step for other half of direct effect
+  theta_est <- est_onestep(data = data,
+                           delta = delta_grid,
+                           g_lrnrs = hal_binary_lrnr,
+                           e_lrnrs = hal_binary_lrnr,
+                           m_lrnrs = hal_contin_lrnr,
+                           phi_lrnrs = hal_contin_lrnr,
+                           w_names = w_names,
+                           z_names = z_names,
+                           cv_folds = 5)
 
   # construct process M(delta) by using multiplier bootstrap
-  test_de_est <- lapply(delta_grid, function(delta) {
-    # use `medshift` wrapper function for other half of direct effect
-    theta_est <- medshift(W = W, A = A, Z = Z, Y = Y,
-                          delta = delta,
-                          ...,
-                          estimator = estimator,
-                          estimator_args = estimator_args)
-
+  test_de_est <- lapply(seq_along(delta_grid), function(iter) {
     # compute estimate of the direct effect
-    beta_est <- EY - theta_est$theta
+    beta_est <- EY - theta_est[[iter]]$theta
 
     # compute corresponding un-centered influence function
-    eif_est <- Y - (theta_est$eif + theta_est$theta)
+    eif_est <- Y - (theta_est[[iter]]$eif + theta_est[[iter]]$theta)
 
     # difference in estimated influence function and direct effect
     eif_de_diff <- eif_est - beta_est

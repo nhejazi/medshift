@@ -81,26 +81,30 @@ est_onestep <- function(data,
   )
 
   # combine results of EIF components for full EIF
-  D_obs <- lapply(cv_eif_results[[1]], function(x) {
-    D_obs_fold <- rowSums(x[, ..eif_component_names])
-    return(D_obs_fold)
+  D_obs <- lapply(seq_along(delta), function(iter) {
+    # compute influence function, parameter, variance for given delta
+    D_yazw <- lapply(cv_eif_results[[iter]], function(x) {
+      D_obs_fold <- rowSums(x[, ..eif_component_names])
+      return(D_obs_fold)
+    })
+
+    # get estimated observation-level values of EIF
+    estim_eif <- do.call(c, D_yazw)
+
+    # compute one-step estimate of parameter and variance from EIF
+    estim_onestep_param <- mean(estim_eif)
+    estim_onestep_var <- stats::var(estim_eif) / length(estim_eif)
+
+    # output
+    estim_onestep_out <- list(
+      theta = estim_onestep_param,
+      var = estim_onestep_var,
+      eif = (estim_eif - estim_onestep_param),
+      type = "onestep"
+    )
+    return(estim_onestep_out)
   })
 
-  # get estimated observation-level values of EIF
-  estim_eif <- do.call(c, D_obs)
-
-  # compute one-step estimate of parameter and variance from EIF
-  estim_onestep_param <- mean(estim_eif)
-  estim_onestep_var <- stats::var(estim_eif) / length(estim_eif)
-
-  # output
-  estim_onestep_out <- list(
-    theta = estim_onestep_param,
-    var = estim_onestep_var,
-    eif = (estim_eif - estim_onestep_param),
-    type = "one-step"
-  )
-  return(estim_onestep_out)
 }
 
 ################################################################################
@@ -165,11 +169,14 @@ cv_eif <- function(fold,
 
   # compute nuisance parameters eta = (g, m, e, phi)
   ## 1) fit regression for incremental propensity score intervention
-  g_out <- fit_g_mech(
-    data = train_data, valid_data = valid_data,
-    delta = delta,
-    lrnr_stack = lrnr_stack_g, w_names = w_names
-  )
+  g_out <- lapply(delta, function(delta) {
+    g_est_delta <- fit_g_mech(
+      data = train_data, valid_data = valid_data,
+      delta = delta,
+      lrnr_stack = lrnr_stack_g, w_names = w_names
+    )
+    return(g_est_delta)
+  })
 
   ## 2) fit clever regression for treatment, conditional on mediators
   e_out <- fit_e_mech(
@@ -198,38 +205,42 @@ cv_eif <- function(fold,
   idx_A0 <- which(valid_data$A == 0)
 
 
-  # compute component Dzw from nuisance parameters
-  Dzw_groupwise <- compute_Dzw(g_output = g_out, m_output = m_out)
-  D_ZW <- Dzw_groupwise$dzw_cntrl + Dzw_groupwise$dzw_treat
+  # loop over each delta-shift in grid to assemble EIF components
+  eif_over_delta <- lapply(seq_along(delta), function(iter) {
+    # compute component Dzw from nuisance parameters
+    Dzw_groupwise <- compute_Dzw(g_output = g_out[[iter]], m_output = m_out)
+    D_ZW <- Dzw_groupwise$dzw_cntrl + Dzw_groupwise$dzw_treat
 
-  # compute component Da from nuisance parameters
-  g_pred_A1 <- g_out$g_est$g_pred_A1
-  g_pred_A0 <- g_out$g_est$g_pred_A0
-  Da_numerator <- delta * phi_est * (valid_data$A - g_pred_A1)
-  Da_denominator <- (delta * g_pred_A1 + g_pred_A0)^2
-  D_A <- Da_numerator / Da_denominator
+    # compute component Da from nuisance parameters
+    g_pred_A1 <- g_out[[iter]]$g_est$g_pred_A1
+    g_pred_A0 <- g_out[[iter]]$g_est$g_pred_A0
+    Da_numerator <- delta[iter] * phi_est * (valid_data$A - g_pred_A1)
+    Da_denominator <- (delta[iter] * g_pred_A1 + g_pred_A0)^2
+    D_A <- Da_numerator / Da_denominator
 
+    # compute component Dy from nuisance parameters
+    ipw_groupwise <- compute_ipw(
+      g_output = g_out[[iter]], e_output = e_out,
+      idx_treat = idx_A1, idx_cntrl = idx_A0
+    )
+    m_pred_obs <- rep(NA, nrow(valid_data))
+    m_pred_obs[idx_A1] <- m_out$m_est$m_pred_A1[idx_A1]
+    m_pred_obs[idx_A0] <- m_out$m_est$m_pred_A0[idx_A0]
 
-  # compute component Dy from nuisance parameters
-  ipw_groupwise <- compute_ipw(
-    g_output = g_out, e_output = e_out,
-    idx_treat = idx_A1, idx_cntrl = idx_A0
-  )
-  m_pred_obs <- rep(NA, nrow(valid_data))
-  m_pred_obs[idx_A1] <- m_out$m_est$m_pred_A1[idx_A1]
-  m_pred_obs[idx_A0] <- m_out$m_est$m_pred_A0[idx_A0]
+    # stabilize weights in AIPW by dividing by sample average, n.b., E[g/e] = 1
+    mean_aipw <- ipw_groupwise$mean_aipw
+    g_shifted <- ipw_groupwise$g_shifted
+    e_pred <- ipw_groupwise$e_pred
+    D_Y <- ((g_shifted / e_pred) / mean_aipw) * (valid_data$Y - m_pred_obs)
 
-  # stabilize weights in A-IPW by dividing by sample average, n.b., E[g/e] = 1
-  mean_aipw <- ipw_groupwise$mean_aipw
-  g_shifted <- ipw_groupwise$g_shifted
-  e_pred <- ipw_groupwise$e_pred
-  D_Y <- ((g_shifted / e_pred) / mean_aipw) * (valid_data$Y - m_pred_obs)
+    # output table of EIF results for given shift
+    eif_out <- data.table::data.table(
+      Dy = D_Y, Da = D_A, Dzw = D_ZW,
+      fold = origami::fold_index()
+    )
+    return(eif_out)
+  })
 
-
-  # output list
-  out <- list(data.table::data.table(
-    Dy = D_Y, Da = D_A, Dzw = D_ZW,
-    fold = origami::fold_index()
-  ))
-  return(out)
+  # output
+  return(eif_over_delta)
 }
