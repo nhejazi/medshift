@@ -18,6 +18,7 @@
 #' @param n_mult A \code{numeric} scalar giving the number of repetitions of the
 #'  multipliers (Rademacher or Gaussian) to be used in computing the multiplier
 #'  bootstrap.
+#' @param error_level A \code{numeric} [TO FILL IN]
 #' @param mult_type A \code{character} identifying the type of multipliers to be
 #'  used in the multiplier bootstrap. Choices are limited to \code{"rademacher"}
 #'  or \code{"gaussian"}, with the default being the former.
@@ -34,10 +35,14 @@ test_de <- function(W,
                     delta_grid = seq(0.1, 0.9, 0.2),
                     n_mult = 10000,
                     mult_type = c("rademacher", "gaussian"),
+                    error_level = 0.05,
                     ...) {
   # set default arguments
   mult_type <- match.arg(mult_type)
   estimator <- match.arg(estimator)
+
+  # significance cutoffs
+  sig_cutoffs <- c(error_level/2, 1 - error_level/2)
 
   # construct input data structure
   data <- data.table::as.data.table(cbind(Y, Z, A, W))
@@ -80,24 +85,30 @@ test_de <- function(W,
                            cv_folds = 5)
 
   # construct process M(delta) by using multiplier bootstrap
-  test_de_est <- lapply(seq_along(delta_grid), function(iter) {
-    # compute estimate of the direct effect
-    beta_est <- EY - theta_est[[iter]]$theta
+  rho_est <- apply(mult_boot_mat, 2, function(mults) {
+    # NOTE: there ought to be a better way then looping over the grid of delta
+    m_process_out <- lapply(seq_along(delta_grid), function(iter) {
+      # compute estimate of the direct effect
+      beta_est <- EY - theta_est[[iter]]$theta
 
-    # compute corresponding un-centered influence function
-    eif_est <- Y - (theta_est[[iter]]$eif + theta_est[[iter]]$theta)
+      # compute corresponding un-centered influence function
+      eif_est <- Y - (theta_est[[iter]]$eif + theta_est[[iter]]$theta)
 
-    # difference in estimated influence function and direct effect
-    eif_de_diff <- eif_est - beta_est
+      # difference in estimated influence function and direct effect
+      eif_de_diff <- eif_est - beta_est
 
-    # estimated variance for current shift
-    se_eif <- sqrt(stats::var(eif_de_diff) / n_obs)
+      # estimated variance for current shift
+      se_eif <- sqrt(stats::var(eif_de_diff) / n_obs)
 
-    # compute process M(delta) using multipliers
-    m_process <- mean((mult_boot * eif_de_diff) / se_eif) / sqrt(n_obs)
-    return(m_process)
+      # compute process M(delta) using multipliers
+      m_process <- mean((mults * eif_de_diff) / se_eif)
+      return(m_process)
+    })
+    m_process <- do.call(c, m_process_out)
+    sup_m_process <- max(abs(m_process))
   })
 
   # need Pr(sup_{delta} M(delta) <= t | O_1,...,O_n)
+  t_est <- quantile(rho_est, sig_levels)
 
 }

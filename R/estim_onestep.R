@@ -170,6 +170,8 @@ cv_eif <- function(fold,
   # compute nuisance parameters eta = (g, m, e, phi)
   ## 1) fit regression for incremental propensity score intervention
   g_out <- lapply(delta, function(delta) {
+    # NOTE: even this is _repeated_ computation since delta is a multiplier
+    #       ...worth fixing later if a bottleneck.
     g_est_delta <- fit_g_mech(
       data = train_data, valid_data = valid_data,
       delta = delta,
