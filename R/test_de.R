@@ -24,7 +24,10 @@
 #'  or \code{"gaussian"}, with the default being the former.
 #' @param ... Other arguments to be passed to \code{\link{medshift}}.
 #'
-#' @importFrom stats var rbinom rnorm
+#' @importFrom stats var rbinom rnorm quantile
+#' @importFrom data.table as.data.table setnames rbindlist
+#' @importFrom dplyr "%>%" transmute between
+#' @importFrom tibble as_tibble
 #'
 #' @export
 #
@@ -84,31 +87,52 @@ test_de <- function(W,
                            z_names = z_names,
                            cv_folds = 5)
 
-  # construct process M(delta) by using multiplier bootstrap
+  # perform multiplier bootstrap to construct ingredients for simultaneous CI
   rho_est <- apply(mult_boot_mat, 2, function(mults) {
-    # NOTE: there ought to be a better way then looping over the grid of delta
+    # NOTE: there ought to be a better way than looping over the grid of deltas
     m_process_out <- lapply(seq_along(delta_grid), function(iter) {
       # compute estimate of the direct effect
       beta_est <- EY - theta_est[[iter]]$theta
 
-      # compute corresponding un-centered influence function
-      eif_est <- Y - (theta_est[[iter]]$eif + theta_est[[iter]]$theta)
+      # compute corresponding parameter-centered influence function
+      s_eif_est <- Y - (theta_est[[iter]]$eif + theta_est[[iter]]$theta)
 
       # difference in estimated influence function and direct effect
-      eif_de_diff <- eif_est - beta_est
+      eif_de_diff <- s_eif_est - beta_est
 
       # estimated variance for current shift
       se_eif <- sqrt(stats::var(eif_de_diff) / n_obs)
 
       # compute process M(delta) using multipliers
       m_process <- mean((mults * eif_de_diff) / se_eif)
-      return(m_process)
-    })
-    m_process <- do.call(c, m_process_out)
-    sup_m_process <- max(abs(m_process))
-  })
 
-  # need Pr(sup_{delta} M(delta) <= t | O_1,...,O_n)
-  c_alpha <- unname(stats::quantile(rho_est, ci_level))
+      # construct output
+      return(list(beta_est = beta_est, se = se_eif, m_est = m_process))
+    })
+    m_process_out <- data.table::rbindlist(m_process_out)
+    sup_m_process <- max(abs(m_process_out$m_est))
+    return(list(est = m_process_out[, -3], sup_m = sup_m_process))
+  })
+  # NOTE: this is _very_ inefficient as we store the parameter and standard
+  #       error estimates for each of the bootstrap iterations even though they
+  #       are the same, i.e., we save 10000 data frames when we need just 1.
+  param_est <- lapply(rho_est, `[[`, "est")[[1]]
+
+  # construct simultaneous CI using quantiles from supremum of M(delta)
+  sup_m_process <- do.call(c, lapply(rho_est, `[[`, "sup_m"))
+  c_alpha <- unname(stats::quantile(sup_m_process, ci_level))
+  est_with_cis <- param_est %>%
+    dplyr::transmute(
+      lwr_ci = beta_est - c_alpha * se,
+      beta_est = I(beta_est),
+      upr_ci = beta_est + c_alpha * se,
+      se = I(se)
+    ) %>%
+    tibble::as_tibble()
+  band_has_null <- any(apply(est_with_cis, 1, function(est) {
+    has_null <- dplyr::between(0, est[1], est[3])
+  }))
+
+  # p-value: evaluate 1-rho(t) at observed value of supremum test statistic
 
 }
