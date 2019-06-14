@@ -35,7 +35,7 @@ test_de <- function(W,
                     A,
                     Z,
                     Y,
-                    delta_grid = seq(0.1, 0.9, 0.2),
+                    delta_grid = seq(from = 0, to = 1, by = 0.2),
                     n_mult = 10000,
                     mult_type = c("rademacher", "gaussian"),
                     ci_level = 0.95,
@@ -45,7 +45,7 @@ test_de <- function(W,
   estimator <- match.arg(estimator)
 
   # significance cutoffs
-  sig_cutoffs <- c(error_level/2, 1 - error_level/2)
+  sig_cutoffs <- c(error_level / 2, 1 - error_level / 2)
 
   # construct input data structure
   data <- data.table::as.data.table(cbind(Y, Z, A, W))
@@ -77,15 +77,17 @@ test_de <- function(W,
   mult_boot_mat <- do.call(cbind, mult_boot)
 
   # use estimate one-step for other half of direct effect
-  theta_est <- est_onestep(data = data,
-                           delta = delta_grid,
-                           g_lrnrs = hal_binary_lrnr,
-                           e_lrnrs = hal_binary_lrnr,
-                           m_lrnrs = hal_contin_lrnr,
-                           phi_lrnrs = hal_contin_lrnr,
-                           w_names = w_names,
-                           z_names = z_names,
-                           cv_folds = 5)
+  theta_est <- est_onestep(
+    data = data,
+    delta = delta_grid,
+    g_lrnrs = hal_binary_lrnr,
+    e_lrnrs = hal_binary_lrnr,
+    m_lrnrs = hal_contin_lrnr,
+    phi_lrnrs = hal_contin_lrnr,
+    w_names = w_names,
+    z_names = z_names,
+    cv_folds = 5
+  )
 
   # perform multiplier bootstrap to construct ingredients for simultaneous CI
   rho_est <- apply(mult_boot_mat, 2, function(mults) {
@@ -126,13 +128,23 @@ test_de <- function(W,
       lwr_ci = beta_est - c_alpha * se,
       beta_est = I(beta_est),
       upr_ci = beta_est + c_alpha * se,
-      se = I(se)
+      se = I(se),
+      test_stat = beta_est / se
     ) %>%
     tibble::as_tibble()
-  band_has_null <- any(apply(est_with_cis, 1, function(est) {
-    has_null <- dplyr::between(0, est[1], est[3])
-  }))
 
-  # p-value: evaluate 1-rho(t) at observed value of supremum test statistic
+  # create function that is the CDF of the sup_m_process
+  # NOTE: for p-value, evaluate 1-rho(t) of supremum test statistic
+  pval_rho <- 1 - mean(sup_m_process < max(abs(est_with_cis$test_stat)))
+  # pval_msg <- ifelse(pval_rho < 1 - ci_level,
+  # paste("There is sufficient evidence to reject the null of",
+  # "no direct effect at alpha =", 1 - ci_level),
+  # paste("There is insufficient evidence to reject the null",
+  # "of no direct effect at alpha =", 1 - ci_level)
+  # )
+  # pval_out <- list(pval = pval_rho, msg = pval_msg)
 
+  # output
+  out <- list(est_de = est_with_cis, pval_de = pval_rho)
+  return(out)
 }

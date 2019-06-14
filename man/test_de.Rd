@@ -5,8 +5,9 @@
 \title{Hypothesis test of direct effect with mediated stochastic interventions
 using the multiplier bootstrap}
 \usage{
-test_de(W, A, Z, Y, delta_grid = seq(0.1, 0.9, 0.2), n_mult = 10000,
-  mult_type = c("rademacher", "gaussian"), ci_level = 0.95, ...)
+test_de(W, A, Z, Y, delta_grid = seq(from = 0, to = 1, by = 0.2),
+  n_mult = 10000, mult_type = c("rademacher", "gaussian"),
+  ci_level = 0.95, ...)
 }
 \arguments{
 \item{W}{A \code{matrix}, \code{data.frame}, or similar corresponding to a
