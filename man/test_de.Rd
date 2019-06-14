@@ -22,24 +22,26 @@ the intervention A and the outcome Y).}
 
 \item{Y}{A \code{numeric} vector corresponding to an outcome variable.}
 
+\item{delta_grid}{A \code{numeric} of values giving the varous degrees of
+shift in the intervention to be used in defining the causal quantity of
+interest. In the case of binary interventions, this takes the form of an
+incremental propensity score shift, acting as a multiplier of probabilities
+with which a given observational unit receives the intervention (EH Kennedy,
+2018, JASA; <doi:10.1080/01621459.2017.1422737>).}
+
 \item{n_mult}{A \code{numeric} scalar giving the number of repetitions of the
-multipliers (Rademacher or Gaussian) to be used in computing the multiplier
-bootstrap.}
+multipliers to be used in computing the multiplier bootstrap.}
 
 \item{mult_type}{A \code{character} identifying the type of multipliers to be
 used in the multiplier bootstrap. Choices are limited to \code{"rademacher"}
 or \code{"gaussian"}, with the default being the former.}
 
+\item{ci_level}{A \code{numeric} indicating the (1 - alpha) level of the
+simultaneous confidence band to be computed around the estimates of the
+direct effect. The error level of the test reported in the p-value returned
+is simply alpha, i.e., one less this quantity.}
+
 \item{...}{Other arguments to be passed to \code{\link{medshift}}.}
-
-\item{delta}{A \code{numeric} value indicating the degree of shift in the
-intervention to be used in defining the causal quantity of interest. In the
-case of binary interventions, this takes the form of an incremental
-propensity score shift, acting as a multiplier of the probability with which
-a given observational unit receives the intervention (EH Kennedy, 2018,
-JASA; <doi:10.1080/01621459.2017.1422737>).}
-
-\item{error_level}{A \code{numeric} [TO FILL IN]}
 }
 \description{
 Hypothesis test of direct effect with mediated stochastic interventions
