@@ -32,6 +32,8 @@ Imports:
     uuid,
     stats,
     methods,
+    dplyr,
+    tibble,
     data.table,
     assertthat,
     origami,
