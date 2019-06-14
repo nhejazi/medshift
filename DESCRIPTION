@@ -1,6 +1,6 @@
 Package: medshift
 Title: Causal mediation analysis for stochastic interventions
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(
     person("Nima", "Hejazi", email = "nh@nimahejazi.org",
            role = c("aut", "cre", "cph"),
@@ -32,6 +32,8 @@ Imports:
     uuid,
     stats,
     methods,
+    dplyr,
+    tibble,
     data.table,
     assertthat,
     origami,

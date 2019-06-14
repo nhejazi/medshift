@@ -110,7 +110,9 @@ theta_os <- medshift(
   m_lrnrs = hal_contin_lrnr,
   phi_lrnrs = hal_contin_lrnr,
   estimator = "onestep",
-  estimator_args = list(cv_folds = 10)
+  estimator_args = list(
+    cv_folds = 10
+  )
 )
 theta_os
 
