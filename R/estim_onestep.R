@@ -81,21 +81,21 @@ est_onestep <- function(data,
   )
 
   # combine results of EIF components for full EIF
-  D_obs <- lapply(seq_along(delta), function(iter) {
+  est_over_delta <- lapply(seq_along(delta), function(iter) {
     # compute influence function, parameter, variance for given delta
-    D_yazw <- lapply(cv_eif_results[[iter]], function(x) {
+    D_obs <- lapply(cv_eif_results[[iter]], function(x) {
       D_obs_fold <- rowSums(x[, ..eif_component_names])
       return(D_obs_fold)
     })
 
     # get estimated observation-level values of EIF
-    estim_eif <- do.call(c, D_yazw)
+    estim_eif <- do.call(c, D_obs)
 
     # compute one-step estimate of parameter and variance from EIF
     estim_onestep_param <- mean(estim_eif)
     estim_onestep_var <- stats::var(estim_eif) / length(estim_eif)
 
-    # output
+    # output for a given delta
     estim_onestep_out <- list(
       theta = estim_onestep_param,
       var = estim_onestep_var,
@@ -104,6 +104,13 @@ est_onestep <- function(data,
     )
     return(estim_onestep_out)
   })
+
+  # output
+  if (length(delta) == 1) {
+    return(unlist(est_over_delta, recursive = FALSE))
+  } else {
+    return(over_over_delta)
+  }
 }
 
 ################################################################################
