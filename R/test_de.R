@@ -15,15 +15,20 @@
 #'  incremental propensity score shift, acting as a multiplier of probabilities
 #'  with which a given observational unit receives the intervention (EH Kennedy,
 #'  2018, JASA; <doi:10.1080/01621459.2017.1422737>).
-#' @param n_mult A \code{numeric} scalar giving the number of repetitions of the
-#'  multipliers to be used in computing the multiplier bootstrap.
+#' @param mult_type A \code{character} identifying the type of multipliers to be
+#'  used in the multiplier bootstrap. Choices are limited to \code{"rademacher"}
+#'  or \code{"gaussian"}, with the default being the former.
 #' @param ci_level A \code{numeric} indicating the (1 - alpha) level of the
 #'  simultaneous confidence band to be computed around the estimates of the
 #'  direct effect. The error level of the test reported in the p-value returned
 #'  is simply alpha, i.e., one less this quantity.
-#' @param mult_type A \code{character} identifying the type of multipliers to be
-#'  used in the multiplier bootstrap. Choices are limited to \code{"rademacher"}
-#'  or \code{"gaussian"}, with the default being the former.
+#' @param n_mult A \code{numeric} scalar giving the number of repetitions of the
+#'  multipliers to be used in computing the multiplier bootstrap.
+#' @param cv_folds A \code{numeric} integer value specifying the number of folds
+#'  to be created for cross-validation. Use of cross-validation / cross-fitting
+#'  allows for entropy conditions on the AIPW estimator to be relaxed. Note: for
+#'  compatibility with \code{origami::make_folds}, this value specified here
+#'  must be greater than or equal to 2; the default is to create 10 folds.
 #' @param ... Other arguments to be passed to \code{\link{medshift}}.
 #'
 #' @importFrom stats var rbinom rnorm quantile
@@ -38,26 +43,23 @@ test_de <- function(W,
                     Z,
                     Y,
                     delta_grid = seq(from = 0, to = 1, by = 0.2),
-                    n_mult = 10000,
                     mult_type = c("rademacher", "gaussian"),
                     ci_level = 0.95,
+                    n_mult = 10000,
+                    cv_folds = 10,
                     ...) {
   # set default arguments
   mult_type <- match.arg(mult_type)
-  estimator <- match.arg(estimator)
-
-  # significance cutoffs
-  sig_cutoffs <- c(error_level / 2, 1 - error_level / 2)
 
   # construct input data structure
-  data <- data.table::as.data.table(cbind(Y, Z, A, W))
+  data_in <- data.table::as.data.table(cbind(Y, Z, A, W))
   w_names <- paste("W", seq_len(dim(data.table::as.data.table(W))[2]),
     sep = "_"
   )
   z_names <- paste("Z", seq_len(dim(data.table::as.data.table(Z))[2]),
     sep = "_"
   )
-  data.table::setnames(data, c("Y", z_names, "A", w_names))
+  data.table::setnames(data_in, c("Y", z_names, "A", w_names))
 
   # compute E[Y] for half of direct effect and size of observed data
   EY <- mean(Y)
@@ -78,17 +80,14 @@ test_de <- function(W,
   }
   mult_boot_mat <- do.call(cbind, mult_boot)
 
-  # use estimate one-step for other half of direct effect
+  # estimate via one-step for other half of direct effect
   theta_est <- est_onestep(
-    data = data,
+    data = data_in,
     delta = delta_grid,
-    g_lrnrs = hal_binary_lrnr,
-    e_lrnrs = hal_binary_lrnr,
-    m_lrnrs = hal_contin_lrnr,
-    phi_lrnrs = hal_contin_lrnr,
+    ...,
     w_names = w_names,
     z_names = z_names,
-    cv_folds = 5
+    cv_folds = cv_folds
   )
 
   # perform multiplier bootstrap to construct ingredients for simultaneous CI
@@ -114,12 +113,12 @@ test_de <- function(W,
       return(list(beta_est = beta_est, se = se_eif, m_est = m_process))
     })
     m_process_out <- data.table::rbindlist(m_process_out)
-    sup_m_process <- max(abs(m_process_out$m_est))
-    return(list(est = m_process_out[, -3], sup_m = sup_m_process))
+    sup_m_over_delta <- max(abs(m_process_out$m_est))
+    return(list(est = m_process_out[, -3], sup_m = sup_m_over_delta))
   })
   # NOTE: this is _very_ inefficient as we store the parameter and standard
   #       error estimates for each of the bootstrap iterations even though they
-  #       are the same, i.e., we save 10000 data frames when we need just 1.
+  #       are the same, i.e., we save n_mult data frames when we need just 1
   param_est <- lapply(rho_est, `[[`, "est")[[1]]
 
   # construct simultaneous CI using quantiles from supremum of M(delta)
@@ -135,16 +134,8 @@ test_de <- function(W,
     ) %>%
     tibble::as_tibble()
 
-  # create function that is the CDF of the sup_m_process
-  # NOTE: for p-value, evaluate 1-rho(t) of supremum test statistic
+  # for p-value, evaluate 1-rho(t) at observed supremum test statistic
   pval_rho <- 1 - mean(sup_m_process < max(abs(est_with_cis$test_stat)))
-  # pval_msg <- ifelse(pval_rho < 1 - ci_level,
-  # paste("There is sufficient evidence to reject the null of",
-  # "no direct effect at alpha =", 1 - ci_level),
-  # paste("There is insufficient evidence to reject the null",
-  # "of no direct effect at alpha =", 1 - ci_level)
-  # )
-  # pval_out <- list(pval = pval_rho, msg = pval_msg)
 
   # output
   out <- list(est_de = est_with_cis, pval_de = pval_rho)

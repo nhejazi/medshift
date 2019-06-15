@@ -103,7 +103,7 @@ summary(os_medshift)
 #>       lwr_ci    param_est       upr_ci    param_var     eif_mean 
 #>       0.7401     0.788136     0.836172     0.000601 4.408236e-17 
 #>    estimator 
-#>     one-step
+#>      onestep
 ```
 
 For details on how to use data adaptive regression (machine learning)

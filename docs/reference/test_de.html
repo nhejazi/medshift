@@ -6,7 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get inverse probability weighted (IPW) estimate from nuisance parameters — compute_ipw • medshift</title>
+<title>Hypothesis test of direct effect with mediated stochastic interventions
+using the multiplier bootstrap — test_de • medshift</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -31,9 +32,11 @@
 
 
 
-<meta property="og:title" content="Get inverse probability weighted (IPW) estimate from nuisance parameters — compute_ipw" />
+<meta property="og:title" content="Hypothesis test of direct effect with mediated stochastic interventions
+using the multiplier bootstrap — test_de" />
 
-<meta property="og:description" content="Get inverse probability weighted (IPW) estimate from nuisance parameters" />
+<meta property="og:description" content="Hypothesis test of direct effect with mediated stochastic interventions
+using the multiplier bootstrap" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -112,42 +115,84 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get inverse probability weighted (IPW) estimate from nuisance parameters</h1>
-    <small class="dont-index">Source: <a href='https://github.com/nhejazi/medshift/blob/master/R/estim_reweighted.R'><code>R/estim_reweighted.R</code></a></small>
-    <div class="hidden name"><code>compute_ipw.Rd</code></div>
+    <h1>Hypothesis test of direct effect with mediated stochastic interventions
+using the multiplier bootstrap</h1>
+    <small class="dont-index">Source: <a href='https://github.com/nhejazi/medshift/blob/master/R/test_de.R'><code>R/test_de.R</code></a></small>
+    <div class="hidden name"><code>test_de.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Get inverse probability weighted (IPW) estimate from nuisance parameters</p>
+    <p>Hypothesis test of direct effect with mediated stochastic interventions
+using the multiplier bootstrap</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>compute_ipw</span>(<span class='no'>g_output</span>, <span class='no'>e_output</span>, <span class='no'>idx_treat</span>, <span class='no'>idx_cntrl</span>)</pre>
+    <pre class="usage"><span class='fu'>test_de</span>(<span class='no'>W</span>, <span class='no'>A</span>, <span class='no'>Z</span>, <span class='no'>Y</span>, <span class='kw'>delta_grid</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='kw'>from</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>to</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='fl'>0.2</span>),
+  <span class='kw'>mult_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"rademacher"</span>, <span class='st'>"gaussian"</span>), <span class='kw'>ci_level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>,
+  <span class='kw'>n_mult</span> <span class='kw'>=</span> <span class='fl'>10000</span>, <span class='kw'>cv_folds</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>g_output</th>
-      <td><p>Object containing results from fitting the propensity score
-regression, as produced by a call to <code>fit_g_mech</code>.</p></td>
+      <th>W</th>
+      <td><p>A <code>matrix</code>, <code>data.frame</code>, or similar corresponding to a
+set of baseline covariates.</p></td>
     </tr>
     <tr>
-      <th>e_output</th>
-      <td><p>Object containing results from fitting the propensity score
-regression while conditioning on mediators, as produced by a call to
-<code>fit_e_mech</code>.</p></td>
+      <th>A</th>
+      <td><p>A <code>numeric</code> vector corresponding to a treatment variable. The
+parameter of interest is defined as a location shift of this quantity.</p></td>
     </tr>
     <tr>
-      <th>idx_treat</th>
-      <td><p>A <code>numeric</code> vector providing the indices corresponding
-to units that received treatment (A = 1), for a binary intervention.</p></td>
+      <th>Z</th>
+      <td><p>A <code>numeric</code> vector, <code>matrix</code>, <code>data.frame</code>, or
+similar corresponding to a set of mediators (on the causal pathway between
+the intervention A and the outcome Y).</p></td>
     </tr>
     <tr>
-      <th>idx_cntrl</th>
-      <td><p>A <code>numeric</code> vector providing the indices corresponding
-to units that did not receive treatment (A = 0), for a binary intervention.</p></td>
+      <th>Y</th>
+      <td><p>A <code>numeric</code> vector corresponding to an outcome variable.</p></td>
+    </tr>
+    <tr>
+      <th>delta_grid</th>
+      <td><p>A <code>numeric</code> of values giving the varous degrees of
+shift in the intervention to be used in defining the causal quantity of
+interest. In the case of binary interventions, this takes the form of an
+incremental propensity score shift, acting as a multiplier of probabilities
+with which a given observational unit receives the intervention (EH Kennedy,
+2018, JASA; &lt;doi:10.1080/01621459.2017.1422737&gt;).</p></td>
+    </tr>
+    <tr>
+      <th>mult_type</th>
+      <td><p>A <code>character</code> identifying the type of multipliers to be
+used in the multiplier bootstrap. Choices are limited to <code>"rademacher"</code>
+or <code>"gaussian"</code>, with the default being the former.</p></td>
+    </tr>
+    <tr>
+      <th>ci_level</th>
+      <td><p>A <code>numeric</code> indicating the (1 - alpha) level of the
+simultaneous confidence band to be computed around the estimates of the
+direct effect. The error level of the test reported in the p-value returned
+is simply alpha, i.e., one less this quantity.</p></td>
+    </tr>
+    <tr>
+      <th>n_mult</th>
+      <td><p>A <code>numeric</code> scalar giving the number of repetitions of the
+multipliers to be used in computing the multiplier bootstrap.</p></td>
+    </tr>
+    <tr>
+      <th>cv_folds</th>
+      <td><p>A <code>numeric</code> integer value specifying the number of folds
+to be created for cross-validation. Use of cross-validation / cross-fitting
+allows for entropy conditions on the AIPW estimator to be relaxed. Note: for
+compatibility with <code><a href='http://tlverse.org/origami/reference/make_folds.html'>origami::make_folds</a></code>, this value specified here
+must be greater than or equal to 2; the default is to create 10 folds.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Other arguments to be passed to <code><a href='medshift.html'>medshift</a></code>.</p></td>
     </tr>
     </table>
     

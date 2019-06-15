@@ -6,8 +6,8 @@
 using the multiplier bootstrap}
 \usage{
 test_de(W, A, Z, Y, delta_grid = seq(from = 0, to = 1, by = 0.2),
-  n_mult = 10000, mult_type = c("rademacher", "gaussian"),
-  ci_level = 0.95, ...)
+  mult_type = c("rademacher", "gaussian"), ci_level = 0.95,
+  n_mult = 10000, cv_folds = 10, ...)
 }
 \arguments{
 \item{W}{A \code{matrix}, \code{data.frame}, or similar corresponding to a
@@ -29,9 +29,6 @@ incremental propensity score shift, acting as a multiplier of probabilities
 with which a given observational unit receives the intervention (EH Kennedy,
 2018, JASA; <doi:10.1080/01621459.2017.1422737>).}
 
-\item{n_mult}{A \code{numeric} scalar giving the number of repetitions of the
-multipliers to be used in computing the multiplier bootstrap.}
-
 \item{mult_type}{A \code{character} identifying the type of multipliers to be
 used in the multiplier bootstrap. Choices are limited to \code{"rademacher"}
 or \code{"gaussian"}, with the default being the former.}
@@ -40,6 +37,15 @@ or \code{"gaussian"}, with the default being the former.}
 simultaneous confidence band to be computed around the estimates of the
 direct effect. The error level of the test reported in the p-value returned
 is simply alpha, i.e., one less this quantity.}
+
+\item{n_mult}{A \code{numeric} scalar giving the number of repetitions of the
+multipliers to be used in computing the multiplier bootstrap.}
+
+\item{cv_folds}{A \code{numeric} integer value specifying the number of folds
+to be created for cross-validation. Use of cross-validation / cross-fitting
+allows for entropy conditions on the AIPW estimator to be relaxed. Note: for
+compatibility with \code{origami::make_folds}, this value specified here
+must be greater than or equal to 2; the default is to create 10 folds.}
 
 \item{...}{Other arguments to be passed to \code{\link{medshift}}.}
 }
