@@ -2,7 +2,7 @@
 % Please edit documentation in R/estim_substitution.R
 \name{compute_Dzw}
 \alias{compute_Dzw}
-\title{Get Dzw component of efficient influence function from nuisance parameters}
+\title{Construct joint Z-W component of efficient influence function}
 \usage{
 compute_Dzw(g_output, m_output)
 }
@@ -14,6 +14,6 @@ regression, as produced by a call to \code{fit_g_mech}.}
 regression, as produced by a call to \code{fit_m_mech}.}
 }
 \description{
-Get Dzw component of efficient influence function from nuisance parameters
+Construct joint Z-W component of efficient influence function
 }
 \keyword{internal}

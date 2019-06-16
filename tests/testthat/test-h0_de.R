@@ -1,12 +1,11 @@
-context("Estimators agree for incremental propensity score interventions")
+context("Uniform test of no direct effect")
 
 library(data.table)
 library(stringr)
 library(hal9001)
 library(sl3)
-library(tmle3)
 set.seed(7128816)
-delta <- 0.5
+alpha_level <- 0.05
 
 ################################################################################
 # setup learners for the nuisance parameters
@@ -23,8 +22,6 @@ hal_binary_lrnr <- Lrnr_hal9001$new(
   fit_type = "glmnet", n_folds = 5,
   family = "binomial"
 )
-cv_hal_contin_lrnr <- Lrnr_cv$new(hal_contin_lrnr, full_fit = TRUE)
-cv_hal_binary_lrnr <- Lrnr_cv$new(hal_binary_lrnr, full_fit = TRUE)
 
 ################################################################################
 # setup data and simulate to test with estimators
@@ -56,8 +53,7 @@ make_simulated_data <- function(n_obs = 1000, # no. observations
   Z <- cbind(Z_1, Z_2, Z_3)
 
   # create outcome as a linear function of A, W + white noise
-  Y <- Z_1 + Z_2 - Z_3 + A - 0.1 * rowSums(W)^2 +
-    rnorm(n_obs, mean = 0, sd = 0.5)
+  Y <- Z_1 + Z_2 - Z_3 - 0.1 * rowSums(W)^2 + rnorm(n_obs, mean = 0, sd = 0.5)
 
   # full data structure
   data <- as.data.table(cbind(Y, Z, A, W))
@@ -75,83 +71,30 @@ w_names <- colnames(data)[str_detect(colnames(data), "W")]
 
 
 ################################################################################
-# test different estimators
+# test of hypothesis testing procedure
 ################################################################################
-set.seed(7128816)
-theta_sub <- medshift(
+de_test <- test_de(
   W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
-  delta = delta,
+  mult_type = "rademacher",
+  ci_level = (1 - alpha_level),
   g_learners = hal_binary_lrnr,
   e_learners = hal_binary_lrnr,
   m_learners = hal_contin_lrnr,
   phi_learners = hal_contin_lrnr,
-  estimator = "substitution"
+  cv_folds = 5
 )
-theta_sub
 
-set.seed(7128816)
-theta_re <- medshift(
-  W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
-  delta = delta,
-  g_learners = hal_binary_lrnr,
-  e_learners = hal_binary_lrnr,
-  m_learners = hal_contin_lrnr,
-  phi_learners = hal_contin_lrnr,
-  estimator = "reweighted"
-)
-theta_re
+test_that("Uniform test of no direct effect rejects H0 with fixed p-value", {
+  expect_equal(de_test$pval_de, 0.903, tol = 1e-3)
+})
 
-set.seed(7128816)
-theta_os <- medshift(
-  W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
-  delta = delta,
-  g_learners = hal_binary_lrnr,
-  e_learners = hal_binary_lrnr,
-  m_learners = hal_contin_lrnr,
-  phi_learners = hal_contin_lrnr,
-  estimator = "onestep",
-  estimator_args = list(
-    cv_folds = 10
+test_that("Simultaneous confidence band uniformly covers zero under H0", {
+  covers_zero <- apply(
+    de_test$est_de[, c("lwr_ci", "upr_ci")], 1,
+    function(ci) {
+      check_zero <- dplyr::between(0, ci[1], ci[2])
+      return(check_zero)
+    }
   )
-)
-theta_os
-
-set.seed(7128816)
-theta_tmle <- medshift(
-  W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
-  delta = delta,
-  g_learners = cv_hal_binary_lrnr,
-  e_learners = cv_hal_binary_lrnr,
-  m_learners = cv_hal_contin_lrnr,
-  phi_learners = cv_hal_contin_lrnr,
-  estimator = "tmle",
-  estimator_args = list(
-    max_iter = 100,
-    step_size = 1e-5
-  )
-)
-theta_tmle
-
-test_that("Substitution and re-weighted estimator agree", {
-  expect_equal(theta_sub$theta, theta_re$theta, tol = 1e-2)
-})
-
-test_that("Substitution and one-step estimator agree", {
-  expect_equal(theta_sub$theta, theta_os$theta, tol = 1e-2)
-})
-
-test_that("Re-weighted and one-step estimator agree", {
-  expect_equal(theta_re$theta, theta_os$theta, tol = 1e-2)
-})
-
-test_that("Substitution and TML estimator agree", {
-  expect_equal(theta_sub$theta, theta_tmle$summary$psi, tol = 1e-2)
-})
-
-test_that("Re-weighted and TML estimator agree", {
-  expect_equal(theta_re$theta, theta_tmle$summary$psi, tol = 1e-2)
-})
-
-test_that("One-step and TML estimator agree", {
-  expect_equal(theta_re$theta, theta_tmle$summary$psi, tol = 1e-2)
+  expect_true(all(covers_zero))
 })

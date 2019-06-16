@@ -4,7 +4,8 @@
 \alias{est_substitution}
 \title{Substitution estimator}
 \usage{
-est_substitution(data, delta, g_lrnrs, m_lrnrs, w_names, z_names, ...)
+est_substitution(data, delta, g_learners, m_learners, w_names, z_names,
+  ...)
 }
 \arguments{
 \item{data}{A \code{data.table} containing the observed data, with columns
@@ -21,12 +22,12 @@ propensity score shift, acting as a multiplier of the probability with which
 a given observational unit receives the intervention (EH Kennedy, 2018,
 JASA; <doi:10.1080/01621459.2017.1422737>).}
 
-\item{g_lrnrs}{A \code{Stack} object, or other learner class (inheriting from
-\code{Lrnr_base}), containing a single or set of instantiated learners from
-the \code{sl3} package, to be used in fitting a model for the propensity
+\item{g_learners}{A \code{Stack} object, or other learner class (inheriting
+from \code{Lrnr_base}), containing a single or set of instantiated learners
+from the \code{sl3} package, used in fitting a model for the propensity
 score, i.e., g = P(A | W).}
 
-\item{m_lrnrs}{A \code{Stack} object, or other learner class (inheriting
+\item{m_learners}{A \code{Stack} object, or other learner class (inheriting
 from \code{Lrnr_base}), containing a single or set of instantiated learners
 from the \code{sl3} package, to be used in fitting the outcome regression,
 i.e., m(A, Z, W).}

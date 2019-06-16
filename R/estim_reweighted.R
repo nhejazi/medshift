@@ -1,4 +1,4 @@
-#' Inverse probability re/IP-weighted estimator
+#' Inverse probability weighted (IPW) estimator
 #'
 #' @param data A \code{data.table} containing the observed data, with columns
 #'  in the order specified by the NPSEM (Y, Z, A, W), with column names set
@@ -12,11 +12,11 @@
 #'  propensity score shift, acting as a multiplier of the probability with which
 #'  a given observational unit receives the intervention (EH Kennedy, 2018,
 #'  JASA; <doi:10.1080/01621459.2017.1422737>).
-#' @param g_lrnrs A \code{Stack} object, or other learner class (inheriting from
-#'  \code{Lrnr_base}), containing a single or set of instantiated learners from
-#'  the \code{sl3} package, to be used in fitting a model for the propensity
+#' @param g_learners A \code{Stack} object, or other learner class (inheriting
+#'  from \code{Lrnr_base}), containing a single or set of instantiated learners
+#'  from the \code{sl3} package, used in fitting a model for the propensity
 #'  score, i.e., g = P(A | W).
-#' @param e_lrnrs A \code{Stack} object, or other learner class (inheriting
+#' @param e_learners A \code{Stack} object, or other learner class (inheriting
 #'  from \code{Lrnr_base}), containing a single or set of instantiated learners
 #'  from the \code{sl3} package, to be used in fitting a cleverly parameterized
 #'  propensity score that includes the mediators, i.e., e = P(A | Z, W).
@@ -30,20 +30,20 @@
 #
 est_ipw <- function(data,
                     delta,
-                    g_lrnrs,
-                    e_lrnrs,
+                    g_learners,
+                    e_learners,
                     w_names,
                     z_names,
                     ...) {
   # fit regression for incremental propensity score intervention
   g_out <- fit_g_mech(
     data = data, delta = delta,
-    lrnr_stack = g_lrnrs, w_names = w_names
+    learners = g_learners, w_names = w_names
   )
 
   # fit clever regression for treatment, conditional on mediators
   e_out <- fit_e_mech(
-    data = data, lrnr_stack = e_lrnrs,
+    data = data, learners = e_learners,
     z_names = z_names, w_names = w_names
   )
 

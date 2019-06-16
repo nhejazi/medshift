@@ -121,10 +121,10 @@ set.seed(71281)
 os_fit <- medshift(
   W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
   delta = delta_ipsi,
-  g_lrnrs = hal_binary_lrnr,
-  e_lrnrs = hal_binary_lrnr,
-  m_lrnrs = hal_contin_lrnr,
-  phi_lrnrs = hal_contin_lrnr,
+  g_learners = hal_binary_lrnr,
+  e_learners = hal_binary_lrnr,
+  m_learners = hal_contin_lrnr,
+  phi_learners = hal_contin_lrnr,
   estimator = "onestep",
 )
 summary(os_fit)
@@ -134,10 +134,10 @@ set.seed(71281)
 sub_fit <- medshift(
   W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
   delta = delta_ipsi,
-  g_lrnrs = hal_binary_lrnr,
-  e_lrnrs = hal_binary_lrnr,
-  m_lrnrs = hal_contin_lrnr,
-  phi_lrnrs = hal_contin_lrnr,
+  g_learners = hal_binary_lrnr,
+  e_learners = hal_binary_lrnr,
+  m_learners = hal_contin_lrnr,
+  phi_learners = hal_contin_lrnr,
   estimator = "substitution",
 )
 summary(sub_fit)

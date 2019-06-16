@@ -64,7 +64,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">medshift</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
       </span>
     </div>
 
@@ -123,7 +123,7 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>fit_m_mech</span>(<span class='no'>data</span>, <span class='kw'>valid_data</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>lrnr_stack</span>, <span class='no'>z_names</span>, <span class='no'>w_names</span>)</pre>
+    <pre class="usage"><span class='fu'>fit_m_mech</span>(<span class='no'>data</span>, <span class='kw'>valid_data</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>learners</span>, <span class='no'>z_names</span>, <span class='no'>w_names</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -144,7 +144,7 @@ appearing in the preceding argument <code>data</code>, to be used for estimation
 via cross-fitting. Optional, defaulting to <code>NULL</code>.</p></td>
     </tr>
     <tr>
-      <th>lrnr_stack</th>
+      <th>learners</th>
       <td><p>A <code>Stack</code> object, or other learner class (inheriting
 from <code>Lrnr_base</code>), containing a single or set of instantiated learners
 from the <code>sl3</code> package, to be used in fitting the outcome regression,

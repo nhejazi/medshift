@@ -4,7 +4,7 @@
 \alias{fit_phi_mech}
 \title{Fit intervention-specific exponential tilt nuisance parameter}
 \usage{
-fit_phi_mech(train_data, valid_data, lrnr_stack, m_output, w_names)
+fit_phi_mech(train_data, valid_data, learners, m_output, w_names)
 }
 \arguments{
 \item{train_data}{A \code{data.table} containing the observed data, with
@@ -18,7 +18,7 @@ wrapper function \code{medshift}.}
 appearing in the preceding argument \code{train_data}, to be used for
 estimation via cross-fitting. Not optional for this nuisance parameter.}
 
-\item{lrnr_stack}{A \code{Stack} object, or other learner class (inheriting
+\item{learners}{A \code{Stack} object, or other learner class (inheriting
 from \code{Lrnr_base}), containing a single or set of instantiated learners
 from the \code{sl3} package, to be used in fitting a cleverly parameterized
 propensity score that includes the mediators, i.e., e = P(A | Z, W).}

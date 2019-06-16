@@ -4,7 +4,7 @@
 \alias{fit_g_mech}
 \title{Fit propensity score with incremental stochastic shift intervention}
 \usage{
-fit_g_mech(data, valid_data = NULL, delta, lrnr_stack, w_names)
+fit_g_mech(data, valid_data = NULL, delta, learners, w_names)
 }
 \arguments{
 \item{data}{A \code{data.table} containing the observed data, with columns
@@ -25,7 +25,7 @@ propensity score shift, acting as a multiplier of the probability with which
 a given observational unit receives the intervention (EH Kennedy, 2018,
 JASA; <doi:10.1080/01621459.2017.1422737>).}
 
-\item{lrnr_stack}{A \code{Stack} object, or other learner class (inheriting
+\item{learners}{A \code{Stack} object, or other learner class (inheriting
 from \code{Lrnr_base}), containing a single or set of instantiated learners
 from the \code{sl3} package, to be used in fitting a model for the
 propensity score, i.e., g = P(A | W).}

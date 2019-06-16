@@ -6,7 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Inverse probability weighted (IPW) estimator — est_ipw • medshift</title>
+<title>Hypothesis test of direct effect with mediated stochastic interventions
+using the multiplier bootstrap — test_de • medshift</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -31,9 +32,11 @@
 
 
 
-<meta property="og:title" content="Inverse probability weighted (IPW) estimator — est_ipw" />
+<meta property="og:title" content="Hypothesis test of direct effect with mediated stochastic interventions
+using the multiplier bootstrap — test_de" />
 
-<meta property="og:description" content="Inverse probability weighted (IPW) estimator" />
+<meta property="og:description" content="Hypothesis test of direct effect with mediated stochastic interventions
+using the multiplier bootstrap" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -112,39 +115,67 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Inverse probability weighted (IPW) estimator</h1>
-    <small class="dont-index">Source: <a href='https://github.com/nhejazi/medshift/blob/master/R/estim_reweighted.R'><code>R/estim_reweighted.R</code></a></small>
-    <div class="hidden name"><code>est_ipw.Rd</code></div>
+    <h1>Hypothesis test of direct effect with mediated stochastic interventions
+using the multiplier bootstrap</h1>
+    <small class="dont-index">Source: <a href='https://github.com/nhejazi/medshift/blob/master/R/test_de.R'><code>R/test_de.R</code></a></small>
+    <div class="hidden name"><code>test_de.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Inverse probability weighted (IPW) estimator</p>
+    <p>Hypothesis test of direct effect with mediated stochastic interventions
+using the multiplier bootstrap</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>est_ipw</span>(<span class='no'>data</span>, <span class='no'>delta</span>, <span class='no'>g_learners</span>, <span class='no'>e_learners</span>, <span class='no'>w_names</span>, <span class='no'>z_names</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>test_de</span>(<span class='no'>W</span>, <span class='no'>A</span>, <span class='no'>Z</span>, <span class='no'>Y</span>, <span class='kw'>delta_grid</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='kw'>from</span> <span class='kw'>=</span> <span class='fl'>0.1</span>, <span class='kw'>to</span> <span class='kw'>=</span> <span class='fl'>2.9</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='fl'>0.4</span>),
+  <span class='kw'>mult_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"rademacher"</span>, <span class='st'>"gaussian"</span>), <span class='kw'>ci_level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>, <span class='no'>g_learners</span>,
+  <span class='no'>e_learners</span>, <span class='no'>m_learners</span>, <span class='no'>phi_learners</span>, <span class='kw'>cv_folds</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>n_mult</span> <span class='kw'>=</span> <span class='fl'>10000</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>data</th>
-      <td><p>A <code>data.table</code> containing the observed data, with columns
-in the order specified by the NPSEM (Y, Z, A, W), with column names set
-appropriately based on the original input data. Such a structure is merely
-a convenience utility to passing data around to the various core estimation
-routines and is automatically generated as part of a call to the user-facing
-wrapper function <code>medshift</code>.</p></td>
+      <th>W</th>
+      <td><p>A <code>matrix</code>, <code>data.frame</code>, or similar corresponding to a
+set of baseline covariates.</p></td>
     </tr>
     <tr>
-      <th>delta</th>
-      <td><p>A <code>numeric</code> value indicating the degree of shift in the
-intervention to be used in defining the causal quantity of interest. In the
-case of binary interventions, this takes the form of an incremental
-propensity score shift, acting as a multiplier of the probability with which
-a given observational unit receives the intervention (EH Kennedy, 2018,
-JASA; &lt;doi:10.1080/01621459.2017.1422737&gt;).</p></td>
+      <th>A</th>
+      <td><p>A <code>numeric</code> vector corresponding to a treatment variable. The
+parameter of interest is defined as a location shift of this quantity.</p></td>
+    </tr>
+    <tr>
+      <th>Z</th>
+      <td><p>A <code>numeric</code> vector, <code>matrix</code>, <code>data.frame</code>, or
+similar corresponding to a set of mediators (on the causal pathway between
+the intervention A and the outcome Y).</p></td>
+    </tr>
+    <tr>
+      <th>Y</th>
+      <td><p>A <code>numeric</code> vector corresponding to an outcome variable.</p></td>
+    </tr>
+    <tr>
+      <th>delta_grid</th>
+      <td><p>A <code>numeric</code> of values giving the varous degrees of
+shift in the intervention to be used in defining the causal quantity of
+interest. In the case of binary interventions, this takes the form of an
+incremental propensity score shift, acting as a multiplier of probabilities
+with which a given observational unit receives the intervention (EH Kennedy,
+2018, JASA; &lt;doi:10.1080/01621459.2017.1422737&gt;).</p></td>
+    </tr>
+    <tr>
+      <th>mult_type</th>
+      <td><p>A <code>character</code> identifying the type of multipliers to be
+used in the multiplier bootstrap. Choices are limited to <code>"rademacher"</code>
+or <code>"gaussian"</code>, with the default being the former.</p></td>
+    </tr>
+    <tr>
+      <th>ci_level</th>
+      <td><p>A <code>numeric</code> indicating the (1 - alpha) level of the
+simultaneous confidence band to be computed around the estimates of the
+direct effect. The error level of the test reported in the p-value returned
+is simply alpha, i.e., one less this quantity.</p></td>
     </tr>
     <tr>
       <th>g_learners</th>
@@ -161,20 +192,32 @@ from the <code>sl3</code> package, to be used in fitting a cleverly parameterize
 propensity score that includes the mediators, i.e., e = P(A | Z, W).</p></td>
     </tr>
     <tr>
-      <th>w_names</th>
-      <td><p>A <code>character</code> vector of the names of the columns that
-correspond to baseline covariates (W). The input for this argument is
-automatically generated by a call to the wrapper function <code>medshift</code>.</p></td>
+      <th>m_learners</th>
+      <td><p>A <code>Stack</code> object, or other learner class (inheriting
+from <code>Lrnr_base</code>), containing a single or set of instantiated learners
+from the <code>sl3</code> package, to be used in fitting the outcome regression,
+i.e., m(A, Z, W).</p></td>
     </tr>
     <tr>
-      <th>z_names</th>
-      <td><p>A <code>character</code> vector of the names of the columns that
-correspond to mediators (Z). The input for this argument is automatically
-generated by a call to the wrapper function <code>medshift</code>.</p></td>
+      <th>phi_learners</th>
+      <td><p>A <code>Stack</code> object, or other learner class
+(inheriting from <code>Lrnr_base</code>), containing a single or set of
+instantiated learners from the <code>sl3</code> package, to be used in fitting a
+reduced regression useful for computing the efficient one-step estimator,
+i.e., phi(W) = E[m(A = 1, Z, W) - m(A = 0, Z, W) | W).</p></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>Other arguments currently ignored.</p></td>
+      <th>cv_folds</th>
+      <td><p>A <code>numeric</code> integer value specifying the number of folds
+to be created for cross-validation. Use of cross-validation / cross-fitting
+allows for entropy conditions on the AIPW estimator to be relaxed. Note: for
+compatibility with <code><a href='http://tlverse.org/origami/reference/make_folds.html'>origami::make_folds</a></code>, this value specified here
+must be greater than or equal to 2; the default is to create 10 folds.</p></td>
+    </tr>
+    <tr>
+      <th>n_mult</th>
+      <td><p>A <code>numeric</code> scalar giving the number of repetitions of the
+multipliers to be used in computing the multiplier bootstrap.</p></td>
     </tr>
     </table>
     

@@ -188,10 +188,10 @@ via its one-step estimator $\hat{\theta}(\delta)$ below
 # let's compute the parameter where A (but not Z) are shifted
 theta_eff <- medshift(W = W, A = A, Z = Z, Y = Y,
                       delta = delta_shift_ipsi,
-                      g = sl_binary_lrnr,
-                      e = sl_binary_lrnr,
-                      m = sl_contin_lrnr,
-                      phi = fglm_contin_lrnr,
+                      g_learners = sl_binary_lrnr,
+                      e_learners = sl_binary_lrnr,
+                      m_learners = sl_contin_lrnr,
+                      phi_learners = fglm_contin_lrnr,
                       estimator = "onestep",
                       estimator_args = list(cv_folds = 2))
 summary(theta_eff)

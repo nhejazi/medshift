@@ -1,5 +1,4 @@
 utils::globalVariables(c("A", ".N", "..w_names"))
-################################################################################
 
 #' Fit propensity score with incremental stochastic shift intervention
 #'
@@ -18,7 +17,7 @@ utils::globalVariables(c("A", ".N", "..w_names"))
 #'  propensity score shift, acting as a multiplier of the probability with which
 #'  a given observational unit receives the intervention (EH Kennedy, 2018,
 #'  JASA; <doi:10.1080/01621459.2017.1422737>).
-#' @param lrnr_stack A \code{Stack} object, or other learner class (inheriting
+#' @param learners A \code{Stack} object, or other learner class (inheriting
 #'  from \code{Lrnr_base}), containing a single or set of instantiated learners
 #'  from the \code{sl3} package, to be used in fitting a model for the
 #'  propensity score, i.e., g = P(A | W).
@@ -30,7 +29,7 @@ utils::globalVariables(c("A", ".N", "..w_names"))
 #' @importFrom sl3 sl3_Task
 #
 fit_g_mech <- function(data, valid_data = NULL,
-                       delta, lrnr_stack, w_names) {
+                       delta, learners, w_names) {
   #  construct task for propensity score fit
   g_task <- sl3::sl3_Task$new(
     data = data,
@@ -39,7 +38,7 @@ fit_g_mech <- function(data, valid_data = NULL,
   )
 
   # fit and predict
-  g_fit_stack <- lrnr_stack$train(g_task)
+  g_fit_stack <- learners$train(g_task)
 
   # use full data for counterfactual prediction if no validation data provided
   if (is.null(valid_data)) {
@@ -106,7 +105,7 @@ fit_g_mech <- function(data, valid_data = NULL,
 #' @param valid_data A holdout data set, with columns exactly matching those
 #'  appearing in the preceding argument \code{data}, to be used for estimation
 #'  via cross-fitting. Optional, defaulting to \code{NULL}.
-#' @param lrnr_stack A \code{Stack} object, or other learner class (inheriting
+#' @param learners A \code{Stack} object, or other learner class (inheriting
 #'  from \code{Lrnr_base}), containing a single or set of instantiated learners
 #'  from the \code{sl3} package, to be used in fitting a cleverly parameterized
 #'  propensity score that includes the mediators, i.e., e = P(A | Z, W).
@@ -121,7 +120,7 @@ fit_g_mech <- function(data, valid_data = NULL,
 #' @importFrom sl3 sl3_Task
 #
 fit_e_mech <- function(data, valid_data = NULL,
-                       lrnr_stack, z_names, w_names) {
+                       learners, z_names, w_names) {
   # construct task for nuisance parameter fit
   e_task <- sl3::sl3_Task$new(
     data = data,
@@ -130,7 +129,7 @@ fit_e_mech <- function(data, valid_data = NULL,
   )
 
   # fit and predict
-  e_fit_stack <- lrnr_stack$train(e_task)
+  e_fit_stack <- learners$train(e_task)
 
   # use full data for counterfactual prediction if no validation data provided
   if (is.null(valid_data)) {
@@ -186,7 +185,7 @@ fit_e_mech <- function(data, valid_data = NULL,
 #' @param valid_data A holdout data set, with columns exactly matching those
 #'  appearing in the preceding argument \code{data}, to be used for estimation
 #'  via cross-fitting. Optional, defaulting to \code{NULL}.
-#' @param lrnr_stack A \code{Stack} object, or other learner class (inheriting
+#' @param learners A \code{Stack} object, or other learner class (inheriting
 #'  from \code{Lrnr_base}), containing a single or set of instantiated learners
 #'  from the \code{sl3} package, to be used in fitting the outcome regression,
 #'  i.e., m(A, Z, W).
@@ -201,7 +200,7 @@ fit_e_mech <- function(data, valid_data = NULL,
 #' @importFrom sl3 sl3_Task
 #
 fit_m_mech <- function(data, valid_data = NULL,
-                       lrnr_stack, z_names, w_names) {
+                       learners, z_names, w_names) {
   #  construct task for propensity score fit
   m_task <- sl3::sl3_Task$new(
     data = data,
@@ -210,7 +209,7 @@ fit_m_mech <- function(data, valid_data = NULL,
   )
 
   # fit and predict
-  m_fit_stack <- lrnr_stack$train(m_task)
+  m_fit_stack <- learners$train(m_task)
 
   # use full data for counterfactual prediction if no validation data provided
   if (is.null(valid_data)) {
@@ -300,7 +299,7 @@ fit_m_mech <- function(data, valid_data = NULL,
 #' @param valid_data A holdout data set, with columns exactly matching those
 #'  appearing in the preceding argument \code{train_data}, to be used for
 #'  estimation via cross-fitting. Not optional for this nuisance parameter.
-#' @param lrnr_stack A \code{Stack} object, or other learner class (inheriting
+#' @param learners A \code{Stack} object, or other learner class (inheriting
 #'  from \code{Lrnr_base}), containing a single or set of instantiated learners
 #'  from the \code{sl3} package, to be used in fitting a cleverly parameterized
 #'  propensity score that includes the mediators, i.e., e = P(A | Z, W).
@@ -313,7 +312,7 @@ fit_m_mech <- function(data, valid_data = NULL,
 #' @importFrom data.table data.table as.data.table
 #' @importFrom sl3 sl3_Task
 #
-fit_phi_mech <- function(train_data, valid_data, lrnr_stack, m_output,
+fit_phi_mech <- function(train_data, valid_data, learners, m_output,
                          w_names) {
   # regression on pseudo-outcome for this nuisance parameter
   # NOTE: first, learn the regression model using the training data
@@ -334,7 +333,7 @@ fit_phi_mech <- function(train_data, valid_data, lrnr_stack, m_output,
   )
 
   # fit stack of learners to learn the regression model for phi
-  phi_fit <- lrnr_stack$train(phi_train_task)
+  phi_fit <- learners$train(phi_train_task)
 
   # NOW, predict on the validation data
   # NOTE: first, as before, must construct the pseudo-outcome

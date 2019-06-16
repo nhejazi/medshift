@@ -4,7 +4,7 @@
 \alias{fit_e_mech}
 \title{Fit propensity score regression while conditioning on mediators}
 \usage{
-fit_e_mech(data, valid_data = NULL, lrnr_stack, z_names, w_names)
+fit_e_mech(data, valid_data = NULL, learners, z_names, w_names)
 }
 \arguments{
 \item{data}{A \code{data.table} containing the observed data, with columns
@@ -18,7 +18,7 @@ wrapper function \code{medshift}.}
 appearing in the preceding argument \code{data}, to be used for estimation
 via cross-fitting. Optional, defaulting to \code{NULL}.}
 
-\item{lrnr_stack}{A \code{Stack} object, or other learner class (inheriting
+\item{learners}{A \code{Stack} object, or other learner class (inheriting
 from \code{Lrnr_base}), containing a single or set of instantiated learners
 from the \code{sl3} package, to be used in fitting a cleverly parameterized
 propensity score that includes the mediators, i.e., e = P(A | Z, W).}
