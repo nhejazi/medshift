@@ -15,19 +15,19 @@
 #'  propensity score shift, acting as a multiplier of the probability with which
 #'  a given observational unit receives the intervention (EH Kennedy, 2018,
 #'  JASA; <doi:10.1080/01621459.2017.1422737>).
-#' @param g_lrnrs A \code{Stack} object, or other learner class (inheriting from
-#'  \code{Lrnr_base}), containing a single or set of instantiated learners from
-#'  the \code{sl3} package, to be used in fitting a model for the propensity
+#' @param g_learners A \code{Stack} object, or other learner class (inheriting
+#'  from \code{Lrnr_base}), containing a single or set of instantiated learners
+#'  from the \code{sl3} package, used in fitting a model for the propensity
 #'  score, i.e., g = P(A | W).
-#' @param e_lrnrs A \code{Stack} object, or other learner class (inheriting from
-#'  \code{Lrnr_base}), containing a single or set of instantiated learners from
-#'  the \code{sl3} package, to be used in fitting a cleverly parameterized
+#' @param e_learners A \code{Stack} object, or other learner class (inheriting
+#'  from \code{Lrnr_base}), containing a single or set of instantiated learners
+#'  from the \code{sl3} package, to be used in fitting a cleverly parameterized
 #'  propensity score that includes the mediators, i.e., e = P(A | Z, W).
-#' @param m_lrnrs A \code{Stack} object, or other learner class (inheriting from
-#'  \code{Lrnr_base}), containing a single or set of instantiated learners from
-#'  the \code{sl3} package, to be used in fitting the outcome regression, i.e.,
-#'  m(A, Z, W).
-#' @param phi_lrnrs A \code{Stack} object, or other learner class (inheriting
+#' @param m_learners A \code{Stack} object, or other learner class (inheriting
+#'  from \code{Lrnr_base}), containing a single or set of instantiated learners
+#'  from the \code{sl3} package, to be used in fitting the outcome regression,
+#'  i.e., m(A, Z, W).
+#' @param phi_learners A \code{Stack} object, or other learner class (inheriting
 #'  from \code{Lrnr_base}), containing a single or set of instantiated learners
 #'  from the \code{sl3} package, to be used in fitting a reduced regression
 #'  useful for computing the efficient one-step estimator, i.e., phi(W) =
@@ -51,6 +51,7 @@
 #' @importFrom sl3 Lrnr_glm_fast
 #' @importFrom tmle3 tmle3
 #' @importFrom stats binomial
+#' @importFrom assertthat assert_that
 #'
 #' @export
 #
@@ -59,12 +60,12 @@ medshift <- function(W,
                      Z,
                      Y,
                      delta,
-                     g_lrnrs =
+                     g_learners =
                        sl3::Lrnr_glm_fast$new(family = stats::binomial()),
-                     e_lrnrs =
+                     e_learners =
                        sl3::Lrnr_glm_fast$new(family = stats::binomial()),
-                     m_lrnrs = sl3::Lrnr_glm_fast$new(),
-                     phi_lrnrs = sl3::Lrnr_glm_fast$new(),
+                     m_learners = sl3::Lrnr_glm_fast$new(),
+                     phi_learners = sl3::Lrnr_glm_fast$new(),
                      estimator = c(
                        "onestep",
                        "tmle",
@@ -80,6 +81,9 @@ medshift <- function(W,
   estimator <- match.arg(estimator)
   estimator_args <- unlist(estimator_args, recursive = FALSE)
 
+  # NOTE: procedure does _not_ support static interventions currently
+  assertthat::assert_that(delta > 0 && delta < Inf)
+
   # construct input data structure
   data <- data.table::as.data.table(cbind(Y, Z, A, W))
   w_names <- paste("W", seq_len(dim(data.table::as.data.table(W))[2]),
@@ -94,7 +98,7 @@ medshift <- function(W,
     # SUBSTITUTION ESTIMATOR
     sub_est_args <- list(
       data = data, delta = delta,
-      g_lrnrs = g_lrnrs, m_lrnrs = m_lrnrs,
+      g_learners = g_learners, m_learners = m_learners,
       w_names = w_names, z_names = z_names
     )
     est_out <- do.call(est_substitution, sub_est_args)
@@ -102,7 +106,7 @@ medshift <- function(W,
     # INVERSE PROBABILITY RE-WEIGHTED ESTIMATOR
     ipw_est_args <- list(
       data = data, delta = delta,
-      g_lrnrs = g_lrnrs, e_lrnrs = e_lrnrs,
+      g_learners = g_learners, e_learners = e_learners,
       w_names = w_names, z_names = z_names
     )
     est_out <- do.call(est_ipw, ipw_est_args)
@@ -110,8 +114,8 @@ medshift <- function(W,
     # CROSS-FITTED ONE-STEP ESTIMATOR
     os_est_args <- list(
       data = data, delta = delta,
-      g_lrnrs = g_lrnrs, e_lrnrs = e_lrnrs,
-      m_lrnrs = m_lrnrs, phi_lrnrs = phi_lrnrs,
+      g_learners = g_learners, e_learners = e_learners,
+      m_learners = m_learners, phi_learners = phi_learners,
       w_names = w_names, z_names = z_names,
       cv_folds = estimator_args[["cv_folds"]]
     )
@@ -119,11 +123,11 @@ medshift <- function(W,
   } else if (estimator == "tmle") {
     # CROSS-VALIDATED TARGETED MINIMUM LOSS ESTIMATOR
     node_list <- list(W = w_names, A = "A", Z = z_names, Y = "Y")
-    learner_list <- list(Y = m_lrnrs, A = g_lrnrs)
+    learner_list <- list(Y = m_learners, A = g_learners)
     tmle_spec <- tmle_medshift(
       delta = delta,
-      e_learners = e_lrnrs,
-      phi_learners = phi_lrnrs,
+      e_learners = e_learners,
+      phi_learners = phi_learners,
       max_iter = estimator_args[["max_iter"]],
       step_size = estimator_args[["step_size"]]
     )

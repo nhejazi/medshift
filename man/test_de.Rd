@@ -5,9 +5,9 @@
 \title{Hypothesis test of direct effect with mediated stochastic interventions
 using the multiplier bootstrap}
 \usage{
-test_de(W, A, Z, Y, delta_grid = seq(from = 0, to = 1, by = 0.2),
-  mult_type = c("rademacher", "gaussian"), ci_level = 0.95,
-  n_mult = 10000, cv_folds = 10, ...)
+test_de(W, A, Z, Y, delta_grid = seq(from = 0.1, to = 2.9, by = 0.4),
+  mult_type = c("rademacher", "gaussian"), ci_level = 0.95, g_learners,
+  e_learners, m_learners, phi_learners, cv_folds = 10, n_mult = 10000)
 }
 \arguments{
 \item{W}{A \code{matrix}, \code{data.frame}, or similar corresponding to a
@@ -38,8 +38,26 @@ simultaneous confidence band to be computed around the estimates of the
 direct effect. The error level of the test reported in the p-value returned
 is simply alpha, i.e., one less this quantity.}
 
-\item{n_mult}{A \code{numeric} scalar giving the number of repetitions of the
-multipliers to be used in computing the multiplier bootstrap.}
+\item{g_learners}{A \code{Stack} object, or other learner class (inheriting
+from \code{Lrnr_base}), containing a single or set of instantiated learners
+from the \code{sl3} package, used in fitting a model for the propensity
+score, i.e., g = P(A | W).}
+
+\item{e_learners}{A \code{Stack} object, or other learner class (inheriting
+from \code{Lrnr_base}), containing a single or set of instantiated learners
+from the \code{sl3} package, to be used in fitting a cleverly parameterized
+propensity score that includes the mediators, i.e., e = P(A | Z, W).}
+
+\item{m_learners}{A \code{Stack} object, or other learner class (inheriting
+from \code{Lrnr_base}), containing a single or set of instantiated learners
+from the \code{sl3} package, to be used in fitting the outcome regression,
+i.e., m(A, Z, W).}
+
+\item{phi_learners}{A \code{Stack} object, or other learner class
+(inheriting from \code{Lrnr_base}), containing a single or set of
+instantiated learners from the \code{sl3} package, to be used in fitting a
+reduced regression useful for computing the efficient one-step estimator,
+i.e., phi(W) = E[m(A = 1, Z, W) - m(A = 0, Z, W) | W).}
 
 \item{cv_folds}{A \code{numeric} integer value specifying the number of folds
 to be created for cross-validation. Use of cross-validation / cross-fitting
@@ -47,7 +65,8 @@ allows for entropy conditions on the AIPW estimator to be relaxed. Note: for
 compatibility with \code{origami::make_folds}, this value specified here
 must be greater than or equal to 2; the default is to create 10 folds.}
 
-\item{...}{Other arguments to be passed to \code{\link{medshift}}.}
+\item{n_mult}{A \code{numeric} scalar giving the number of repetitions of the
+multipliers to be used in computing the multiplier bootstrap.}
 }
 \description{
 Hypothesis test of direct effect with mediated stochastic interventions

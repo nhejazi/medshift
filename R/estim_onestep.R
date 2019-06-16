@@ -14,19 +14,19 @@ utils::globalVariables(c("..eif_component_names", "..w_names"))
 #'  propensity score shift, acting as a multiplier of the probability with which
 #'  a given observational unit receives the intervention (EH Kennedy, 2018,
 #'  JASA; <doi:10.1080/01621459.2017.1422737>).
-#' @param g_lrnrs A \code{Stack} object, or other learner class (inheriting from
-#'  \code{Lrnr_base}), containing a single or set of instantiated learners from
-#'  the \code{sl3} package, to be used in fitting a model for the propensity
+#' @param g_learners A \code{Stack} object, or other learner class (inheriting
+#'  from \code{Lrnr_base}), containing a single or set of instantiated learners
+#'  from the \code{sl3} package, used in fitting a model for the propensity
 #'  score, i.e., g = P(A | W).
-#' @param e_lrnrs A \code{Stack} object, or other learner class (inheriting
+#' @param e_learners A \code{Stack} object, or other learner class (inheriting
 #'  from \code{Lrnr_base}), containing a single or set of instantiated learners
 #'  from the \code{sl3} package, to be used in fitting a cleverly parameterized
 #'  propensity score that includes the mediators, i.e., e = P(A | Z, W).
-#' @param m_lrnrs A \code{Stack} object, or other learner class (inheriting
+#' @param m_learners A \code{Stack} object, or other learner class (inheriting
 #'  from \code{Lrnr_base}), containing a single or set of instantiated learners
 #'  from the \code{sl3} package, to be used in fitting the outcome regression,
 #'  i.e., m(A, Z, W).
-#' @param phi_lrnrs A \code{Stack} object, or other learner class
+#' @param phi_learners A \code{Stack} object, or other learner class
 #'  (inheriting from \code{Lrnr_base}), containing a single or set of
 #'  instantiated learners from the \code{sl3} package, to be used in fitting a
 #'  reduced regression useful for computing the efficient one-step estimator,
@@ -48,10 +48,10 @@ utils::globalVariables(c("..eif_component_names", "..w_names"))
 #
 est_onestep <- function(data,
                         delta,
-                        g_lrnrs,
-                        e_lrnrs,
-                        m_lrnrs,
-                        phi_lrnrs,
+                        g_learners,
+                        e_learners,
+                        m_learners,
+                        phi_learners,
                         w_names,
                         z_names,
                         cv_folds = 10) {
@@ -70,10 +70,10 @@ est_onestep <- function(data,
     folds = folds,
     data = data,
     delta = delta,
-    lrnr_stack_g = g_lrnrs,
-    lrnr_stack_e = e_lrnrs,
-    lrnr_stack_m = m_lrnrs,
-    lrnr_stack_phi = phi_lrnrs,
+    g_learners = g_learners,
+    e_learners = e_learners,
+    m_learners = m_learners,
+    phi_learners = phi_learners,
     w_names = w_names,
     z_names = z_names,
     use_future = FALSE,
@@ -109,7 +109,7 @@ est_onestep <- function(data,
   if (length(delta) == 1) {
     return(unlist(est_over_delta, recursive = FALSE))
   } else {
-    return(over_over_delta)
+    return(est_over_delta)
   }
 }
 
@@ -131,23 +131,23 @@ est_onestep <- function(data,
 #'  propensity score shift, acting as a multiplier of the probability with which
 #'  a given observational unit receives the intervention (EH Kennedy, 2018,
 #'  JASA; <doi:10.1080/01621459.2017.1422737>).
-#' @param lrnr_stack_g A \code{Stack} object, or other learner class (inheriting
+#' @param g_learners A \code{Stack} object, or other learner class (inheriting
 #'  from \code{Lrnr_base}), containing a single or set of instantiated learners
 #'  from the \code{sl3} package, to be used in fitting a model for the
 #'  propensity score, i.e., g = P(A | W).
-#' @param lrnr_stack_e A \code{Stack} object, or other learner class (inheriting
+#' @param e_learners A \code{Stack} object, or other learner class (inheriting
 #'  from \code{Lrnr_base}), containing a single or set of instantiated learners
 #'  from the \code{sl3} package, to be used in fitting a cleverly parameterized
 #'  propensity score that includes the mediators, i.e., e = P(A | Z, W).
-#' @param lrnr_stack_m A \code{Stack} object, or other learner class (inheriting
+#' @param m_learners A \code{Stack} object, or other learner class (inheriting
 #'  from \code{Lrnr_base}), containing a single or set of instantiated learners
 #'  from the \code{sl3} package, to be used in fitting the outcome regression,
 #'  i.e., m(A, Z, W).
-#' @param lrnr_stack_phi A \code{Stack} object, or other learner class
-#'  (inheriting from \code{Lrnr_base}), containing a single or set of
-#'  instantiated learners from the \code{sl3} package, to be used in fitting a
-#'  reduced regression useful for computing the efficient one-step estimator,
-#'  i.e., phi(W) = E[m(A = 1, Z, W) - m(A = 0, Z, W) | W).
+#' @param phi_learners A \code{Stack} object, or other learner class (inheriting
+#'  from \code{Lrnr_base}), containing a single or set of instantiated learners
+#'  from the \code{sl3} package, to be used in fitting a reduced regression for
+#'  computing the efficient one-step estimator, i.e., phi(W) = E[m(A = 1, Z, W)
+#'  - m(A = 0, Z, W) | W).
 #' @param w_names A \code{character} vector of the names of the columns that
 #'  correspond to baseline covariates (W). The input for this argument is
 #'  automatically generated by a call to the wrapper function \code{medshift}.
@@ -163,10 +163,10 @@ est_onestep <- function(data,
 cv_eif <- function(fold,
                    data,
                    delta,
-                   lrnr_stack_g,
-                   lrnr_stack_e,
-                   lrnr_stack_m,
-                   lrnr_stack_phi,
+                   g_learners,
+                   e_learners,
+                   m_learners,
+                   phi_learners,
                    w_names,
                    z_names) {
   # make training and validation data
@@ -181,7 +181,7 @@ cv_eif <- function(fold,
     g_est_delta <- fit_g_mech(
       data = train_data, valid_data = valid_data,
       delta = delta,
-      lrnr_stack = lrnr_stack_g, w_names = w_names
+      learners = g_learners, w_names = w_names
     )
     return(g_est_delta)
   })
@@ -189,21 +189,21 @@ cv_eif <- function(fold,
   ## 2) fit clever regression for treatment, conditional on mediators
   e_out <- fit_e_mech(
     data = train_data, valid_data = valid_data,
-    lrnr_stack = lrnr_stack_e,
+    learners = e_learners,
     z_names = z_names, w_names = w_names
   )
 
   ## 3) fit regression for incremental propensity score intervention
   m_out <- fit_m_mech(
     data = train_data, valid_data = valid_data,
-    lrnr_stack = lrnr_stack_m,
+    learners = m_learners,
     z_names = z_names, w_names = w_names
   )
 
   ## 4) difference-reduced dimension regression with pseudo-outcome
   phi_est <- fit_phi_mech(
     train_data = train_data, valid_data = valid_data,
-    lrnr_stack = lrnr_stack_phi,
+    learners = phi_learners,
     m_output = m_out, w_names = w_names
   )
 

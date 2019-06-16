@@ -43,7 +43,6 @@ Suggests:
     testthat,
     knitr,
     rmarkdown,
-    dplyr,
     stringr,
     Rsolnp,
     nnls,

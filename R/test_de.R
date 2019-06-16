@@ -1,3 +1,5 @@
+utils::globalVariables(c("beta_est", "se_eif"))
+
 #' Hypothesis test of direct effect with mediated stochastic interventions
 #' using the multiplier bootstrap
 #'
@@ -22,19 +24,36 @@
 #'  simultaneous confidence band to be computed around the estimates of the
 #'  direct effect. The error level of the test reported in the p-value returned
 #'  is simply alpha, i.e., one less this quantity.
-#' @param n_mult A \code{numeric} scalar giving the number of repetitions of the
-#'  multipliers to be used in computing the multiplier bootstrap.
+#' @param g_learners A \code{Stack} object, or other learner class (inheriting
+#'  from \code{Lrnr_base}), containing a single or set of instantiated learners
+#'  from the \code{sl3} package, used in fitting a model for the propensity
+#'  score, i.e., g = P(A | W).
+#' @param e_learners A \code{Stack} object, or other learner class (inheriting
+#'  from \code{Lrnr_base}), containing a single or set of instantiated learners
+#'  from the \code{sl3} package, to be used in fitting a cleverly parameterized
+#'  propensity score that includes the mediators, i.e., e = P(A | Z, W).
+#' @param m_learners A \code{Stack} object, or other learner class (inheriting
+#'  from \code{Lrnr_base}), containing a single or set of instantiated learners
+#'  from the \code{sl3} package, to be used in fitting the outcome regression,
+#'  i.e., m(A, Z, W).
+#' @param phi_learners A \code{Stack} object, or other learner class
+#'  (inheriting from \code{Lrnr_base}), containing a single or set of
+#'  instantiated learners from the \code{sl3} package, to be used in fitting a
+#'  reduced regression useful for computing the efficient one-step estimator,
+#'  i.e., phi(W) = E[m(A = 1, Z, W) - m(A = 0, Z, W) | W).
 #' @param cv_folds A \code{numeric} integer value specifying the number of folds
 #'  to be created for cross-validation. Use of cross-validation / cross-fitting
 #'  allows for entropy conditions on the AIPW estimator to be relaxed. Note: for
 #'  compatibility with \code{origami::make_folds}, this value specified here
 #'  must be greater than or equal to 2; the default is to create 10 folds.
-#' @param ... Other arguments to be passed to \code{\link{medshift}}.
+#' @param n_mult A \code{numeric} scalar giving the number of repetitions of the
+#'  multipliers to be used in computing the multiplier bootstrap.
 #'
 #' @importFrom stats var rbinom rnorm quantile
 #' @importFrom data.table as.data.table setnames rbindlist
 #' @importFrom dplyr "%>%" transmute between
 #' @importFrom tibble as_tibble
+#' @importFrom assertthat assert_that
 #'
 #' @export
 #
@@ -42,14 +61,20 @@ test_de <- function(W,
                     A,
                     Z,
                     Y,
-                    delta_grid = seq(from = 0, to = 1, by = 0.2),
+                    delta_grid = seq(from = 0.1, to = 2.9, by = 0.4),
                     mult_type = c("rademacher", "gaussian"),
                     ci_level = 0.95,
-                    n_mult = 10000,
+                    g_learners,
+                    e_learners,
+                    m_learners,
+                    phi_learners,
                     cv_folds = 10,
-                    ...) {
+                    n_mult = 10000) {
   # set default arguments
   mult_type <- match.arg(mult_type)
+
+  # NOTE: procedure does _not_ support static interventions currently
+  assertthat::assert_that(all(delta_grid > 0) && all(delta_grid < Inf))
 
   # construct input data structure
   data_in <- data.table::as.data.table(cbind(Y, Z, A, W))
@@ -84,7 +109,10 @@ test_de <- function(W,
   theta_est <- est_onestep(
     data = data_in,
     delta = delta_grid,
-    ...,
+    g_learners = g_learners,
+    e_learners = e_learners,
+    m_learners = m_learners,
+    phi_learners = phi_learners,
     w_names = w_names,
     z_names = z_names,
     cv_folds = cv_folds
@@ -110,7 +138,7 @@ test_de <- function(W,
       m_process <- mean((mults * eif_de_diff) / se_eif)
 
       # construct output
-      return(list(beta_est = beta_est, se = se_eif, m_est = m_process))
+      return(list(beta_est = beta_est, se_eif = se_eif, m_est = m_process))
     })
     m_process_out <- data.table::rbindlist(m_process_out)
     sup_m_over_delta <- max(abs(m_process_out$m_est))
@@ -126,11 +154,11 @@ test_de <- function(W,
   c_alpha <- unname(stats::quantile(sup_m_process, ci_level))
   est_with_cis <- param_est %>%
     dplyr::transmute(
-      lwr_ci = beta_est - c_alpha * se,
+      lwr_ci = beta_est - c_alpha * se_eif,
       beta_est = I(beta_est),
-      upr_ci = beta_est + c_alpha * se,
-      se = I(se),
-      test_stat = beta_est / se
+      upr_ci = beta_est + c_alpha * se_eif,
+      se_eif = I(se_eif),
+      test_stat = beta_est / se_eif
     ) %>%
     tibble::as_tibble()
 

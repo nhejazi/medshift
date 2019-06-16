@@ -12,11 +12,11 @@
 #'  propensity score shift, acting as a multiplier of the probability with which
 #'  a given observational unit receives the intervention (EH Kennedy, 2018,
 #'  JASA; <doi:10.1080/01621459.2017.1422737>).
-#' @param g_lrnrs A \code{Stack} object, or other learner class (inheriting from
-#'  \code{Lrnr_base}), containing a single or set of instantiated learners from
-#'  the \code{sl3} package, to be used in fitting a model for the propensity
+#' @param g_learners A \code{Stack} object, or other learner class (inheriting
+#'  from \code{Lrnr_base}), containing a single or set of instantiated learners
+#'  from the \code{sl3} package, used in fitting a model for the propensity
 #'  score, i.e., g = P(A | W).
-#' @param m_lrnrs A \code{Stack} object, or other learner class (inheriting
+#' @param m_learners A \code{Stack} object, or other learner class (inheriting
 #'  from \code{Lrnr_base}), containing a single or set of instantiated learners
 #'  from the \code{sl3} package, to be used in fitting the outcome regression,
 #'  i.e., m(A, Z, W).
@@ -30,20 +30,20 @@
 #
 est_substitution <- function(data,
                              delta,
-                             g_lrnrs,
-                             m_lrnrs,
+                             g_learners,
+                             m_learners,
                              w_names,
                              z_names,
                              ...) {
   # estimate propensity score
   g_out <- fit_g_mech(
     data = data, delta = delta,
-    lrnr_stack = g_lrnrs, w_names = w_names
+    learners = g_learners, w_names = w_names
   )
 
   # fit regression for incremental propensity score intervention
   m_out <- fit_m_mech(
-    data = data, lrnr_stack = m_lrnrs,
+    data = data, learners = m_learners,
     z_names = z_names, w_names = w_names
   )
 
@@ -60,7 +60,7 @@ est_substitution <- function(data,
 
 ################################################################################
 
-#' Get Dzw component of efficient influence function from nuisance parameters
+#' Construct joint Z-W component of efficient influence function
 #'
 #' @param g_output Object containing results from fitting the propensity score
 #'  regression, as produced by a call to \code{fit_g_mech}.

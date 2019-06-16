@@ -66,7 +66,7 @@ idx_cntrl <- which(data$A == 0)
 g_out <- fit_g_mech(
   data = data,
   delta = delta,
-  lrnr_stack = Lrnr_hal9001$new(fit_type = "glmnet", family = "binomial"),
+  learners = Lrnr_hal9001$new(fit_type = "glmnet", family = "binomial"),
   w_names = w_names
 )
 
