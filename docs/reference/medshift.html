@@ -128,10 +128,10 @@ with stochastic interventions</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>medshift</span>(<span class='no'>W</span>, <span class='no'>A</span>, <span class='no'>Z</span>, <span class='no'>Y</span>, <span class='no'>delta</span>, <span class='kw'>g_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='https://tlverse.org/sl3/reference/Lrnr_glm_fast.html'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(<span class='kw'>family</span> <span class='kw'>=</span>
-  <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/family.html'>binomial</a></span>()), <span class='kw'>e_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='https://tlverse.org/sl3/reference/Lrnr_glm_fast.html'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(<span class='kw'>family</span> <span class='kw'>=</span>
-  <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/family.html'>binomial</a></span>()), <span class='kw'>m_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='https://tlverse.org/sl3/reference/Lrnr_glm_fast.html'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(),
-  <span class='kw'>phi_lrnrs</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='https://tlverse.org/sl3/reference/Lrnr_glm_fast.html'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(), <span class='kw'>estimator</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"onestep"</span>,
+    <pre class="usage"><span class='fu'>medshift</span>(<span class='no'>W</span>, <span class='no'>A</span>, <span class='no'>Z</span>, <span class='no'>Y</span>, <span class='no'>delta</span>, <span class='kw'>g_learners</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='https://tlverse.org/sl3/reference/Lrnr_glm_fast.html'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(<span class='kw'>family</span> <span class='kw'>=</span>
+  <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/family.html'>binomial</a></span>()), <span class='kw'>e_learners</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='https://tlverse.org/sl3/reference/Lrnr_glm_fast.html'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(<span class='kw'>family</span> <span class='kw'>=</span>
+  <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/family.html'>binomial</a></span>()), <span class='kw'>m_learners</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='https://tlverse.org/sl3/reference/Lrnr_glm_fast.html'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(),
+  <span class='kw'>phi_learners</span> <span class='kw'>=</span> <span class='kw pkg'>sl3</span><span class='kw ns'>::</span><span class='no'><a href='https://tlverse.org/sl3/reference/Lrnr_glm_fast.html'>Lrnr_glm_fast</a></span>$<span class='fu'>new</span>(), <span class='kw'>estimator</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"onestep"</span>,
   <span class='st'>"tmle"</span>, <span class='st'>"substitution"</span>, <span class='st'>"reweighted"</span>), <span class='kw'>estimator_args</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>cv_folds</span> <span class='kw'>=</span>
   <span class='fl'>10</span>, <span class='kw'>max_iter</span> <span class='kw'>=</span> <span class='fl'>10000</span>, <span class='kw'>step_size</span> <span class='kw'>=</span> <span class='fl'>1e-06</span>))</pre>
     
@@ -168,28 +168,28 @@ a given observational unit receives the intervention (EH Kennedy, 2018,
 JASA; &lt;doi:10.1080/01621459.2017.1422737&gt;).</p></td>
     </tr>
     <tr>
-      <th>g_lrnrs</th>
-      <td><p>A <code>Stack</code> object, or other learner class (inheriting from
-<code>Lrnr_base</code>), containing a single or set of instantiated learners from
-the <code>sl3</code> package, to be used in fitting a model for the propensity
+      <th>g_learners</th>
+      <td><p>A <code>Stack</code> object, or other learner class (inheriting
+from <code>Lrnr_base</code>), containing a single or set of instantiated learners
+from the <code>sl3</code> package, used in fitting a model for the propensity
 score, i.e., g = P(A | W).</p></td>
     </tr>
     <tr>
-      <th>e_lrnrs</th>
-      <td><p>A <code>Stack</code> object, or other learner class (inheriting from
-<code>Lrnr_base</code>), containing a single or set of instantiated learners from
-the <code>sl3</code> package, to be used in fitting a cleverly parameterized
+      <th>e_learners</th>
+      <td><p>A <code>Stack</code> object, or other learner class (inheriting
+from <code>Lrnr_base</code>), containing a single or set of instantiated learners
+from the <code>sl3</code> package, to be used in fitting a cleverly parameterized
 propensity score that includes the mediators, i.e., e = P(A | Z, W).</p></td>
     </tr>
     <tr>
-      <th>m_lrnrs</th>
-      <td><p>A <code>Stack</code> object, or other learner class (inheriting from
-<code>Lrnr_base</code>), containing a single or set of instantiated learners from
-the <code>sl3</code> package, to be used in fitting the outcome regression, i.e.,
-m(A, Z, W).</p></td>
+      <th>m_learners</th>
+      <td><p>A <code>Stack</code> object, or other learner class (inheriting
+from <code>Lrnr_base</code>), containing a single or set of instantiated learners
+from the <code>sl3</code> package, to be used in fitting the outcome regression,
+i.e., m(A, Z, W).</p></td>
     </tr>
     <tr>
-      <th>phi_lrnrs</th>
+      <th>phi_learners</th>
       <td><p>A <code>Stack</code> object, or other learner class (inheriting
 from <code>Lrnr_base</code>), containing a single or set of instantiated learners
 from the <code>sl3</code> package, to be used in fitting a reduced regression

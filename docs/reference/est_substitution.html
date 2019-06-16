@@ -123,7 +123,8 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>est_substitution</span>(<span class='no'>data</span>, <span class='no'>delta</span>, <span class='no'>g_lrnrs</span>, <span class='no'>m_lrnrs</span>, <span class='no'>w_names</span>, <span class='no'>z_names</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>est_substitution</span>(<span class='no'>data</span>, <span class='no'>delta</span>, <span class='no'>g_learners</span>, <span class='no'>m_learners</span>, <span class='no'>w_names</span>, <span class='no'>z_names</span>,
+  <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -147,14 +148,14 @@ a given observational unit receives the intervention (EH Kennedy, 2018,
 JASA; &lt;doi:10.1080/01621459.2017.1422737&gt;).</p></td>
     </tr>
     <tr>
-      <th>g_lrnrs</th>
-      <td><p>A <code>Stack</code> object, or other learner class (inheriting from
-<code>Lrnr_base</code>), containing a single or set of instantiated learners from
-the <code>sl3</code> package, to be used in fitting a model for the propensity
+      <th>g_learners</th>
+      <td><p>A <code>Stack</code> object, or other learner class (inheriting
+from <code>Lrnr_base</code>), containing a single or set of instantiated learners
+from the <code>sl3</code> package, used in fitting a model for the propensity
 score, i.e., g = P(A | W).</p></td>
     </tr>
     <tr>
-      <th>m_lrnrs</th>
+      <th>m_learners</th>
       <td><p>A <code>Stack</code> object, or other learner class (inheriting
 from <code>Lrnr_base</code>), containing a single or set of instantiated learners
 from the <code>sl3</code> package, to be used in fitting the outcome regression,

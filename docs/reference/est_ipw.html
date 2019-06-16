@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Inverse probability re/IP-weighted estimator — est_ipw • medshift</title>
+<title>Inverse probability weighted (IPW) estimator — est_ipw • medshift</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -31,9 +31,9 @@
 
 
 
-<meta property="og:title" content="Inverse probability re/IP-weighted estimator — est_ipw" />
+<meta property="og:title" content="Inverse probability weighted (IPW) estimator — est_ipw" />
 
-<meta property="og:description" content="Inverse probability re/IP-weighted estimator" />
+<meta property="og:description" content="Inverse probability weighted (IPW) estimator" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -112,18 +112,18 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Inverse probability re/IP-weighted estimator</h1>
+    <h1>Inverse probability weighted (IPW) estimator</h1>
     <small class="dont-index">Source: <a href='https://github.com/nhejazi/medshift/blob/master/R/estim_reweighted.R'><code>R/estim_reweighted.R</code></a></small>
     <div class="hidden name"><code>est_ipw.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Inverse probability re/IP-weighted estimator</p>
+    <p>Inverse probability weighted (IPW) estimator</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>est_ipw</span>(<span class='no'>data</span>, <span class='no'>delta</span>, <span class='no'>g_lrnrs</span>, <span class='no'>e_lrnrs</span>, <span class='no'>w_names</span>, <span class='no'>z_names</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>est_ipw</span>(<span class='no'>data</span>, <span class='no'>delta</span>, <span class='no'>g_learners</span>, <span class='no'>e_learners</span>, <span class='no'>w_names</span>, <span class='no'>z_names</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -147,14 +147,14 @@ a given observational unit receives the intervention (EH Kennedy, 2018,
 JASA; &lt;doi:10.1080/01621459.2017.1422737&gt;).</p></td>
     </tr>
     <tr>
-      <th>g_lrnrs</th>
-      <td><p>A <code>Stack</code> object, or other learner class (inheriting from
-<code>Lrnr_base</code>), containing a single or set of instantiated learners from
-the <code>sl3</code> package, to be used in fitting a model for the propensity
+      <th>g_learners</th>
+      <td><p>A <code>Stack</code> object, or other learner class (inheriting
+from <code>Lrnr_base</code>), containing a single or set of instantiated learners
+from the <code>sl3</code> package, used in fitting a model for the propensity
 score, i.e., g = P(A | W).</p></td>
     </tr>
     <tr>
-      <th>e_lrnrs</th>
+      <th>e_learners</th>
       <td><p>A <code>Stack</code> object, or other learner class (inheriting
 from <code>Lrnr_base</code>), containing a single or set of instantiated learners
 from the <code>sl3</code> package, to be used in fitting a cleverly parameterized
