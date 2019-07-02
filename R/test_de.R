@@ -61,7 +61,7 @@ test_de <- function(W,
                     A,
                     Z,
                     Y,
-                    delta_grid = seq(from = 0.1, to = 2.9, by = 0.4),
+                    delta_grid = seq(from = 0.5, to = 5.0, by = 0.9),
                     mult_type = c("rademacher", "gaussian"),
                     ci_level = 0.95,
                     g_learners,
@@ -93,8 +93,7 @@ test_de <- function(W,
   # generate multipliers
   if (mult_type == "rademacher") {
     mult_boot <- lapply(seq_len(n_mult), function(iter) {
-      mults <- stats::rbinom(n_obs, 1, 0.5)
-      mults[mults == 0] <- -1
+      mults <- (2 * stats::rbinom(n_obs, 1, 0.5)) - 1
       return(mults)
     })
   } else if (mult_type == "gaussian") {
@@ -125,7 +124,7 @@ test_de <- function(W,
       # compute estimate of the direct effect
       beta_est <- EY - theta_est[[iter]]$theta
 
-      # compute corresponding parameter-centered influence function
+      # compute corresponding uncentered influence function
       s_eif_est <- Y - (theta_est[[iter]]$eif + theta_est[[iter]]$theta)
 
       # difference in estimated influence function and direct effect
