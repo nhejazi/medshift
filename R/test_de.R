@@ -157,7 +157,8 @@ test_de <- function(W,
       beta_est = I(beta_est),
       upr_ci = beta_est + c_alpha * se_eif,
       se_eif = I(se_eif),
-      test_stat = beta_est / se_eif
+      test_stat = beta_est / se_eif,
+      delta = delta_grid
     ) %>%
     tibble::as_tibble()
 
