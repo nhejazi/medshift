@@ -5,7 +5,7 @@
 \title{Hypothesis test of direct effect with mediated stochastic interventions
 using the multiplier bootstrap}
 \usage{
-test_de(W, A, Z, Y, delta_grid = seq(from = 0.1, to = 2.9, by = 0.4),
+test_de(W, A, Z, Y, delta_grid = seq(from = 0.5, to = 5, by = 0.9),
   mult_type = c("rademacher", "gaussian"), ci_level = 0.95, g_learners,
   e_learners, m_learners, phi_learners, cv_folds = 10, n_mult = 10000)
 }

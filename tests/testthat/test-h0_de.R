@@ -75,6 +75,7 @@ w_names <- colnames(data)[str_detect(colnames(data), "W")]
 ################################################################################
 de_test <- test_de(
   W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
+  delta_grid = seq(from = 0.5, to = 5, by = 0.9),
   mult_type = "rademacher",
   ci_level = (1 - alpha_level),
   g_learners = hal_binary_lrnr,
@@ -85,7 +86,7 @@ de_test <- test_de(
 )
 
 test_that("Uniform test of no direct effect rejects H0 with fixed p-value", {
-  expect_equal(de_test$pval_de, 0.903, tol = 1e-3)
+  expect_equal(de_test$pval_de, 0.822, tol = 1e-3)
 })
 
 test_that("Simultaneous confidence band uniformly covers zero under H0", {
