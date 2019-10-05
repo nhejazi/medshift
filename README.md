@@ -139,7 +139,7 @@ After using the `medshift` R package, please cite the following:
       year={2019},
       url = {https://arxiv.org/abs/1901.02776},
       doi = {},
-      journal={submitted},
+      journal={arxiv},
       volume={},
       number={},
       pages={},
@@ -149,10 +149,10 @@ After using the `medshift` R package, please cite the following:
     @manual{hejazi2019medshift,
       author = {Hejazi, Nima S and D{\'\i}az, Iv{\'a}n},
       title = {{medshift}: Causal mediation analysis for stochastic
-        interventions in {R}},
+        interventions},
       year  = {2019},
       url = {https://github.com/nhejazi/medshift},
-      note = {R package version 0.1.0}
+      note = {R package version 0.1.1}
     }
 ```
 

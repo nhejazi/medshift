@@ -4,7 +4,7 @@ author: "[Nima Hejazi](https://nimahejazi.org) and
   [Iván Díaz](https://www.idiaz.xyz/)"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
-bibliography: vignette-refs.bib
+bibliography: ../inst/REFERENCES.bib
 vignette: >
   %\VignetteIndexEntry{Causal mediation analysis for stochastic interventions}
   %\VignetteEngine{knitr::rmarkdown}
@@ -180,9 +180,9 @@ estimator is
   \delta}(O_i) + D^A_{\hat{\eta}_{j(i)}, \delta}(O_i) +
   D^{Z,W}_{\hat{\eta}_{j(i)}, \delta}(O_i) \right\},
 \end{equation*}
-which is implemented in the `medshift` R package [@hejazi2019medshift]. We
-make use of that implementation to estimate $\mathbb{E}\{Y(g_{\delta}, q)\}$
-via its one-step estimator $\hat{\theta}(\delta)$ below
+which is implemented in the `medshift` R package. We make use of that
+implementation to estimate $\mathbb{E}\{Y(g_{\delta}, q)\}$ via its one-step
+estimator $\hat{\theta}(\delta)$ below
 
 ```{r efficient_est, message=FALSE, warning=FALSE}
 # let's compute the parameter where A (but not Z) are shifted
