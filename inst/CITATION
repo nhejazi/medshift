@@ -1,6 +1,6 @@
 citHeader("Please cite the following works when using the 'medshift' software
-           package, including the software tool itself and the article
-           describing the statistical methodology.")
+           package, including both the software tool and the article describing
+           the statistical methodology.")
 
 year <- format(Sys.Date(), "%Y")
 note <- sprintf("R package version %s", meta$Version)
