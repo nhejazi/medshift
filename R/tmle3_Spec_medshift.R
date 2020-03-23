@@ -5,7 +5,6 @@
 #' @importFrom tmle3 tmle3_Spec define_lf tmle3_Update Targeted_Likelihood
 #'
 #' @export
-#
 tmle3_Spec_medshift <- R6::R6Class(
   classname = "tmle3_Spec_medshift",
   portable = TRUE,
@@ -88,7 +87,7 @@ tmle3_Spec_medshift <- R6::R6Class(
 #' Z = Mediators (binary or categorical; possibly multivariate)
 #' Y = Outcome (binary or bounded continuous)
 #'
-#' @param shift_type A \code{character} defining the type of shift to be applied
+#' @param shift_type A \code{character} defining the type of shift to apply
 #'  to the treatment. By default, this is an exponential tilt intervention.
 #' @param delta A \code{numeric}, specification of the magnitude of the
 #'  desired shift.
@@ -96,20 +95,19 @@ tmle3_Spec_medshift <- R6::R6Class(
 #'  from \code{Lrnr_base}), containing a single or set of instantiated learners
 #'  from the \code{sl3} package, to be used in fitting a cleverly parameterized
 #'  propensity score that includes the mediators, i.e., e = P(A | Z, W).
-#' @param phi_learners A \code{Stack} object, or other learner class (inheriting
-#'  from \code{Lrnr_base}), containing a single or set of instantiated learners
-#'  from the \code{sl3} package, to be used in fitting a reduced regression
-#'  useful for computing the efficient one-step estimator, i.e., phi(W) =
-#'  E[m(A = 1, Z, W) - m(A = 0, Z, W) | W).
-#' @param max_iter A \code{numeric} setting the total number of iterations to be
-#'  used in the targeted procedure based on universal least favorable submodels.
+#' @param phi_learners A \code{Stack} object, or other learner class
+#'  (inheriting from \code{Lrnr_base}), containing a single or set of
+#'  instantiated learners from \pkg{sl3}, to be used in fitting a reduced
+#'  regression useful for computing the efficient one-step estimator, i.e.,
+#'  phi(W) = E[m(A = 1, Z, W) - m(A = 0, Z, W) | W).
+#' @param max_iter A \code{numeric} setting the total number of iterations to
+#'  be used in the targeted procedure via universal least favorable submodels.
 #' @param step_size A \code{numeric} giving the step size (\code{delta_epsilon}
-#'  in \code{tmle3}) to be used in the targeted procedure based on universal
-#'  least favorable submodels.
+#'  in \code{\link[tmle3]{tmle3}}) to be used in the targeted procedure via
+#'  universal least favorable submodels.
 #' @param ... Additional arguments (currently unused).
 #'
 #' @export
-#
 tmle_medshift <- function(shift_type = "exptilt",
                           delta, e_learners, phi_learners,
                           max_iter = 1e4, step_size = 1e-6,
@@ -134,7 +132,6 @@ tmle_medshift <- function(shift_type = "exptilt",
 #' @importFrom tmle3 define_node
 #'
 #' @keywords internal
-#
 stochastic_mediation_npsem <- function(node_list, variable_types = NULL) {
   # make tmle_task
   npsem <- list(
@@ -158,13 +155,12 @@ stochastic_mediation_npsem <- function(node_list, variable_types = NULL) {
 #'
 #' @param tmle_task A \code{tmle3_Task} object specifying the data and the
 #'  NPSEM for use in constructing elements of TML estimator.
-#' @param learner_list A \code{list} specifying which learners are to be applied
-#'  for each of the regression tasks required for the TML estimator.
+#' @param learner_list A \code{list} specifying which learners are to apply for
+#'  each of the regression tasks required for the TML estimator.
 #'
 #' @importFrom tmle3 define_lf LF_emp LF_fit Likelihood
 #'
 #' @keywords internal
-#
 stochastic_mediation_likelihood <- function(tmle_task, learner_list) {
   # covariates
   W_factor <- tmle3::define_lf(tmle3::LF_emp, "W")
@@ -211,7 +207,6 @@ stochastic_mediation_likelihood <- function(tmle_task, learner_list) {
 #' @importFrom sl3 sl3_Task
 #'
 #' @keywords internal
-#
 make_e_task <- function(tmle_task, likelihood) {
   e_data <- tmle_task$internal_data
   e_task <- sl3::sl3_Task$new(
@@ -234,12 +229,11 @@ make_e_task <- function(tmle_task, likelihood) {
 #' @param likelihood A trained \code{Likelihood} object from \code{tmle3},
 #'  constructed via the helper function \code{stochastic_mediation_likelihood}.
 #'
-#' @importFrom data.table as.data.table data.table
+#' @importFrom data.table as.data.table data.table setnames
 #' @importFrom uuid UUIDgenerate
 #' @importFrom sl3 sl3_Task
 #'
 #' @keywords internal
-#
 make_phi_task <- function(tmle_task, likelihood) {
   # create treatment and control tasks for intervention conditions
   treatment_task <-
@@ -263,6 +257,7 @@ make_phi_task <- function(tmle_task, likelihood) {
     m_diff = m_diff,
     tmle_task$get_tmle_node("W")
   ))
+  data.table::setnames(phi_data, c("m_diff", tmle_task$npsem[["W"]]$variables))
   phi_task <- sl3::sl3_Task$new(
     data = phi_data,
     outcome = "m_diff",
