@@ -1,5 +1,5 @@
-#' Defines a TML Estimator for Outcome under Joint Stochastic Intervention on
-#' Treatment and Mediator
+#' Defines a TML Estimator for the Counterfactual Mean Under Joint Stochastic
+#' Intervention on Treatment and Mediator
 #'
 #' @importFrom R6 R6Class
 #' @importFrom tmle3 tmle3_Spec define_lf tmle3_Update Targeted_Likelihood
@@ -127,7 +127,7 @@ tmle_medshift <- function(shift_type = "exptilt",
 #'
 #' @param node_list A \code{list} object specifying the different nodes in the
 #'  nonparametric structural equation model.
-#' @param variable_types Used to define how variables are handled. Optional.
+#' @param variable_types Used to define how variables are handled (optional).
 #'
 #' @importFrom tmle3 define_node
 #'
@@ -201,7 +201,7 @@ stochastic_mediation_likelihood <- function(tmle_task, learner_list) {
 #'
 #' @param tmle_task A \code{tmle3_Task} object specifying the data and the
 #'   NPSEM for use in constructing elements of TML estimator.
-#' @param likelihood A trained \code{Likelihood} object from \code{tmle3},
+#' @param likelihood A trained \code{Likelihood} object from \pkg{tmle3},
 #'  constructed via the helper function \code{stochastic_mediation_likelihood}.
 #'
 #' @importFrom sl3 sl3_Task
@@ -258,6 +258,8 @@ make_phi_task <- function(tmle_task, likelihood) {
     tmle_task$get_tmle_node("W")
   ))
   data.table::setnames(phi_data, c("m_diff", tmle_task$npsem[["W"]]$variables))
+
+  # NOTE: TODO: need to pass in fold structure
   phi_task <- sl3::sl3_Task$new(
     data = phi_data,
     outcome = "m_diff",

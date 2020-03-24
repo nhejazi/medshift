@@ -8,9 +8,9 @@ with stochastic interventions}
 medshift(W, A, Z, Y, delta, g_learners = sl3::Lrnr_glm_fast$new(family =
   stats::binomial()), e_learners = sl3::Lrnr_glm_fast$new(family =
   stats::binomial()), m_learners = sl3::Lrnr_glm_fast$new(),
-  phi_learners = sl3::Lrnr_glm_fast$new(), estimator = c("onestep",
-  "tmle", "substitution", "reweighted"), estimator_args = list(cv_folds =
-  10, max_iter = 10000, step_size = 1e-06))
+  phi_learners = sl3::Lrnr_glm_fast$new(), estimator = c("onestep", "tmle",
+  "substitution", "reweighted"), estimator_args = list(cv_folds = 10,
+  max_iter = 10000, step_size = 1e-06))
 }
 \arguments{
 \item{W}{A \code{matrix}, \code{data.frame}, or similar corresponding to a
@@ -30,7 +30,7 @@ intervention to be used in defining the causal quantity of interest. In the
 case of binary interventions, this takes the form of an incremental
 propensity score shift, acting as a multiplier of the probability with which
 a given observational unit receives the intervention (EH Kennedy, 2018,
-JASA; <doi:10.1080/01621459.2017.1422737>).}
+JASA; \url{doi:10.1080/01621459.2017.1422737}).}
 
 \item{g_learners}{A \code{Stack} object, or other learner class (inheriting
 from \code{Lrnr_base}), containing a single or set of instantiated learners

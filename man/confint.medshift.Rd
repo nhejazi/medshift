@@ -4,8 +4,7 @@
 \alias{confint.medshift}
 \title{Confidence Intervals for Stochastic Mediation Parameters}
 \usage{
-\method{confint}{medshift}(object, parm = seq_len(object$psi),
-  level = 0.95, ...)
+\method{confint}{medshift}(object, parm = seq_len(object$psi), level = 0.95, ...)
 }
 \arguments{
 \item{object}{An object of class \code{medshift}, as produced by invoking

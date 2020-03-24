@@ -4,8 +4,7 @@
 \alias{est_substitution}
 \title{Substitution estimator}
 \usage{
-est_substitution(data, delta, g_learners, m_learners, w_names, z_names,
-  ...)
+est_substitution(data, delta, g_learners, m_learners, w_names, z_names, ...)
 }
 \arguments{
 \item{data}{A \code{data.table} containing the observed data, with columns
@@ -20,7 +19,7 @@ intervention to be used in defining the causal quantity of interest. In the
 case of binary interventions, this takes the form of an incremental
 propensity score shift, acting as a multiplier of the probability with which
 a given observational unit receives the intervention (EH Kennedy, 2018,
-JASA; <doi:10.1080/01621459.2017.1422737>).}
+JASA; \url{doi:10.1080/01621459.2017.1422737}).}
 
 \item{g_learners}{A \code{Stack} object, or other learner class (inheriting
 from \code{Lrnr_base}), containing a single or set of instantiated learners

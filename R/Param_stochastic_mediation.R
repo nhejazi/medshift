@@ -25,8 +25,8 @@
 #'     }
 #'     \item{\code{...}}{Not currently used.
 #'     }
-#'     \item{\code{outcome_node}}{character, the name of the node that should be
-#'           treated as the outcome
+#'     \item{\code{outcome_node}}{character, the name of the node that should
+#'           be treated as the outcome.
 #'     }
 #'   }
 #'
@@ -38,11 +38,11 @@
 #'     \item{\code{lf_exptilt}}{Object derived from \code{\link{LF_base}} for
 #'           assessing the stochastic mediation intervention.
 #'     }
-#'     \item{\code{treatment_task}}{\code{\link{tmle3_Task}} object created from
-#'           setting the intervention to the treatment condition: do(A = 1).
+#'     \item{\code{treatment_task}}{\code{\link{tmle3_Task}} object created
+#'           from setting the intervention to the treatment do(A = 1).
 #'     }
 #'     \item{\code{control_task}}{\code{\link{tmle3_Task}} object created from
-#'           setting the intervention to the control condition: do(A = 0).
+#'           setting the intervention to the control do(A = 0).
 #'     }
 #'     \item{\code{shift_param}}{\code{numeric}, specification of the magnitude
 #'           of the desired shift (a multiplier for the propensity score).
@@ -114,7 +114,7 @@ Param_medshift <- R6::R6Class(
       phi_est <- likelihood$get_likelihood(tmle_task, "phi", fold_number)
       g_delta_est <- cf_likelihood$get_likelihood(tmle_task, "A", fold_number)
 
-      # compute/extract g(1|W) for clever covariate for score of A
+      # compute g(1|W) for clever covariate for score of A
       g1_est <- likelihood$get_likelihood(treatment_task, "A", fold_number)
       g0_est <- likelihood$get_likelihood(control_task, "A", fold_number)
 
@@ -167,7 +167,7 @@ Param_medshift <- R6::R6Class(
         fold_number
       )[[self$lf_exptilt$name]]
 
-      # compute individual scores for DY, DA, DZW
+      # compute individual scores for {D_Y, D_A, D_ZW}
       D_Y <- HY * (y - m_est)
       D_A <- HA * (a - g1_est)
       D_ZW <- (g1_delta_est * m1_est) + (g0_delta_est * m0_est)

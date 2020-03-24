@@ -10,7 +10,7 @@ make_e_task(tmle_task, likelihood)
 \item{tmle_task}{A \code{tmle3_Task} object specifying the data and the
 NPSEM for use in constructing elements of TML estimator.}
 
-\item{likelihood}{A trained \code{Likelihood} object from \code{tmle3},
+\item{likelihood}{A trained \code{Likelihood} object from \pkg{tmle3},
 constructed via the helper function \code{stochastic_mediation_likelihood}.}
 }
 \description{

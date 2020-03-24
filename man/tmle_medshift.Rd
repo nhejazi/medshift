@@ -8,7 +8,7 @@ tmle_medshift(shift_type = "exptilt", delta, e_learners, phi_learners,
   max_iter = 10000, step_size = 1e-06, ...)
 }
 \arguments{
-\item{shift_type}{A \code{character} defining the type of shift to be applied
+\item{shift_type}{A \code{character} defining the type of shift to apply
 to the treatment. By default, this is an exponential tilt intervention.}
 
 \item{delta}{A \code{numeric}, specification of the magnitude of the
@@ -19,18 +19,18 @@ from \code{Lrnr_base}), containing a single or set of instantiated learners
 from the \code{sl3} package, to be used in fitting a cleverly parameterized
 propensity score that includes the mediators, i.e., e = P(A | Z, W).}
 
-\item{phi_learners}{A \code{Stack} object, or other learner class (inheriting
-from \code{Lrnr_base}), containing a single or set of instantiated learners
-from the \code{sl3} package, to be used in fitting a reduced regression
-useful for computing the efficient one-step estimator, i.e., phi(W) =
-E[m(A = 1, Z, W) - m(A = 0, Z, W) | W).}
+\item{phi_learners}{A \code{Stack} object, or other learner class
+(inheriting from \code{Lrnr_base}), containing a single or set of
+instantiated learners from \pkg{sl3}, to be used in fitting a reduced
+regression useful for computing the efficient one-step estimator, i.e.,
+phi(W) = E[m(A = 1, Z, W) - m(A = 0, Z, W) | W).}
 
-\item{max_iter}{A \code{numeric} setting the total number of iterations to be
-used in the targeted procedure based on universal least favorable submodels.}
+\item{max_iter}{A \code{numeric} setting the total number of iterations to
+be used in the targeted procedure via universal least favorable submodels.}
 
 \item{step_size}{A \code{numeric} giving the step size (\code{delta_epsilon}
-in \code{tmle3}) to be used in the targeted procedure based on universal
-least favorable submodels.}
+in \code{\link[tmle3]{tmle3}}) to be used in the targeted procedure via
+universal least favorable submodels.}
 
 \item{...}{Additional arguments (currently unused).}
 }
