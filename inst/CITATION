@@ -1,6 +1,6 @@
-citHeader("Please cite the following works when using the 'medshift' software
-           package, including both the software tool and the article describing
-           the statistical methodology.")
+citHeader("Please cite the paper below for the 'medshift' software package
+           itself. Please also make sure to cite the appropriate articles
+           describing the statistical methodology.")
 
 year <- format(Sys.Date(), "%Y")
 note <- sprintf("R package version %s", meta$Version)
@@ -15,10 +15,11 @@ bibentry(bibtype = "Manual",
          url = "https://github.com/nhejazi/medshift")
 
 bibentry(bibtype = "Article",
-         journal = "arxiv",
+         journal = "Journal of the Royal Statistical Society, Series B (Statistical Methodology)",
          title = "Causal mediation analysis for stochastic interventions",
          author = c(person("Iván", "Díaz"),
                     person("Nima", "Hejazi", "S")),
-         year = "2019+",
-         doi = "",
-         url = "https://arxiv.org/abs/1901.02776")
+         year = "2020",
+         month = "February",
+         doi = "10.1111/rssb.12362",
+         url = "https://doi.org/10.1111/rssb.12362")

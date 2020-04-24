@@ -2,9 +2,9 @@
 % Please edit documentation in R/tmle3_Spec_medshift.R
 \name{tmle3_Spec_medshift}
 \alias{tmle3_Spec_medshift}
-\title{Defines a TML Estimator for the Counterfactual Mean Under Joint Stochastic
-Intervention on Treatment and Mediator}
+\title{TML Estimator for the Counterfactual Mean of a Joint Stochastic Intervention
+Defining the Population Intervention (In)direct Effects}
 \description{
-Defines a TML Estimator for the Counterfactual Mean Under Joint Stochastic
-Intervention on Treatment and Mediator
+TML Estimator for the Counterfactual Mean of a Joint Stochastic Intervention
+Defining the Population Intervention (In)direct Effects
 }

@@ -1,5 +1,5 @@
-#' Defines a TML Estimator for the Counterfactual Mean Under Joint Stochastic
-#' Intervention on Treatment and Mediator
+#' TML Estimator for the Counterfactual Mean of a Joint Stochastic Intervention
+#' Defining the Population Intervention (In)direct Effects
 #'
 #' @importFrom R6 R6Class
 #' @importFrom tmle3 tmle3_Spec define_lf tmle3_Update Targeted_Likelihood
@@ -11,10 +11,10 @@ tmle3_Spec_medshift <- R6::R6Class(
   class = TRUE,
   inherit = tmle3_Spec,
   public = list(
-    initialize = function(shift_type = "exptilt", delta,
-                              e_learners, phi_learners,
-                              max_iter = 1e4, step_size = 1e-6,
-                              ...) {
+    initialize = function(shift_type = "ipsi", delta,
+                          e_learners, phi_learners,
+                          max_iter = 1e4, step_size = 1e-6,
+                          ...) {
       options <- list(
         shift_type = shift_type,
         delta_shift = delta,
@@ -77,9 +77,10 @@ tmle3_Spec_medshift <- R6::R6Class(
   private = list()
 )
 
-################################################################################
+###############################################################################
 
-#' Outcome under Joint Stochastic Intervention on Treatment and Mediator
+#' TML Estimator for the Counterfactual Mean of a Joint Stochastic Intervention
+#' Defining the Population Intervention (In)direct Effects
 #'
 #' O = (W, A, Z, Y)
 #' W = Covariates (possibly multivariate)
@@ -87,28 +88,29 @@ tmle3_Spec_medshift <- R6::R6Class(
 #' Z = Mediators (binary or categorical; possibly multivariate)
 #' Y = Outcome (binary or bounded continuous)
 #'
-#' @param shift_type A \code{character} defining the type of shift to apply
-#'  to the treatment. By default, this is an exponential tilt intervention.
-#' @param delta A \code{numeric}, specification of the magnitude of the
-#'  desired shift.
-#' @param e_learners A \code{Stack} object, or other learner class (inheriting
-#'  from \code{Lrnr_base}), containing a single or set of instantiated learners
-#'  from the \code{sl3} package, to be used in fitting a cleverly parameterized
-#'  propensity score that includes the mediators, i.e., e = P(A | Z, W).
-#' @param phi_learners A \code{Stack} object, or other learner class
-#'  (inheriting from \code{Lrnr_base}), containing a single or set of
-#'  instantiated learners from \pkg{sl3}, to be used in fitting a reduced
-#'  regression useful for computing the efficient one-step estimator, i.e.,
+#' @param shift_type A \code{character} defining the type of shift to be
+#'  applied to the exposure -- an incremental propensity score intervention, by
+#'  default.
+#' @param delta A \code{numeric}, specifying the magnitude of the shift.
+#' @param e_learners A \code{\link[sl3]{Stack}} (or other learner class that
+#'  inherits from \code{\link[sl3]{Lrnr_base}}), containing a single or set of
+#'  instantiated learners from \pkg{sl3}, to be used in fitting a cleverly
+#'  parameterized propensity score that conditions on the mediators, i.e.,
+#'  e = P(A | Z, W).
+#' @param phi_learners A \code{\link[sl3]{Stack}} (or other learner class that
+#'  inherits from \code{\link[sl3]{Lrnr_base}}), containing a single or set of
+#'  instantiated learners from \pkg{sl3}, to be used in a regression of a
+#'  pseudo-outcome on the baseline covariates, i.e.,
 #'  phi(W) = E[m(A = 1, Z, W) - m(A = 0, Z, W) | W).
-#' @param max_iter A \code{numeric} setting the total number of iterations to
-#'  be used in the targeted procedure via universal least favorable submodels.
+#' @param max_iter A \code{numeric} setting the maximum iterations allowed in
+#'  the targeting step based on universal least favorable submodels.
 #' @param step_size A \code{numeric} giving the step size (\code{delta_epsilon}
-#'  in \code{\link[tmle3]{tmle3}}) to be used in the targeted procedure via
-#'  universal least favorable submodels.
+#'  in \code{tmle3}) to be used in the targeting step based on universal least
+#'  favorable submodels.
 #' @param ... Additional arguments (currently unused).
 #'
 #' @export
-tmle_medshift <- function(shift_type = "exptilt",
+tmle_medshift <- function(shift_type = "ipsi",
                           delta, e_learners, phi_learners,
                           max_iter = 1e4, step_size = 1e-6,
                           ...) {
@@ -121,13 +123,13 @@ tmle_medshift <- function(shift_type = "exptilt",
   )
 }
 
-################################################################################
+###############################################################################
 
 #' Stochastic Mediation NPSEM
 #'
 #' @param node_list A \code{list} object specifying the different nodes in the
-#'  nonparametric structural equation model.
-#' @param variable_types Used to define how variables are handled (optional).
+#'  nonparametric structural equation model (NPSEM).
+#' @param variable_types Used to define how variables are handled. Optional.
 #'
 #' @importFrom tmle3 define_node
 #'
@@ -149,14 +151,14 @@ stochastic_mediation_npsem <- function(node_list, variable_types = NULL) {
   return(npsem)
 }
 
-################################################################################
+###############################################################################
 
 #' Stochastic Mediation Likelihood Factors
 #'
-#' @param tmle_task A \code{tmle3_Task} object specifying the data and the
-#'  NPSEM for use in constructing elements of TML estimator.
-#' @param learner_list A \code{list} specifying which learners are to apply for
-#'  each of the regression tasks required for the TML estimator.
+#' @param tmle_task A \code{\link[tmle3]{tmle3_Task}} specifying the data and
+#'  NPSEM for use in constructing components required for TML estimation.
+#' @param likelihood A trained \code{\link[tmle3]{Likelihood}}, constructed via
+#'  the \code{\link{stochastic_mediation_likelihood}} helper.
 #'
 #' @importFrom tmle3 define_lf LF_emp LF_fit Likelihood
 #'
@@ -189,45 +191,44 @@ stochastic_mediation_likelihood <- function(tmle_task, learner_list) {
 
   # construct and train likelihood
   factor_list <- list(W_factor, A_factor, Y_factor)
-
   likelihood_def <- tmle3::Likelihood$new(factor_list)
   likelihood <- likelihood_def$train(tmle_task)
   return(likelihood)
 }
 
-################################################################################
+###############################################################################
 
 #' Make task for derived likelihood factor e(A,W)
 #'
-#' @param tmle_task A \code{tmle3_Task} object specifying the data and the
-#'   NPSEM for use in constructing elements of TML estimator.
-#' @param likelihood A trained \code{Likelihood} object from \pkg{tmle3},
-#'  constructed via the helper function \code{stochastic_mediation_likelihood}.
+#' @param tmle_task A \code{\link[tmle3]{tmle3_Task}} specifying the data and
+#'  NPSEM for use in constructing components required for TML estimation.
+#' @param likelihood A trained \code{\link[tmle3]{Likelihood}}, constructed via
+#'  the \code{\link{stochastic_mediation_likelihood}} helper.
 #'
 #' @importFrom sl3 sl3_Task
 #'
 #' @keywords internal
 make_e_task <- function(tmle_task, likelihood) {
-  e_data <- tmle_task$internal_data
   e_task <- sl3::sl3_Task$new(
-    data = e_data,
+    data = tmle_task$internal_data,
     outcome = tmle_task$npsem[["A"]]$variables,
     covariates = c(
       tmle_task$npsem[["Z"]]$variables,
       tmle_task$npsem[["W"]]$variables
-    )
+    ),
+    folds = tmle_task$folds
   )
   return(e_task)
 }
 
-################################################################################
+###############################################################################
 
 #' Make task for derived likelihood factor phi(W)
 #'
-#' @param tmle_task A \code{tmle3_Task} object specifying the data and the
-#'  NPSEM for use in constructing elements of TML estimator.
-#' @param likelihood A trained \code{Likelihood} object from \code{tmle3},
-#'  constructed via the helper function \code{stochastic_mediation_likelihood}.
+#' @param tmle_task A \code{\link[tmle3]{tmle3_Task}} specifying the data and
+#'  NPSEM for use in constructing components required for TML estimation.
+#' @param likelihood A trained \code{\link[tmle3]{Likelihood}}, constructed via
+#'  the \code{\link{stochastic_mediation_likelihood}} helper.
 #'
 #' @importFrom data.table as.data.table data.table setnames
 #' @importFrom uuid UUIDgenerate
@@ -252,19 +253,21 @@ make_phi_task <- function(tmle_task, likelihood) {
   m0 <- likelihood$get_likelihood(control_task, "Y")
   m_diff <- m1 - m0
 
-  # create regression task for pseudo-outcome and baseline covariates
+  # create data for pseudo-outcome regression on baseline covariates
   phi_data <- data.table::as.data.table(list(
-    m_diff = m_diff,
+    m_pseudo = m_diff,
     tmle_task$get_tmle_node("W")
   ))
-  data.table::setnames(phi_data, c("m_diff", tmle_task$npsem[["W"]]$variables))
+  data.table::setnames(phi_data,
+                       c("m_pseudo", tmle_task$npsem[["W"]]$variables))
 
-  # NOTE: TODO: need to pass in fold structure
+  # create task while preserving original fold structure from input task
   phi_task <- sl3::sl3_Task$new(
     data = phi_data,
-    outcome = "m_diff",
+    outcome = "m_pseudo",
     covariates = tmle_task$npsem[["W"]]$variables,
-    outcome_type = "continuous"
+    outcome_type = "continuous",
+    folds = tmle_task$folds
   )
   return(phi_task)
 }
