@@ -37,27 +37,27 @@ The `medshift` R package is designed to provide facilities for estimating a
 parameter that arises in a decomposition of the population intervention causal
 effect into the (in)direct effects under stochastic interventions in the setting
 of mediation analysis. `medshift` is designed as an implementation to accompany
-the methodology described in @diaz2019causal. Implemented estimators include the
+the methodology described in @diaz2020causal. Implemented estimators include the
 classical substitution (G-computation) estimator, an inverse probability
-weighted (IPW) estimator, an efficient one-step (AIPW) estimator using
-cross-fitting [@pfanzagl1985contributions; @zheng2011cross;
-@chernozhukov2018double], and a one-step cross-validated targeted minimum
-loss (TML) estimator based on the method of universal least favorable submodels
-[@vdl2011targeted; @zheng2011cross; @vdl2016onestep]. `medshift` integrates with
-the [`sl3` R package](https://github.com/tlverse/sl3) [@coyle2018sl3] to allow
-constructed estimators to leverage machine learning and implements its TML
-estimator via the architecture exposed by the [`tmle3` R
+weighted (IPW) estimator, an efficient one-step estimator using cross-fitting
+[@pfanzagl1985contributions; @zheng2011cross; @chernozhukov2018double], and a
+cross-validated targeted minimum loss (TML) estimator based on the method of
+universal least favorable submodels [@vdl2011targeted; @zheng2011cross;
+@vdl2016onestep]. `medshift` integrates with the [`sl3` R
+package](https://github.com/tlverse/sl3) [@coyle2020sl3] to allow constructed
+estimators to leverage machine learning and implements its TML estimator via
+the architecture exposed by the [`tmle3` R
 package](https://github.com/tlverse/tmle3).
 
 ---
 
 ## Installation
 
-Install the most recent _stable release_ from GitHub via
-[`devtools`](https://www.rstudio.com/products/rpackages/devtools/):
+Install the _most recent version_ from the `master` branch on GitHub via
+[`remotes`](https://CRAN.R-project.org/package=remotes):
 
 ```{r gh-master-installation, eval=FALSE}
-devtools::install_github("nhejazi/medshift")
+remotes::install_github("nhejazi/medshift")
 ```
 
 ---
@@ -132,40 +132,41 @@ prior to submitting a pull request.
 
 After using the `medshift` R package, please cite the following:
 
-        @article{diaz2019causal,
+        @article{diaz2020causal,
           title={Causal mediation analysis for stochastic interventions},
           author={D{\'\i}az, Iv{\'a}n and Hejazi, Nima S},
-          year={2019},
-          url = {https://arxiv.org/abs/1901.02776},
-          doi = {},
-          journal={arxiv},
+          year={2020},
+          url = {https://doi.org/10.1111/rssb.12362},
+          doi = {10.1111/rssb.12362},
+          journal={Journal of the Royal Statistical Society: Series B
+            (Statistical Methodology)},
           volume={},
           number={},
           pages={},
-          publisher={}
+          publisher={Wiley Online Library}
         }
 
-        @manual{hejazi2019medshift,
+        @manual{hejazi2020medshift,
           author = {Hejazi, Nima S and D{\'\i}az, Iv{\'a}n},
           title = {{medshift}: Causal mediation analysis for stochastic
             interventions},
-          year  = {2019},
+          year  = {2020},
           url = {https://github.com/nhejazi/medshift},
-          note = {R package version 0.1.1}
+          note = {R package version 0.1.3}
         }
 
 ---
 
 ## License
 
-&copy; 2018-2019 [Nima S. Hejazi](https://nimahejazi.org)
+&copy; 2018-2020 [Nima S. Hejazi](https://nimahejazi.org)
 
 The contents of this repository are distributed under the MIT license. See below
 for details:
 ```
 MIT License
 
-Copyright (c) 2018-2019 Nima S. Hejazi
+Copyright (c) 2018-2020 Nima S. Hejazi
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -8,10 +8,10 @@ compute_Dzw(g_output, m_output)
 }
 \arguments{
 \item{g_output}{Object containing results from fitting the propensity score
-regression, as produced by a call to \code{fit_g_mech}.}
+regression, as produced by a call to \code{\link{fit_g_mech}}.}
 
 \item{m_output}{Object containing results from fitting the outcome
-regression, as produced by a call to \code{fit_m_mech}.}
+regression, as produced by a call to \code{\link{fit_m_mech}}.}
 }
 \description{
 Construct joint Z-W component of efficient influence function

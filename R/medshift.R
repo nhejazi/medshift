@@ -8,6 +8,11 @@
 #'  similar corresponding to a set of mediators (on the causal pathway between
 #'  the intervention A and the outcome Y).
 #' @param Y A \code{numeric} vector corresponding to an outcome variable.
+#' @param ids A \code{numeric} vector of observation-level IDs, allowing for
+#'  observational units to be related through a hierarchical structure. The
+#'  default is to assume all units are IID. When repeated IDs are included,
+#'  both the cross-validation procedures used for estimation and inferential
+#'  procedures respect these IDs.
 #' @param delta A \code{numeric} value indicating the degree of shift in the
 #'  intervention to be used in defining the causal quantity of interest. In the
 #'  case of binary interventions, this takes the form of an incremental
@@ -56,6 +61,7 @@ medshift <- function(W,
                      A,
                      Z,
                      Y,
+                     ids = seq(1, length(Y)),
                      delta,
                      g_learners =
                        sl3::Lrnr_glm_fast$new(family = stats::binomial()),
@@ -82,14 +88,14 @@ medshift <- function(W,
   assertthat::assert_that(delta > 0 && delta < Inf)
 
   # construct input data structure
-  data <- data.table::as.data.table(cbind(Y, Z, A, W))
+  data <- data.table::as.data.table(cbind(Y, Z, A, W, ids))
   w_names <- paste("W", seq_len(dim(data.table::as.data.table(W))[2]),
     sep = "_"
   )
   z_names <- paste("Z", seq_len(dim(data.table::as.data.table(Z))[2]),
     sep = "_"
   )
-  data.table::setnames(data, c("Y", z_names, "A", w_names))
+  data.table::setnames(data, c("Y", z_names, "A", w_names, "ids"))
 
   if (estimator == "substitution") {
     # SUBSTITUTION ESTIMATOR
@@ -131,6 +137,7 @@ medshift <- function(W,
     est_out <- tmle3::tmle3(tmle_spec, data, node_list, learner_list)
   }
 
+  browser()
   # lazily create output as S3 class, except for tmle3 output
   if (estimator != "tmle") {
     class(est_out) <- "medshift"

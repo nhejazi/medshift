@@ -8,11 +8,11 @@ compute_ipw(g_output, e_output, idx_treat, idx_cntrl)
 }
 \arguments{
 \item{g_output}{Object containing results from fitting the propensity score
-regression, as produced by a call to \code{fit_g_mech}.}
+regression, as produced by a call to \code{\link{fit_g_mech}}.}
 
 \item{e_output}{Object containing results from fitting the propensity score
 regression while conditioning on mediators, as produced by a call to
-\code{fit_e_mech}.}
+\code{\link{fit_e_mech}}.}
 
 \item{idx_treat}{A \code{numeric} vector providing the indices corresponding
 to units that received treatment (A = 1), for a binary intervention.}

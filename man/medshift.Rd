@@ -4,9 +4,10 @@
 \alias{medshift}
 \title{Nonparametric estimation of the population intervention (in)direct effects}
 \usage{
-medshift(W, A, Z, Y, delta, g_learners = sl3::Lrnr_glm_fast$new(family =
-  stats::binomial()), e_learners = sl3::Lrnr_glm_fast$new(family =
-  stats::binomial()), m_learners = sl3::Lrnr_glm_fast$new(),
+medshift(W, A, Z, Y, ids = seq(1, length(Y)), delta,
+  g_learners = sl3::Lrnr_glm_fast$new(family = stats::binomial()),
+  e_learners = sl3::Lrnr_glm_fast$new(family = stats::binomial()),
+  m_learners = sl3::Lrnr_glm_fast$new(),
   phi_learners = sl3::Lrnr_glm_fast$new(), estimator = c("onestep", "tmle",
   "substitution", "reweighted"), estimator_args = list(cv_folds = 10,
   max_iter = 10000, step_size = 1e-06))
@@ -23,6 +24,12 @@ similar corresponding to a set of mediators (on the causal pathway between
 the intervention A and the outcome Y).}
 
 \item{Y}{A \code{numeric} vector corresponding to an outcome variable.}
+
+\item{ids}{A \code{numeric} vector of observation-level IDs, allowing for
+observational units to be related through a hierarchical structure. The
+default is to assume all units are IID. When repeated IDs are included,
+both the cross-validation procedures used for estimation and inferential
+procedures respect these IDs.}
 
 \item{delta}{A \code{numeric} value indicating the degree of shift in the
 intervention to be used in defining the causal quantity of interest. In the
