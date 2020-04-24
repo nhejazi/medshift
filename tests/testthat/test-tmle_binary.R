@@ -8,9 +8,9 @@ library(tmle3)
 set.seed(7128816)
 delta_ipsi <- 0.5
 
-################################################################################
+###############################################################################
 # setup learners for the nuisance parameters
-################################################################################
+###############################################################################
 
 # instantiate some learners
 mean_lrnr <- Lrnr_mean$new()
@@ -143,10 +143,11 @@ sub_fit <- medshift(
 summary(sub_fit)
 
 # test --- what exactly?
-test_that("TML estimate...", {
+test_that("TML estimate matches one-step estimate closely", {
+  expect_equal(os_fit$theta, tmle_fit$summary$tmle_est, tol = 1e-2)
 })
 
-################################################################################
+###############################################################################
 if (FALSE) {
   get_sim_truth <- function(n_obs = 1e7, # number of observations
                               n_w = 3, # number of baseline covariates

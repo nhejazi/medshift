@@ -3,7 +3,7 @@
 S3method(confint,medshift)
 S3method(print,medshift)
 S3method(summary,medshift)
-export(LF_exptilt_ipsi)
+export(LF_ipsi)
 export(Param_medshift)
 export(medshift)
 export(test_de)

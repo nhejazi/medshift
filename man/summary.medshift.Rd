@@ -8,8 +8,8 @@
 }
 \arguments{
 \item{object}{An object of class \code{medshift}, as produced by invoking
-the function \code{tmle_medshift}, for which a confidence interval is to be
-computed.}
+the function \code{\link{medshift}}, for which a confidence interval is to
+be constructed.}
 
 \item{...}{Other arguments. Not currently used.}
 
@@ -17,5 +17,5 @@ computed.}
 interval to be computed.}
 }
 \description{
-Print a convenient summary for objects of \code{S3} class \code{medshiftx}.
+Print a convenient summary for objects of \code{S3} class \code{medshift}.
 }

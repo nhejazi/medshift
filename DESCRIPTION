@@ -1,6 +1,6 @@
 Package: medshift
 Title: Causal mediation analysis for stochastic interventions
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: c(
     person("Nima", "Hejazi", email = "nh@nimahejazi.org",
            role = c("aut", "cre", "cph"),
@@ -17,15 +17,15 @@ Authors@R: c(
   )
 Maintainer: Nima Hejazi <nh@nimahejazi.org>
 Description: Estimators of a parameter arising in the decomposition of the
-    population intervention causal effect of stochastic interventions under
-    mediation analysis, including one-step augmented inverse probability
-    weighted (AIPW), re-weighting (IPW), and substitution estimators. This
-    parameter constitutes one of two parts of the population intervention
-    (in)direct effect in the mediation setting with stochastic interventions,
-    thus these estimators may be used in constructing assessing the (in)direct
-    effect under stochastic treatment regimes, including incremental propensity
-    score interventions and standard location shifts of the intervention (Díaz
-    and Hejazi; 2019 (submitted); <https://arxiv.org/abs/1901.02776>).
+    population intervention (in)direct effect of stochastic interventions in
+    causal mediation analysis, including efficient one-step, targeted minimum
+    loss (TML), re-weighting (IPW), and substitution estimators. The parameter
+    estimated constitutes a part of each of the population intervention
+    (in)direct effects. These estimators may be used in assessing population
+    intervention (in)direct effects under stochastic treatment regimes,
+    including incremental propensity score interventions and modified treatment
+    policies. The methodology was first discussed by I Díaz and NS Hejazi
+    (2020) <doi:10.1111/rssb.12362>.
 Depends: R (>= 3.2.0)
 Imports:
     R6,
@@ -51,10 +51,6 @@ Suggests:
     xgboost,
     mma
 Remotes:
-    github::osofr/simcausal@master,
-    github::osofr/condensier@master,
-    github::tlverse/hal9001@master,
-    github::tlverse/origami@master,
     github::tlverse/sl3@master,
     github::tlverse/tmle3@master
 License: MIT + file LICENSE
@@ -63,4 +59,5 @@ BugReports: https://github.com/nhejazi/medshift/issues
 Encoding: UTF-8
 LazyData: true
 VignetteBuilder: knitr
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.0
+Roxygen: list(markdown = TRUE, old_usage = TRUE, r6 = FALSE)

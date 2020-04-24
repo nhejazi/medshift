@@ -23,7 +23,7 @@ intervention to be used in defining the causal quantity of interest. In the
 case of binary interventions, this takes the form of an incremental
 propensity score shift, acting as a multiplier of the probability with which
 a given observational unit receives the intervention (EH Kennedy, 2018,
-JASA; <doi:10.1080/01621459.2017.1422737>).}
+JASA; \url{doi:10.1080/01621459.2017.1422737}).}
 
 \item{g_learners}{A \code{Stack} object, or other learner class (inheriting
 from \code{Lrnr_base}), containing a single or set of instantiated learners
@@ -44,7 +44,9 @@ i.e., m(A, Z, W).}
 from \code{Lrnr_base}), containing a single or set of instantiated learners
 from the \code{sl3} package, to be used in fitting a reduced regression for
 computing the efficient one-step estimator, i.e., phi(W) = E[m(A = 1, Z, W)
-- m(A = 0, Z, W) | W).}
+\itemize{
+\item m(A = 0, Z, W) | W).
+}}
 
 \item{w_names}{A \code{character} vector of the names of the columns that
 correspond to baseline covariates (W). The input for this argument is

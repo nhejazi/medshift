@@ -2,15 +2,14 @@
 % Please edit documentation in R/medshift.R
 \name{medshift}
 \alias{medshift}
-\title{Nonparametric estimation of decomposition term for causal mediation analysis
-with stochastic interventions}
+\title{Nonparametric estimation of the population intervention (in)direct effects}
 \usage{
 medshift(W, A, Z, Y, delta, g_learners = sl3::Lrnr_glm_fast$new(family =
   stats::binomial()), e_learners = sl3::Lrnr_glm_fast$new(family =
   stats::binomial()), m_learners = sl3::Lrnr_glm_fast$new(),
-  phi_learners = sl3::Lrnr_glm_fast$new(), estimator = c("onestep",
-  "tmle", "substitution", "reweighted"), estimator_args = list(cv_folds =
-  10, max_iter = 10000, step_size = 1e-06))
+  phi_learners = sl3::Lrnr_glm_fast$new(), estimator = c("onestep", "tmle",
+  "substitution", "reweighted"), estimator_args = list(cv_folds = 10,
+  max_iter = 10000, step_size = 1e-06))
 }
 \arguments{
 \item{W}{A \code{matrix}, \code{data.frame}, or similar corresponding to a
@@ -28,47 +27,45 @@ the intervention A and the outcome Y).}
 \item{delta}{A \code{numeric} value indicating the degree of shift in the
 intervention to be used in defining the causal quantity of interest. In the
 case of binary interventions, this takes the form of an incremental
-propensity score shift, acting as a multiplier of the probability with which
-a given observational unit receives the intervention (EH Kennedy, 2018,
-JASA; <doi:10.1080/01621459.2017.1422737>).}
+propensity score shift, acting as a multiplier of the odds with which a
+unit receives the intervention (EH Kennedy, 2018, JASA;
+\url{doi:10.1080/01621459.2017.1422737}).}
 
-\item{g_learners}{A \code{Stack} object, or other learner class (inheriting
-from \code{Lrnr_base}), containing a single or set of instantiated learners
-from the \code{sl3} package, used in fitting a model for the propensity
+\item{g_learners}{A \code{\link[sl3]{Stack}} (or other learner class that
+inherits from \code{\link[sl3]{Lrnr_base}}), containing a single or set of
+instantiated learners from \pkg{sl3}, to be used in fitting the propensity
 score, i.e., g = P(A | W).}
 
-\item{e_learners}{A \code{Stack} object, or other learner class (inheriting
-from \code{Lrnr_base}), containing a single or set of instantiated learners
-from the \code{sl3} package, to be used in fitting a cleverly parameterized
-propensity score that includes the mediators, i.e., e = P(A | Z, W).}
+\item{e_learners}{A \code{\link[sl3]{Stack}} (or other learner class that
+inherits from \code{\link[sl3]{Lrnr_base}}), containing a single or set of
+instantiated learners from \pkg{sl3}, to be used in fitting a propensity
+score that conditions on the mediators, i.e., e = P(A | Z, W).}
 
-\item{m_learners}{A \code{Stack} object, or other learner class (inheriting
-from \code{Lrnr_base}), containing a single or set of instantiated learners
-from the \code{sl3} package, to be used in fitting the outcome regression,
-i.e., m(A, Z, W).}
+\item{m_learners}{A \code{\link[sl3]{Stack}} (or other learner class that
+inherits from \code{\link[sl3]{Lrnr_base}}), containing a single or set of
+instantiated learners from \pkg{sl3}, to be used in fitting the outcome
+regression, i.e., m(A, Z, W).}
 
-\item{phi_learners}{A \code{Stack} object, or other learner class (inheriting
-from \code{Lrnr_base}), containing a single or set of instantiated learners
-from the \code{sl3} package, to be used in fitting a reduced regression
-useful for computing the efficient one-step estimator, i.e., phi(W) =
-E[m(A = 1, Z, W) - m(A = 0, Z, W) | W).}
+\item{phi_learners}{A \code{\link[sl3]{Stack}} (or other learner class that
+inherits from \code{\link[sl3]{Lrnr_base}}), containing a single or set of
+instantiated learners from \pkg{sl3}, to be used in a regression of a
+pseudo-outcome on the baseline covariates, i.e.,
+phi(W) = E[m(A = 1, Z, W) - m(A = 0, Z, W) | W).}
 
 \item{estimator}{The desired estimator of the natural direct effect to be
 computed. Currently, choices are limited to a substitution estimator, a
-re-weighted estimator, and an efficient one-step estimator. The interested
-user should consider consulting Díaz & Hejazi (2019+) for a comparative
-investigation of each of these estimators.}
+re-weighted estimator, a one-step estimator, and a targeted minimum loss
+estimator.}
 
 \item{estimator_args}{A \code{list} of extra arguments to be passed (via
 \code{...}) to the function call for the specified estimator. The default
-is so chosen as to allow the number of folds used in computing the AIPW
+is so chosen as to allow the number of folds used in computing the one-step
 estimator to be easily tweaked. Refer to the documentation for functions
 \code{\link{est_onestep}}, \code{\link{est_ipw}}, and
 \code{\link{est_substitution}} for details on what other arguments may be
 specified through this mechanism. For the option \code{"tmle"}, there is
-heavy reliance on the architecture provided by the \code{tmle3} package.}
+heavy reliance on the architecture provided by \pkg{tmle3}.}
 }
 \description{
-Nonparametric estimation of decomposition term for causal mediation analysis
-with stochastic interventions
+Nonparametric estimation of the population intervention (in)direct effects
 }

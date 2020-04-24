@@ -27,7 +27,7 @@ shift in the intervention to be used in defining the causal quantity of
 interest. In the case of binary interventions, this takes the form of an
 incremental propensity score shift, acting as a multiplier of probabilities
 with which a given observational unit receives the intervention (EH Kennedy,
-2018, JASA; <doi:10.1080/01621459.2017.1422737>).}
+2018, JASA; \url{doi:10.1080/01621459.2017.1422737}).}
 
 \item{mult_type}{A \code{character} identifying the type of multipliers to be
 used in the multiplier bootstrap. Choices are limited to \code{"rademacher"}
