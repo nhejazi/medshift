@@ -12,5 +12,5 @@
 \item{...}{Other options (not currently used).}
 }
 \description{
-The \code{print} method for objects of class \code{medshiftx}.
+The \code{print} method for objects of class \code{medshift}.
 }

@@ -8,18 +8,16 @@
 }
 \arguments{
 \item{object}{An object of class \code{medshift}, as produced by invoking
-the function \code{tmle_medshift}, for which a confidence interval is to be
-computed.}
+\code{\link{medshift}}, for which a confidence interval is to be computed.}
 
 \item{parm}{A \code{numeric} vector indicating indices of \code{object$est}
 for which to return confidence intervals.}
 
-\item{level}{A \code{numeric} indicating the level of the confidence interval
-to be computed.}
+\item{level}{A \code{numeric} indicating the confidence interval level.}
 
 \item{...}{Other arguments. Not currently used.}
 }
 \description{
-Compute confidence intervals for objects of class \code{medshiftx}, which
-contain estimates produced by \code{medshift}.
+Compute confidence intervals for objects of class \code{medshift}, which
+contain estimates produced by \code{\link{medshift}}.
 }

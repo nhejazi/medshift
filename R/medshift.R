@@ -22,7 +22,7 @@
 #'   inherits from \code{\link[sl3]{Lrnr_base}}), containing a single or set of
 #'   instantiated learners from \pkg{sl3}, to be used in fitting a propensity
 #'   score that conditions on the mediators, i.e., e = P(A | Z, W).
-#' @param e_learners A \code{\link[sl3]{Stack}} (or other learner class that
+#' @param m_learners A \code{\link[sl3]{Stack}} (or other learner class that
 #'   inherits from \code{\link[sl3]{Lrnr_base}}), containing a single or set of
 #'   instantiated learners from \pkg{sl3}, to be used in fitting the outcome
 #'   regression, i.e., m(A, Z, W).

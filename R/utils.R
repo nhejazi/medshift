@@ -1,15 +1,13 @@
 #' Confidence Intervals for Stochastic Mediation Parameters
 #'
-#' Compute confidence intervals for objects of class \code{medshiftx}, which
-#' contain estimates produced by \code{medshift}.
+#' Compute confidence intervals for objects of class \code{medshift}, which
+#' contain estimates produced by \code{\link{medshift}}.
 #'
 #' @param object An object of class \code{medshift}, as produced by invoking
-#'  the function \code{tmle_medshift}, for which a confidence interval is to be
-#'  computed.
+#'  \code{\link{medshift}}, for which a confidence interval is to be computed.
 #' @param parm A \code{numeric} vector indicating indices of \code{object$est}
 #'  for which to return confidence intervals.
-#' @param level A \code{numeric} indicating the level of the confidence interval
-#'  to be computed.
+#' @param level A \code{numeric} indicating the confidence interval level.
 #' @param ... Other arguments. Not currently used.
 #'
 #' @importFrom stats qnorm
@@ -18,7 +16,6 @@
 #' @method confint medshift
 #'
 #' @export
-#
 confint.medshift <- function(object,
                              parm = seq_len(object$psi),
                              level = 0.95,
@@ -47,11 +44,11 @@ confint.medshift <- function(object,
 
 #' Summary for Stochastic Mediation Parameter Objects
 #'
-#' Print a convenient summary for objects of \code{S3} class \code{medshiftx}.
+#' Print a convenient summary for objects of \code{S3} class \code{medshift}.
 #'
 #' @param object An object of class \code{medshift}, as produced by invoking
-#'  the function \code{tmle_medshift}, for which a confidence interval is to be
-#'  computed.
+#'  the function \code{\link{medshift}}, for which a confidence interval is to
+#'  be constructed.
 #' @param ... Other arguments. Not currently used.
 #' @param ci_level A \code{numeric} indicating the level of the confidence
 #'  interval to be computed.
@@ -61,7 +58,6 @@ confint.medshift <- function(object,
 #' @method summary medshift
 #'
 #' @export
-#
 summary.medshift <- function(object,
                              ...,
                              ci_level = 0.95) {
@@ -92,7 +88,7 @@ summary.medshift <- function(object,
 
 #' Print Method for Class medshift
 #'
-#' The \code{print} method for objects of class \code{medshiftx}.
+#' The \code{print} method for objects of class \code{medshift}.
 #'
 #' @param x An object of class \code{medshift}.
 #' @param ... Other options (not currently used).
@@ -100,7 +96,6 @@ summary.medshift <- function(object,
 #' @method print medshift
 #'
 #' @export
-#
 print.medshift <- function(x, ...) {
   # inference is currently limited to the one-step efficient estimator
   # TODO: allow use for TML estimators once impelemented
@@ -118,12 +113,11 @@ print.medshift <- function(x, ...) {
 #' Bounds extreme values to numerical (machine) precision, for use with
 #' sensitive quantities like estimated propensity scores.
 #'
-#' @param vals A \code{numeric} vector of values in the interval [0, 1].
+#' @param vals A \code{numeric} vector of values in the closed unit interval.
 #'
 #' @importFrom assertthat assert_that
 #'
 #' @keywords internal
-#
 bound_precision <- function(vals) {
   assertthat::assert_that(!(max(vals) >= 1 | min(vals) <= 0))
   vals[vals == 0] <- .Machine$double.neg.eps
@@ -137,15 +131,14 @@ bound_precision <- function(vals) {
 #'
 #' Bounds estimated propensity score values to be within a specified range.
 #'
-#' @param vals A \code{numeric} vector of values in the interval [0, 1].
+#' @param vals A \code{numeric} vector of values in the closed unit interval.
 #' @param bounds A \code{numeric} vector containing two values, the first being
 #'  the minimum allowable value and the second being the maximum allowable for
-#'  values appearing in the vector \code{vals} (the previous argument).
+#'  values appearing in the vector \code{vals}.
 #'
 #' @importFrom assertthat assert_that
 #'
 #' @keywords internal
-#
 bound_propensity <- function(vals, bounds = c(0.01, 0.99)) {
   assertthat::assert_that(!(max(vals) >= 1 | min(vals) <= 0))
   vals[vals < bounds[1]] <- bounds[1]

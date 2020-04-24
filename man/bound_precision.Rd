@@ -7,7 +7,7 @@
 bound_precision(vals)
 }
 \arguments{
-\item{vals}{A \code{numeric} vector of values in the interval \link{0, 1}.}
+\item{vals}{A \code{numeric} vector of values in the closed unit interval.}
 }
 \description{
 Bounds extreme values to numerical (machine) precision, for use with
