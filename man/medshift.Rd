@@ -5,12 +5,10 @@
 \title{Nonparametric estimation of the population intervention (in)direct effects}
 \usage{
 medshift(W, A, Z, Y, ids = seq(1, length(Y)), delta,
-  g_learners = sl3::Lrnr_glm_fast$new(family = stats::binomial()),
-  e_learners = sl3::Lrnr_glm_fast$new(family = stats::binomial()),
-  m_learners = sl3::Lrnr_glm_fast$new(),
-  phi_learners = sl3::Lrnr_glm_fast$new(), estimator = c("onestep", "tmle",
-  "substitution", "reweighted"), estimator_args = list(cv_folds = 10,
-  max_iter = 10000, step_size = 1e-06))
+  g_learners = sl3::Lrnr_glm$new(), e_learners = sl3::Lrnr_glm$new(),
+  m_learners = sl3::Lrnr_glm$new(), phi_learners = sl3::Lrnr_glm$new(),
+  estimator = c("onestep", "tmle", "substitution", "reweighted"),
+  estimator_args = list(cv_folds = 10, max_iter = 10000, step_size = 1e-06))
 }
 \arguments{
 \item{W}{A \code{matrix}, \code{data.frame}, or similar corresponding to a

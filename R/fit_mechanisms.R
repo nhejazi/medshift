@@ -32,10 +32,10 @@ fit_g_mech <- function(data, valid_data = NULL,
   g_task <- sl3::sl3_Task$new(
     data = data,
     covariates = w_names,
-    outcome = "A"
+    outcome = "A",
+    id = "ids"
   )
 
-  browser()
   # fit and predict
   g_fit_stack <- learners$train(g_task)
 
@@ -52,7 +52,8 @@ fit_g_mech <- function(data, valid_data = NULL,
   g_task_pred <- sl3::sl3_Task$new(
     data = data_pred,
     covariates = w_names,
-    outcome = "A"
+    outcome = "A",
+    id = "ids"
   )
   g_pred_A1 <- g_fit_stack$predict(g_task_pred)
 
@@ -122,7 +123,8 @@ fit_e_mech <- function(data, valid_data = NULL,
   e_task <- sl3::sl3_Task$new(
     data = data,
     covariates = c(z_names, w_names),
-    outcome = "A"
+    outcome = "A",
+    id = "ids"
   )
 
   # fit and predict
@@ -141,7 +143,8 @@ fit_e_mech <- function(data, valid_data = NULL,
   e_task_pred <- sl3::sl3_Task$new(
     data = data_pred,
     covariates = c(z_names, w_names),
-    outcome = "A"
+    outcome = "A",
+    id = "ids"
   )
 
   # predict from trained model on counterfactual data
@@ -200,7 +203,8 @@ fit_m_mech <- function(data, valid_data = NULL,
   m_task <- sl3::sl3_Task$new(
     data = data,
     covariates = c("A", z_names, w_names),
-    outcome = "Y"
+    outcome = "Y",
+    id = "ids"
   )
 
   # fit and predict
@@ -223,7 +227,8 @@ fit_m_mech <- function(data, valid_data = NULL,
     m_task_train_A1 <- sl3::sl3_Task$new(
       data = data_train_A1,
       covariates = c("A", z_names, w_names),
-      outcome = "Y"
+      outcome = "Y",
+      id = "ids"
     )
     m_pred_train_A1 <- m_fit_stack$predict(m_task_train_A1)
 
@@ -233,7 +238,8 @@ fit_m_mech <- function(data, valid_data = NULL,
     m_task_train_A0 <- sl3::sl3_Task$new(
       data = data_train_A0,
       covariates = c("A", z_names, w_names),
-      outcome = "Y"
+      outcome = "Y",
+      id = "ids"
     )
     m_pred_train_A0 <- m_fit_stack$predict(m_task_train_A0)
   }
@@ -243,7 +249,8 @@ fit_m_mech <- function(data, valid_data = NULL,
   m_task_A1 <- sl3::sl3_Task$new(
     data = data_A1,
     covariates = c("A", z_names, w_names),
-    outcome = "Y"
+    outcome = "Y",
+    id = "ids"
   )
   m_pred_A1 <- m_fit_stack$predict(m_task_A1)
 
@@ -252,7 +259,8 @@ fit_m_mech <- function(data, valid_data = NULL,
   m_task_A0 <- sl3::sl3_Task$new(
     data = data_A0,
     covariates = c("A", z_names, w_names),
-    outcome = "Y"
+    outcome = "Y",
+    id = "ids"
   )
   m_pred_A0 <- m_fit_stack$predict(m_task_A0)
 
@@ -317,13 +325,15 @@ fit_phi_mech <- function(train_data, valid_data, learners, m_output,
   # construct data structure for use with task objects
   phi_train_data <- data.table::data.table(
     m_diff = m_pred_train_diff,
-    train_data[, ..w_names]
+    train_data[, ..w_names],
+    ids = train_data[["ids"]]
   )
   phi_train_task <- sl3::sl3_Task$new(
     data = phi_train_data,
     covariates = w_names,
     outcome = "m_diff",
-    outcome_type = "continuous"
+    outcome_type = "continuous",
+    id = "ids"
   )
 
   # fit stack of learners to learn the regression model for phi
@@ -338,13 +348,15 @@ fit_phi_mech <- function(train_data, valid_data, learners, m_output,
   # construct data structure for use with task objects
   phi_valid_data <- data.table::data.table(
     m_diff = m_pred_valid_diff,
-    valid_data[, ..w_names]
+    valid_data[, ..w_names],
+    ids = valid_data[["ids"]]
   )
   phi_valid_task <- sl3::sl3_Task$new(
     data = phi_valid_data,
     covariates = w_names,
     outcome = "m_diff",
-    outcome_type = "continuous"
+    outcome_type = "continuous",
+    id = "ids"
   )
 
   # predict and return for validation set only

@@ -2,7 +2,7 @@
 % Please edit documentation in R/estim_onestep.R
 \name{est_onestep}
 \alias{est_onestep}
-\title{Estimating equation one-step (efficient) estimator}
+\title{Efficient One-Step Estimator}
 \usage{
 est_onestep(data, delta, g_learners, e_learners, m_learners, phi_learners,
   w_names, z_names, cv_folds = 10)
@@ -57,5 +57,5 @@ for compatibility with \code{\link[origami]{make_folds}}, this value must
 be greater than or equal to 2; the default is to create 10 folds.}
 }
 \description{
-Estimating equation one-step (efficient) estimator
+Efficient One-Step Estimator
 }

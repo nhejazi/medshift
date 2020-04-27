@@ -51,9 +51,8 @@
 #'
 #' @importFrom data.table as.data.table setnames
 #' @importFrom origami make_folds cross_validate
-#' @importFrom sl3 Lrnr_glm_fast
+#' @importFrom sl3 Lrnr_glm
 #' @importFrom tmle3 tmle3
-#' @importFrom stats binomial
 #' @importFrom assertthat assert_that
 #'
 #' @export
@@ -63,12 +62,10 @@ medshift <- function(W,
                      Y,
                      ids = seq(1, length(Y)),
                      delta,
-                     g_learners =
-                       sl3::Lrnr_glm_fast$new(family = stats::binomial()),
-                     e_learners =
-                       sl3::Lrnr_glm_fast$new(family = stats::binomial()),
-                     m_learners = sl3::Lrnr_glm_fast$new(),
-                     phi_learners = sl3::Lrnr_glm_fast$new(),
+                     g_learners = sl3::Lrnr_glm$new(),
+                     e_learners = sl3::Lrnr_glm$new(),
+                     m_learners = sl3::Lrnr_glm$new(),
+                     phi_learners = sl3::Lrnr_glm$new(),
                      estimator = c(
                        "onestep",
                        "tmle",
@@ -84,7 +81,7 @@ medshift <- function(W,
   estimator <- match.arg(estimator)
   estimator_args <- unlist(estimator_args, recursive = FALSE)
 
-  # NOTE: procedure does _not_ support static interventions currently
+  # NOTE: procedure does _not_ support static interventions
   assertthat::assert_that(delta > 0 && delta < Inf)
 
   # construct input data structure
@@ -137,8 +134,7 @@ medshift <- function(W,
     est_out <- tmle3::tmle3(tmle_spec, data, node_list, learner_list)
   }
 
-  browser()
-  # lazily create output as S3 class, except for tmle3 output
+  # lazily create output as ad-hoc S3 class, except for tmle3 output
   if (estimator != "tmle") {
     class(est_out) <- "medshift"
   }
