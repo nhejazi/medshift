@@ -95,7 +95,8 @@ est_onestep <- function(data,
     # combine repeated EIF estimates if IDs are non-unique
     if (length(unique(data[["ids"]])) < nrow(data)) {
       estim_eif_combined <- by(estim_eif, as.numeric(data[["ids"]]), mean,
-                               simplify = FALSE)
+        simplify = FALSE
+      )
       estim_eif_reduced <- unname(do.call(c, estim_eif_combined))
       estim_onestep_var <- stats::var(estim_eif_reduced) /
         length(estim_eif_reduced)

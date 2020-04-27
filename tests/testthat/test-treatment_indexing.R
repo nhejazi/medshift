@@ -2,6 +2,7 @@ context("Indexing by treatment vector matches multiplicative indexing")
 
 library(data.table)
 library(stringr)
+library(sl3)
 set.seed(429153)
 delta <- 0.5
 
@@ -38,13 +39,18 @@ make_simulated_data <- function(n_obs = 1000, # number of observations
   Z <- cbind(Z_1, Z_2, Z_3)
 
   # create outcome as a linear function of A, W + white noise
-  Y <- Z_1 + Z_2 - Z_3 + A - 0.1 * rowSums(W)^2 + rnorm(n_obs, mean = 0, sd = 1)
+  Y <- Z_1 + Z_2 - Z_3 + A - 0.1 * rowSums(W)^2 +
+    rnorm(n_obs, mean = 0, sd = 1)
+
+  # subject-level IDs
+  ids <- seq_along(Y)
 
   # full data structure
-  data <- as.data.table(cbind(Y, Z, A, W))
+  data <- as.data.table(cbind(Y, Z, A, W, ids))
   setnames(data, c(
     "Y", paste("Z", 1:3, sep = "_"), "A",
-    paste("W", seq_len(dim(W)[2]), sep = "_")
+    paste("W", seq_len(dim(W)[2]), sep = "_"),
+    "ids"
   ))
   return(data)
 }
@@ -56,11 +62,9 @@ head(data)
 z_names <- colnames(data)[str_detect(colnames(data), "Z")]
 w_names <- colnames(data)[str_detect(colnames(data), "W")]
 
-
 # get indices of treatment and control units
 idx_treat <- which(data$A == 1)
 idx_cntrl <- which(data$A == 0)
-
 
 # just try indexing by the treatment mechanism
 g_out <- fit_g_mech(

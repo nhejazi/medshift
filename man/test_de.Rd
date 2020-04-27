@@ -5,9 +5,10 @@
 \title{Hypothesis test of direct effect with mediated stochastic interventions
 using the multiplier bootstrap}
 \usage{
-test_de(W, A, Z, Y, delta_grid = seq(from = 0.5, to = 5, by = 0.9),
-  mult_type = c("rademacher", "gaussian"), ci_level = 0.95, g_learners,
-  e_learners, m_learners, phi_learners, cv_folds = 10, n_mult = 10000)
+test_de(W, A, Z, Y, ids = seq(1, length(Y)), delta_grid = seq(from = 0.5,
+  to = 5, by = 0.9), mult_type = c("rademacher", "gaussian"),
+  ci_level = 0.95, g_learners, e_learners, m_learners, phi_learners,
+  cv_folds = 10, n_mult = 10000)
 }
 \arguments{
 \item{W}{A \code{matrix}, \code{data.frame}, or similar corresponding to a
@@ -22,51 +23,57 @@ the intervention A and the outcome Y).}
 
 \item{Y}{A \code{numeric} vector corresponding to an outcome variable.}
 
+\item{ids}{A \code{numeric} vector of observation-level IDs, allowing for
+observational units to be related through a hierarchical structure. The
+default is to assume all units are IID. When repeated IDs are included,
+both the cross-validation procedures used for estimation and inferential
+procedures respect these IDs.}
+
 \item{delta_grid}{A \code{numeric} of values giving the varous degrees of
 shift in the intervention to be used in defining the causal quantity of
 interest. In the case of binary interventions, this takes the form of an
-incremental propensity score shift, acting as a multiplier of probabilities
-with which a given observational unit receives the intervention (EH Kennedy,
+incremental propensity score shift, acting as a multiplier of the odds with
+which a given observational unit receives the intervention (EH Kennedy,
 2018, JASA; \url{doi:10.1080/01621459.2017.1422737}).}
 
-\item{mult_type}{A \code{character} identifying the type of multipliers to be
-used in the multiplier bootstrap. Choices are limited to \code{"rademacher"}
-or \code{"gaussian"}, with the default being the former.}
+\item{mult_type}{A \code{character} identifying the type of multipliers to
+be used in the multiplier bootstrap. Choices are \code{"rademacher"} or
+\code{"gaussian"}, with the default being the former.}
 
 \item{ci_level}{A \code{numeric} indicating the (1 - alpha) level of the
 simultaneous confidence band to be computed around the estimates of the
 direct effect. The error level of the test reported in the p-value returned
 is simply alpha, i.e., one less this quantity.}
 
-\item{g_learners}{A \code{Stack} object, or other learner class (inheriting
-from \code{Lrnr_base}), containing a single or set of instantiated learners
-from the \code{sl3} package, used in fitting a model for the propensity
+\item{g_learners}{A \code{\link[sl3]{Stack}} (or other learner class that
+inherits from \code{\link[sl3]{Lrnr_base}}), containing a single or set of
+instantiated learners from \pkg{sl3}, to be used in fitting the propensity
 score, i.e., g = P(A | W).}
 
-\item{e_learners}{A \code{Stack} object, or other learner class (inheriting
-from \code{Lrnr_base}), containing a single or set of instantiated learners
-from the \code{sl3} package, to be used in fitting a cleverly parameterized
-propensity score that includes the mediators, i.e., e = P(A | Z, W).}
+\item{e_learners}{A \code{\link[sl3]{Stack}} (or other learner class that
+inherits from \code{\link[sl3]{Lrnr_base}}), containing a single or set of
+instantiated learners from \pkg{sl3}, to be used in fitting a propensity
+score that conditions on the mediators, i.e., e = P(A | Z, W).}
 
-\item{m_learners}{A \code{Stack} object, or other learner class (inheriting
-from \code{Lrnr_base}), containing a single or set of instantiated learners
-from the \code{sl3} package, to be used in fitting the outcome regression,
-i.e., m(A, Z, W).}
+\item{m_learners}{A \code{\link[sl3]{Stack}} (or other learner class that
+inherits from \code{\link[sl3]{Lrnr_base}}), containing a single or set of
+instantiated learners from \pkg{sl3}, to be used in fitting the outcome
+regression, i.e., m(A, Z, W).}
 
-\item{phi_learners}{A \code{Stack} object, or other learner class
-(inheriting from \code{Lrnr_base}), containing a single or set of
-instantiated learners from the \code{sl3} package, to be used in fitting a
-reduced regression useful for computing the efficient one-step estimator,
-i.e., phi(W) = E[m(A = 1, Z, W) - m(A = 0, Z, W) | W).}
+\item{phi_learners}{A \code{\link[sl3]{Stack}} (or other learner class that
+inherits from \code{\link[sl3]{Lrnr_base}}), containing a single or set of
+instantiated learners from \pkg{sl3}, to be used in a regression of a
+pseudo-outcome on the baseline covariates, i.e.,
+phi(W) = E[m(A = 1, Z, W) - m(A = 0, Z, W) | W).}
 
-\item{cv_folds}{A \code{numeric} integer value specifying the number of folds
-to be created for cross-validation. Use of cross-validation / cross-fitting
-allows for entropy conditions on the AIPW estimator to be relaxed. Note: for
-compatibility with \code{origami::make_folds}, this value specified here
-must be greater than or equal to 2; the default is to create 10 folds.}
+\item{cv_folds}{A \code{numeric} specifying the number of folds to be
+created for cross-validation. Use of cross-validation / cross-fitting
+allows for entropy conditions on the AIPW estimator to be relaxed. Note:
+for compatibility with \code{\link[origami]{make_folds}}, this value must
+be greater than or equal to 2; the default is to create 10 folds.}
 
-\item{n_mult}{A \code{numeric} scalar giving the number of repetitions of the
-multipliers to be used in computing the multiplier bootstrap.}
+\item{n_mult}{A \code{numeric} scalar giving the number of repetitions of
+the multipliers to be used in computing the multiplier bootstrap.}
 }
 \description{
 Hypothesis test of direct effect with mediated stochastic interventions

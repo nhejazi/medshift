@@ -4,7 +4,7 @@
     <loc>https://code.nimahejazi.org/medshift/index.html</loc>
   </url>
   <url>
-    <loc>https://code.nimahejazi.org/medshift/reference/LF_exptilt_ipsi.html</loc>
+    <loc>https://code.nimahejazi.org/medshift/reference/LF_ipsi.html</loc>
   </url>
   <url>
     <loc>https://code.nimahejazi.org/medshift/reference/Param_medshift.html</loc>
@@ -56,6 +56,9 @@
   </url>
   <url>
     <loc>https://code.nimahejazi.org/medshift/reference/medshift.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/pide.html</loc>
   </url>
   <url>
     <loc>https://code.nimahejazi.org/medshift/reference/print.medshift.html</loc>

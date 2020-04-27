@@ -11,23 +11,27 @@ using the multiplier bootstrap — test_de • medshift</title>
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/readable/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/readable/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -40,7 +44,6 @@ using the multiplier bootstrap — test_de • medshift</title>
 using the multiplier bootstrap — test_de" />
 <meta property="og:description" content="Hypothesis test of direct effect with mediated stochastic interventions
 using the multiplier bootstrap" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -58,7 +61,7 @@ using the multiplier bootstrap" />
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -72,7 +75,7 @@ using the multiplier bootstrap" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">medshift</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.3</span>
       </span>
     </div>
 
@@ -102,7 +105,7 @@ using the multiplier bootstrap" />
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/nhejazi/medshift">
+  <a href="https://github.com/nhejazi/medshift/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -131,9 +134,10 @@ using the multiplier bootstrap</h1>
 using the multiplier bootstrap</p>
     </div>
 
-    <pre class="usage"><span class='fu'>test_de</span>(<span class='no'>W</span>, <span class='no'>A</span>, <span class='no'>Z</span>, <span class='no'>Y</span>, <span class='kw'>delta_grid</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='kw'>from</span> <span class='kw'>=</span> <span class='fl'>0.5</span>, <span class='kw'>to</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='fl'>0.9</span>),
-  <span class='kw'>mult_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"rademacher"</span>, <span class='st'>"gaussian"</span>), <span class='kw'>ci_level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>, <span class='no'>g_learners</span>,
-  <span class='no'>e_learners</span>, <span class='no'>m_learners</span>, <span class='no'>phi_learners</span>, <span class='kw'>cv_folds</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>n_mult</span> <span class='kw'>=</span> <span class='fl'>10000</span>)</pre>
+    <pre class="usage"><span class='fu'>test_de</span>(<span class='no'>W</span>, <span class='no'>A</span>, <span class='no'>Z</span>, <span class='no'>Y</span>, <span class='kw'>ids</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>1</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>Y</span>)), <span class='kw'>delta_grid</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='kw'>from</span> <span class='kw'>=</span> <span class='fl'>0.5</span>,
+  <span class='kw'>to</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='fl'>0.9</span>), <span class='kw'>mult_type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"rademacher"</span>, <span class='st'>"gaussian"</span>),
+  <span class='kw'>ci_level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>, <span class='no'>g_learners</span>, <span class='no'>e_learners</span>, <span class='no'>m_learners</span>, <span class='no'>phi_learners</span>,
+  <span class='kw'>cv_folds</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>n_mult</span> <span class='kw'>=</span> <span class='fl'>10000</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -159,19 +163,27 @@ the intervention A and the outcome Y).</p></td>
       <td><p>A <code>numeric</code> vector corresponding to an outcome variable.</p></td>
     </tr>
     <tr>
+      <th>ids</th>
+      <td><p>A <code>numeric</code> vector of observation-level IDs, allowing for
+observational units to be related through a hierarchical structure. The
+default is to assume all units are IID. When repeated IDs are included,
+both the cross-validation procedures used for estimation and inferential
+procedures respect these IDs.</p></td>
+    </tr>
+    <tr>
       <th>delta_grid</th>
       <td><p>A <code>numeric</code> of values giving the varous degrees of
 shift in the intervention to be used in defining the causal quantity of
 interest. In the case of binary interventions, this takes the form of an
-incremental propensity score shift, acting as a multiplier of probabilities
-with which a given observational unit receives the intervention (EH Kennedy,
-2018, JASA; &lt;doi:10.1080/01621459.2017.1422737&gt;).</p></td>
+incremental propensity score shift, acting as a multiplier of the odds with
+which a given observational unit receives the intervention (EH Kennedy,
+2018, JASA; <a href='doi:10.1080/01621459.2017.1422737'>doi:10.1080/01621459.2017.1422737</a>).</p></td>
     </tr>
     <tr>
       <th>mult_type</th>
-      <td><p>A <code>character</code> identifying the type of multipliers to be
-used in the multiplier bootstrap. Choices are limited to <code>"rademacher"</code>
-or <code>"gaussian"</code>, with the default being the former.</p></td>
+      <td><p>A <code>character</code> identifying the type of multipliers to
+be used in the multiplier bootstrap. Choices are <code>"rademacher"</code> or
+<code>"gaussian"</code>, with the default being the former.</p></td>
     </tr>
     <tr>
       <th>ci_level</th>
@@ -182,56 +194,54 @@ is simply alpha, i.e., one less this quantity.</p></td>
     </tr>
     <tr>
       <th>g_learners</th>
-      <td><p>A <code>Stack</code> object, or other learner class (inheriting
-from <code>Lrnr_base</code>), containing a single or set of instantiated learners
-from the <code>sl3</code> package, used in fitting a model for the propensity
+      <td><p>A <code><a href='https://tlverse.org/sl3/reference/Stack.html'>Stack</a></code> (or other learner class that
+inherits from <code><a href='https://tlverse.org/sl3/reference/Lrnr_base.html'>Lrnr_base</a></code>), containing a single or set of
+instantiated learners from <span class="pkg">sl3</span>, to be used in fitting the propensity
 score, i.e., g = P(A | W).</p></td>
     </tr>
     <tr>
       <th>e_learners</th>
-      <td><p>A <code>Stack</code> object, or other learner class (inheriting
-from <code>Lrnr_base</code>), containing a single or set of instantiated learners
-from the <code>sl3</code> package, to be used in fitting a cleverly parameterized
-propensity score that includes the mediators, i.e., e = P(A | Z, W).</p></td>
+      <td><p>A <code><a href='https://tlverse.org/sl3/reference/Stack.html'>Stack</a></code> (or other learner class that
+inherits from <code><a href='https://tlverse.org/sl3/reference/Lrnr_base.html'>Lrnr_base</a></code>), containing a single or set of
+instantiated learners from <span class="pkg">sl3</span>, to be used in fitting a propensity
+score that conditions on the mediators, i.e., e = P(A | Z, W).</p></td>
     </tr>
     <tr>
       <th>m_learners</th>
-      <td><p>A <code>Stack</code> object, or other learner class (inheriting
-from <code>Lrnr_base</code>), containing a single or set of instantiated learners
-from the <code>sl3</code> package, to be used in fitting the outcome regression,
-i.e., m(A, Z, W).</p></td>
+      <td><p>A <code><a href='https://tlverse.org/sl3/reference/Stack.html'>Stack</a></code> (or other learner class that
+inherits from <code><a href='https://tlverse.org/sl3/reference/Lrnr_base.html'>Lrnr_base</a></code>), containing a single or set of
+instantiated learners from <span class="pkg">sl3</span>, to be used in fitting the outcome
+regression, i.e., m(A, Z, W).</p></td>
     </tr>
     <tr>
       <th>phi_learners</th>
-      <td><p>A <code>Stack</code> object, or other learner class
-(inheriting from <code>Lrnr_base</code>), containing a single or set of
-instantiated learners from the <code>sl3</code> package, to be used in fitting a
-reduced regression useful for computing the efficient one-step estimator,
-i.e., phi(W) = E[m(A = 1, Z, W) - m(A = 0, Z, W) | W).</p></td>
+      <td><p>A <code><a href='https://tlverse.org/sl3/reference/Stack.html'>Stack</a></code> (or other learner class that
+inherits from <code><a href='https://tlverse.org/sl3/reference/Lrnr_base.html'>Lrnr_base</a></code>), containing a single or set of
+instantiated learners from <span class="pkg">sl3</span>, to be used in a regression of a
+pseudo-outcome on the baseline covariates, i.e.,
+phi(W) = E[m(A = 1, Z, W) - m(A = 0, Z, W) | W).</p></td>
     </tr>
     <tr>
       <th>cv_folds</th>
-      <td><p>A <code>numeric</code> integer value specifying the number of folds
-to be created for cross-validation. Use of cross-validation / cross-fitting
-allows for entropy conditions on the AIPW estimator to be relaxed. Note: for
-compatibility with <code><a href='http://tlverse.org/origami/reference/make_folds.html'>origami::make_folds</a></code>, this value specified here
-must be greater than or equal to 2; the default is to create 10 folds.</p></td>
+      <td><p>A <code>numeric</code> specifying the number of folds to be
+created for cross-validation. Use of cross-validation / cross-fitting
+allows for entropy conditions on the AIPW estimator to be relaxed. Note:
+for compatibility with <code><a href='http://tlverse.org/origami/reference/make_folds.html'>make_folds</a></code>, this value must
+be greater than or equal to 2; the default is to create 10 folds.</p></td>
     </tr>
     <tr>
       <th>n_mult</th>
-      <td><p>A <code>numeric</code> scalar giving the number of repetitions of the
-multipliers to be used in computing the multiplier bootstrap.</p></td>
+      <td><p>A <code>numeric</code> scalar giving the number of repetitions of
+the multipliers to be used in computing the multiplier bootstrap.</p></td>
     </tr>
     </table>
 
 
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -242,7 +252,7 @@ multipliers to be used in computing the multiplier bootstrap.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

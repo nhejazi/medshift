@@ -70,7 +70,7 @@ LF_ipsi <- R6::R6Class(
   inherit = tmle3::LF_base,
   public = list(
     initialize = function(name, likelihood_base, shift_param,
-                              treatment_task, control_task, ...) {
+                          treatment_task, control_task, ...) {
       super$initialize(name, ..., type = "density")
       private$.likelihood_base <- likelihood_base
       private$.shift_param <- shift_param

@@ -9,9 +9,6 @@ Status](https://travis-ci.org/nhejazi/medshift.svg?branch=master)](https://travi
 Status](https://ci.appveyor.com/api/projects/status/github/nhejazi/medshift?branch=master&svg=true)](https://ci.appveyor.com/project/nhejazi/medshift)
 [![Coverage
 Status](https://img.shields.io/codecov/c/github/nhejazi/medshift/master.svg)](https://codecov.io/github/nhejazi/medshift?branch=master)
-[![CRAN](http://www.r-pkg.org/badges/version/medshift)](http://www.r-pkg.org/pkg/medshift)
-[![CRAN
-downloads](https://cranlogs.r-pkg.org/badges/medshift)](https://CRAN.R-project.org/package=medshift)
 [![Project Status: Active – The project has reached a stable, usable
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
@@ -32,28 +29,28 @@ estimating a parameter that arises in a decomposition of the population
 intervention causal effect into the (in)direct effects under stochastic
 interventions in the setting of mediation analysis. `medshift` is
 designed as an implementation to accompany the methodology described in
-Díaz and Hejazi (2019). Implemented estimators include the classical
+Díaz and Hejazi (2020). Implemented estimators include the classical
 substitution (G-computation) estimator, an inverse probability weighted
-(IPW) estimator, an efficient one-step (AIPW) estimator using
-cross-fitting (Pfanzagl and Wefelmeyer 1985; Zheng and van der Laan
-2011; Chernozhukov et al. 2018), and a one-step cross-validated targeted
-minimum loss (TML) estimator based on the method of universal least
-favorable submodels (van der Laan and Rose 2011; Zheng and van der Laan
-2011; van der Laan and Gruber 2016). `medshift` integrates with the
-[`sl3` R package](https://github.com/tlverse/sl3) (Coyle et al. 2018) to
-allow constructed estimators to leverage machine learning and implements
-its TML estimator via the architecture exposed by the [`tmle3` R
+(IPW) estimator, an efficient one-step estimator using cross-fitting
+(Pfanzagl and Wefelmeyer 1985; Zheng and van der Laan 2011; Chernozhukov
+et al. 2018), and a cross-validated targeted minimum loss (TML)
+estimator based on the method of universal least favorable submodels
+(van der Laan and Rose 2011; Zheng and van der Laan 2011; van der Laan
+and Gruber 2016). `medshift` integrates with the [`sl3` R
+package](https://github.com/tlverse/sl3) (Coyle et al. 2020) to allow
+constructed estimators to leverage machine learning and implements its
+TML estimator via the architecture exposed by the [`tmle3` R
 package](https://github.com/tlverse/tmle3).
 
 -----
 
 ## Installation
 
-Install the most recent *stable release* from GitHub via
-[`devtools`](https://www.rstudio.com/products/rpackages/devtools/):
+Install the *most recent version* from the `master` branch on GitHub via
+[`remotes`](https://CRAN.R-project.org/package=remotes):
 
 ``` r
-devtools::install_github("nhejazi/medshift")
+remotes::install_github("nhejazi/medshift")
 ```
 
 -----
@@ -100,10 +97,8 @@ os_medshift <- medshift(W = example_data$W, A = example_data$A,
                         delta = 3, estimator = "onestep",
                         estimator_args = list(cv_folds = 3))
 summary(os_medshift)
-#>       lwr_ci    param_est       upr_ci    param_var     eif_mean 
-#>       0.7401     0.788136     0.836172     0.000601 4.408236e-17 
-#>    estimator 
-#>      onestep
+#>       lwr_ci    param_est       upr_ci    param_var     eif_mean    estimator 
+#>       0.7401     0.788136     0.836172     0.000601 4.408236e-17      onestep
 ```
 
 For details on how to use data adaptive regression (machine learning)
@@ -133,26 +128,27 @@ prior to submitting a pull request.
 After using the `medshift` R package, please cite the following:
 
 ``` 
-    @article{diaz2019causal,
+    @article{diaz2020causal,
       title={Causal mediation analysis for stochastic interventions},
       author={D{\'\i}az, Iv{\'a}n and Hejazi, Nima S},
-      year={2019},
-      url = {https://arxiv.org/abs/1901.02776},
-      doi = {},
-      journal={arxiv},
+      year={2020},
+      url = {https://doi.org/10.1111/rssb.12362},
+      doi = {10.1111/rssb.12362},
+      journal={Journal of the Royal Statistical Society: Series B
+        (Statistical Methodology)},
       volume={},
       number={},
       pages={},
-      publisher={}
+      publisher={Wiley Online Library}
     }
 
-    @manual{hejazi2019medshift,
+    @manual{hejazi2020medshift,
       author = {Hejazi, Nima S and D{\'\i}az, Iv{\'a}n},
       title = {{medshift}: Causal mediation analysis for stochastic
         interventions},
-      year  = {2019},
+      year  = {2020},
       url = {https://github.com/nhejazi/medshift},
-      note = {R package version 0.1.1}
+      note = {R package version 0.1.3}
     }
 ```
 
@@ -160,14 +156,14 @@ After using the `medshift` R package, please cite the following:
 
 ## License
 
-© 2018-2019 [Nima S. Hejazi](https://nimahejazi.org)
+© 2018-2020 [Nima S. Hejazi](https://nimahejazi.org)
 
 The contents of this repository are distributed under the MIT license.
 See below for details:
 
     MIT License
     
-    Copyright (c) 2018-2019 Nima S. Hejazi
+    Copyright (c) 2018-2020 Nima S. Hejazi
     
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -203,20 +199,21 @@ Parameters.” *The Econometrics Journal* 21 (1).
 
 </div>
 
-<div id="ref-coyle2018sl3">
+<div id="ref-coyle2020sl3">
 
-Coyle, Jeremy R, Nima S Hejazi, Ivana Malenica, and Oleg Sofrygin. 2018.
-“sl3: Modern Pipelines for Machine Learning and Super Learning.”
+Coyle, Jeremy R, Nima S Hejazi, Ivana Malenica, and Oleg Sofrygin. 2020.
+*sl3: Modern Pipelines for Machine Learning and Super Learning*.
 <https://github.com/tlverse/sl3>.
-<https://doi.org/10.5281/zenodo.1342294>.
+<https://doi.org/10.5281/zenodo.1342293>.
 
 </div>
 
-<div id="ref-diaz2019causal">
+<div id="ref-diaz2020causal">
 
-Díaz, Iván, and Nima S Hejazi. 2019. “Causal Mediation Analysis for
-Stochastic Interventions.” *Submitted*.
-<https://arxiv.org/abs/1901.02776>.
+Díaz, Iván, and Nima S Hejazi. 2020. “Causal Mediation Analysis for
+Stochastic Interventions.” *Journal of the Royal Statistical Society:
+Series B (Statistical Methodology)*. Wiley Online Library.
+<https://doi.org/10.1111/rssb.12362>.
 
 </div>
 

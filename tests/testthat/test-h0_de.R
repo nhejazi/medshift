@@ -55,11 +55,15 @@ make_simulated_data <- function(n_obs = 1000, # no. observations
   # create outcome as a linear function of A, W + white noise
   Y <- Z_1 + Z_2 - Z_3 - 0.1 * rowSums(W)^2 + rnorm(n_obs, mean = 0, sd = 0.5)
 
+  # subject-level IDs
+  ids <- seq_along(Y)
+
   # full data structure
-  data <- as.data.table(cbind(Y, Z, A, W))
+  data <- as.data.table(cbind(Y, Z, A, W, ids))
   setnames(data, c(
     "Y", paste("Z", 1:3, sep = "_"), "A",
-    paste("W", seq_len(dim(W)[2]), sep = "_")
+    paste("W", seq_len(dim(W)[2]), sep = "_"),
+    "ids"
   ))
   return(data)
 }
@@ -69,13 +73,12 @@ data <- make_simulated_data()
 z_names <- colnames(data)[str_detect(colnames(data), "Z")]
 w_names <- colnames(data)[str_detect(colnames(data), "W")]
 
-
-################################################################################
+###############################################################################
 # test of hypothesis testing procedure
-################################################################################
+###############################################################################
 de_test <- test_de(
   W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
-  delta_grid = seq(from = 0.5, to = 5, by = 0.9),
+  ids = data$ids, delta_grid = seq(from = 0.5, to = 5, by = 0.9),
   mult_type = "rademacher",
   ci_level = (1 - alpha_level),
   g_learners = hal_binary_lrnr,
@@ -85,17 +88,17 @@ de_test <- test_de(
   cv_folds = 5
 )
 
-#test_that("Uniform test of no direct effect rejects H0 with fixed p-value", {
-  #expect_equal(de_test$pval_de, 0.822, tol = 1e-3)
-#})
+test_that("Uniform test of no direct effect rejects H0 with fixed p-value", {
+  expect_equal(de_test$pval_de, 0.804, tol = 1e-3)
+})
 
-#test_that("Simultaneous confidence band uniformly covers zero under H0", {
-  #covers_zero <- apply(
-    #de_test$est_de[, c("lwr_ci", "upr_ci")], 1,
-    #function(ci) {
-      #check_zero <- dplyr::between(0, ci[1], ci[2])
-      #return(check_zero)
-    #}
-  #)
-  #expect_true(all(covers_zero))
-#})
+test_that("Simultaneous confidence band uniformly covers zero under H0", {
+  covers_zero <- apply(
+    de_test$est_de[, c("lwr_ci", "upr_ci")], 1,
+    function(ci) {
+      check_zero <- dplyr::between(0, ci[1], ci[2])
+      return(check_zero)
+    }
+  )
+  expect_true(all(covers_zero))
+})

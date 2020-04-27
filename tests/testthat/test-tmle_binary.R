@@ -150,8 +150,8 @@ test_that("TML estimate matches one-step estimate closely", {
 ###############################################################################
 if (FALSE) {
   get_sim_truth <- function(n_obs = 1e7, # number of observations
-                              n_w = 3, # number of baseline covariates
-                              delta = 0.5) { # value of shift parameter
+                            n_w = 3, # number of baseline covariates
+                            delta = 0.5) { # value of shift parameter
 
     # compute large data set for true values
     data <- make_simulated_data(

@@ -258,8 +258,10 @@ make_phi_task <- function(tmle_task, likelihood) {
     m_pseudo = m_diff,
     tmle_task$get_tmle_node("W")
   ))
-  data.table::setnames(phi_data,
-                       c("m_pseudo", tmle_task$npsem[["W"]]$variables))
+  data.table::setnames(
+    phi_data,
+    c("m_pseudo", tmle_task$npsem[["W"]]$variables)
+  )
 
   # create task while preserving original fold structure from input task
   phi_task <- sl3::sl3_Task$new(

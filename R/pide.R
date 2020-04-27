@@ -49,8 +49,10 @@ pide <- function(W,
   eif_EY <- Y - EY
 
   # pass to medshift for common term in effect decomposition
-  est <- medshift(W = W, A = A, Z = Z, Y = Y, ids = ids, delta = delta,
-                  estimator = estimator, ...)
+  est <- medshift(
+    W = W, A = A, Z = Z, Y = Y, ids = ids, delta = delta,
+    estimator = estimator, ...
+  )
   eif_medshift <- est$eif
 
   # reduce EIFs if there are repeated measures
@@ -58,7 +60,8 @@ pide <- function(W,
     eif_EY_combined <- by(eif_EY, as.numeric(ids), mean, simplify = FALSE)
     eif_EY <- unname(do.call(c, eif_EY_combined))
     eif_medshift_combined <- by(eif_medshift, as.numeric(ids), mean,
-                                simplify = FALSE)
+      simplify = FALSE
+    )
     eif_medshift <- unname(do.call(c, eif_medshift_combined))
   }
 
