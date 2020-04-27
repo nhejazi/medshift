@@ -8,6 +8,11 @@
 #'  similar corresponding to a set of mediators (on the causal pathway between
 #'  the intervention A and the outcome Y).
 #' @param Y A \code{numeric} vector corresponding to an outcome variable.
+#' @param ids A \code{numeric} vector of observation-level IDs, allowing for
+#'  observational units to be related through a hierarchical structure. The
+#'  default is to assume all units are IID. When repeated IDs are included,
+#'  both the cross-validation procedures used for estimation and inferential
+#'  procedures respect these IDs.
 #' @param delta A \code{numeric} value indicating the degree of shift in the
 #'  intervention to be used in defining the causal quantity of interest. In the
 #'  case of binary interventions, this takes the form of an incremental
@@ -46,9 +51,8 @@
 #'
 #' @importFrom data.table as.data.table setnames
 #' @importFrom origami make_folds cross_validate
-#' @importFrom sl3 Lrnr_glm_fast
+#' @importFrom sl3 Lrnr_glm
 #' @importFrom tmle3 tmle3
-#' @importFrom stats binomial
 #' @importFrom assertthat assert_that
 #'
 #' @export
@@ -56,13 +60,12 @@ medshift <- function(W,
                      A,
                      Z,
                      Y,
+                     ids = seq(1, length(Y)),
                      delta,
-                     g_learners =
-                       sl3::Lrnr_glm_fast$new(family = stats::binomial()),
-                     e_learners =
-                       sl3::Lrnr_glm_fast$new(family = stats::binomial()),
-                     m_learners = sl3::Lrnr_glm_fast$new(),
-                     phi_learners = sl3::Lrnr_glm_fast$new(),
+                     g_learners = sl3::Lrnr_glm$new(),
+                     e_learners = sl3::Lrnr_glm$new(),
+                     m_learners = sl3::Lrnr_glm$new(),
+                     phi_learners = sl3::Lrnr_glm$new(),
                      estimator = c(
                        "onestep",
                        "tmle",
@@ -78,18 +81,18 @@ medshift <- function(W,
   estimator <- match.arg(estimator)
   estimator_args <- unlist(estimator_args, recursive = FALSE)
 
-  # NOTE: procedure does _not_ support static interventions currently
+  # NOTE: procedure does _not_ support static interventions
   assertthat::assert_that(delta > 0 && delta < Inf)
 
   # construct input data structure
-  data <- data.table::as.data.table(cbind(Y, Z, A, W))
+  data <- data.table::as.data.table(cbind(Y, Z, A, W, ids))
   w_names <- paste("W", seq_len(dim(data.table::as.data.table(W))[2]),
     sep = "_"
   )
   z_names <- paste("Z", seq_len(dim(data.table::as.data.table(Z))[2]),
     sep = "_"
   )
-  data.table::setnames(data, c("Y", z_names, "A", w_names))
+  data.table::setnames(data, c("Y", z_names, "A", w_names, "ids"))
 
   if (estimator == "substitution") {
     # SUBSTITUTION ESTIMATOR
@@ -131,7 +134,7 @@ medshift <- function(W,
     est_out <- tmle3::tmle3(tmle_spec, data, node_list, learner_list)
   }
 
-  # lazily create output as S3 class, except for tmle3 output
+  # lazily create output as ad-hoc S3 class, except for tmle3 output
   if (estimator != "tmle") {
     class(est_out) <- "medshift"
   }
