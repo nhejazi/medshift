@@ -216,8 +216,10 @@
                       <span class="kw">estimator</span> <span class="kw">=</span> <span class="st">"onestep"</span>,
                       <span class="kw">estimator_args</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">cv_folds</span> <span class="kw">=</span> <span class="fl">3</span>))
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">theta_eff</span>)</pre></body></html></div>
-<pre><code>##       lwr_ci    param_est       upr_ci    param_var     eif_mean    estimator 
-##    18.779453      19.1339    19.488346     0.032704 1.071667e-15      onestep</code></pre>
+<pre><code>##        lwr_ci     param_est        upr_ci     param_var      eif_mean 
+##     18.765503     19.119824     19.474145      0.032681 -2.570542e-16 
+##     estimator 
+##       onestep</code></pre>
 </div>
 <div id="estimating-the-direct-effect" class="section level2">
 <h2 class="hasAnchor">
@@ -251,8 +253,8 @@
 <span class="no">de_est</span> <span class="kw">&lt;-</span> <span class="fu">linear_contrast</span>(<span class="no">params_de</span>, <span class="no">eifs_de</span>)
 <span class="no">de_est</span></pre></body></html></div>
 <pre><code>##       lwr_ci    param_est       upr_ci 
-## -0.482033494  0.006791786  0.495617067</code></pre>
-<p>As given above, we have for our estimate of the direct effect <span class="math inline">\(\hat{\beta}_{\text{PIDE}}({\delta}) =\)</span> 0.007.</p>
+## -0.496085065 -0.007284226  0.481516613</code></pre>
+<p>As given above, we have for our estimate of the direct effect <span class="math inline">\(\hat{\beta}_{\text{PIDE}}({\delta}) =\)</span> -0.007.</p>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="hasAnchor">
