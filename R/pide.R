@@ -28,6 +28,8 @@
 #' @param ... Additional arguments passed to \code{\link{medshift}}. Consult
 #'  the documentation of that function for details.
 #'
+#' @importFrom assertthat assert_that
+#'
 #' @export
 pide <- function(W,
                  A,
@@ -53,7 +55,13 @@ pide <- function(W,
     W = W, A = A, Z = Z, Y = Y, ids = ids, delta = delta,
     estimator = estimator, ...
   )
-  eif_medshift <- est$eif
+  if (estimator == "onestep") {
+    param_medshift <- est$theta
+    eif_medshift <- est$eif
+  } else if (estimator == "tmle") {
+    param_medshift <- est$estimates[[1]]$psi
+    eif_medshift <- as.numeric(est$estimates[[1]]$IC)
+  }
 
   # reduce EIFs if there are repeated measures
   if (length(unique(ids)) < length(Y)) {
@@ -65,16 +73,14 @@ pide <- function(W,
     eif_medshift <- unname(do.call(c, eif_medshift_combined))
   }
 
-  # compute EIF for direct effect
-  eif_de <- eif_EY - eif_medshift
-  se_eif_de <- sqrt(var(eif_de) / length(eif_de))
+  # compute parameter estimate and EIF for direct effect
+  param_pide <- param_medshift - EY
+  eif_pide <- eif_medshift - eif_EY
+  se_eif_pide <- sqrt(var(eif_pide) / length(eif_pide))
 
-  # compute parameter estimate for direct effect
-  param_de <- EY - est$theta
-
-  # direct effect parameter and inference
-  param_ci <- param_de + ci_norm_bounds * se_eif_de
-  out <- c(param_ci[1], param_de, param_ci[2], se_eif_de)
+  # direct effect parameter estimate and inference
+  param_ci <- param_pide + (ci_norm_bounds * se_eif_pide)
+  out <- c(param_ci[1], param_pide, param_ci[2], se_eif_pide)
   names(out) <- c("lwr_ci", "pide_est", "upr_ci", "std_err")
   return(out)
 }

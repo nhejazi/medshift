@@ -31,7 +31,9 @@ cv_hal_binary_lrnr <- Lrnr_cv$new(hal_binary_lrnr, full_fit = TRUE)
 ################################################################################
 make_simulated_data <- function(n_obs = 1000, # no. observations
                                 n_w = 3, # no. baseline covariates
-                                delta = 0.5) { # shift parameter value
+                                delta = 0.5, # shift parameter value
+                                repeated_ids = FALSE,
+                                n_clust = 5) {
 
   # baseline covariate -- simple, binary
   W_1 <- rbinom(n_obs, 1, prob = 0.50)
@@ -59,17 +61,25 @@ make_simulated_data <- function(n_obs = 1000, # no. observations
   Y <- Z_1 + Z_2 - Z_3 + A - 0.1 * rowSums(W)^2 +
     rnorm(n_obs, mean = 0, sd = 0.5)
 
+  # create observation-level IDs
+  if (repeated_ids) {
+    ids <- rep(1:(n_obs / n_clust), n_clust)
+  } else {
+    ids <- seq_along(Y)
+  }
+
   # full data structure
-  data <- as.data.table(cbind(Y, Z, A, W))
+  data <- as.data.table(cbind(Y, Z, A, W, ids))
   setnames(data, c(
     "Y", paste("Z", 1:3, sep = "_"), "A",
-    paste("W", seq_len(dim(W)[2]), sep = "_")
+    paste("W", seq_len(dim(W)[2]), sep = "_"),
+    "ids"
   ))
   return(data)
 }
 
 # get data and column names for sl3 tasks (for convenience)
-data <- make_simulated_data()
+data <- make_simulated_data(repeated_ids = TRUE)
 z_names <- colnames(data)[str_detect(colnames(data), "Z")]
 w_names <- colnames(data)[str_detect(colnames(data), "W")]
 
@@ -78,7 +88,8 @@ node_list <- list(
   W = c("W_1", "W_2", "W_3"),
   A = "A",
   Z = c("Z_1", "Z_2", "Z_3"),
-  Y = "Y"
+  Y = "Y",
+  id = "ids"
 )
 learner_list <- list(
   Y = cv_hal_contin_lrnr,
@@ -108,19 +119,18 @@ updater$tmle_params <- tmle_params
 
 ## fit tmle update
 tmle_fit <- fit_tmle3(tmle_task, likelihood_targeted, tmle_params, updater)
+tmle_fit
 
-
-## one-line call with faster with tmle3 wrapper
+## one-line call to the tmle3 wrapper
 set.seed(71281)
 tmle_fit <- tmle3(tmle_spec, data, node_list, learner_list)
 tmle_fit
-
 
 # fit one-step estimator
 set.seed(71281)
 os_fit <- medshift(
   W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
-  delta = delta_ipsi,
+  ids = data$ids, delta = delta_ipsi,
   g_learners = hal_binary_lrnr,
   e_learners = hal_binary_lrnr,
   m_learners = hal_contin_lrnr,
@@ -129,20 +139,7 @@ os_fit <- medshift(
 )
 summary(os_fit)
 
-# fit substitution estimator
-set.seed(71281)
-sub_fit <- medshift(
-  W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
-  delta = delta_ipsi,
-  g_learners = hal_binary_lrnr,
-  e_learners = hal_binary_lrnr,
-  m_learners = hal_contin_lrnr,
-  phi_learners = hal_contin_lrnr,
-  estimator = "substitution",
-)
-summary(sub_fit)
-
-# test --- what exactly?
+# test equivalence of TML and one-step estimators
 test_that("TML estimate matches one-step estimate closely", {
   expect_equal(os_fit$theta, tmle_fit$summary$tmle_est, tol = 1e-2)
 })
