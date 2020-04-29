@@ -60,7 +60,7 @@ medshift <- function(W,
                      A,
                      Z,
                      Y,
-                     ids = seq(1, length(Y)),
+                     ids = seq_along(Y),
                      delta,
                      g_learners = sl3::Lrnr_glm$new(),
                      e_learners = sl3::Lrnr_glm$new(),
@@ -122,7 +122,7 @@ medshift <- function(W,
     est_out <- do.call(est_onestep, os_est_args)
   } else if (estimator == "tmle") {
     # CROSS-VALIDATED TARGETED MINIMUM LOSS ESTIMATOR
-    node_list <- list(W = w_names, A = "A", Z = z_names, Y = "Y")
+    node_list <- list(W = w_names, A = "A", Z = z_names, Y = "Y", id = "ids")
     learner_list <- list(Y = m_learners, A = g_learners)
     tmle_spec <- tmle_medshift(
       delta = delta,

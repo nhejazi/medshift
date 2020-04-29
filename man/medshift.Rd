@@ -4,7 +4,7 @@
 \alias{medshift}
 \title{Nonparametric estimation of the population intervention (in)direct effects}
 \usage{
-medshift(W, A, Z, Y, ids = seq(1, length(Y)), delta,
+medshift(W, A, Z, Y, ids = seq_along(Y), delta,
   g_learners = sl3::Lrnr_glm$new(), e_learners = sl3::Lrnr_glm$new(),
   m_learners = sl3::Lrnr_glm$new(), phi_learners = sl3::Lrnr_glm$new(),
   estimator = c("onestep", "tmle", "substitution", "reweighted"),
