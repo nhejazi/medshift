@@ -28,6 +28,7 @@ at it
 # preliminaries
 library(data.table)
 library(dplyr)
+library(tidyr)
 library(sl3)
 library(medshift)
 library(mma)
@@ -53,11 +54,9 @@ we simply remove the incomplete observations, resulting in a data set with fewer
 observations but much the same structure as the original:
 
 ```{r remove_na, echo=FALSE, message=FALSE, warning=FALSE}
-# remove missing values
-is_na <- unique(do.call(c, apply(apply(weight_behavior, 2, is.na), 2, which)))
-weight_behavior_complete <- weight_behavior[-is_na, ]
-weight_behavior_complete$sports <-
-  as.numeric(weight_behavior_complete$sports) - 1
+weight_behavior_complete <- weight_behavior %>%
+  drop_na() %>%
+  mutate(sports = as.numeric(sports) - 1)
 dim(weight_behavior_complete)
 head(weight_behavior_complete)
 ```

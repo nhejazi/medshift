@@ -33,6 +33,7 @@ Imports:
     stats,
     methods,
     dplyr,
+    tidyr,
     tibble,
     data.table,
     assertthat,
