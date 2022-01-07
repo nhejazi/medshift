@@ -39,13 +39,10 @@ the methodology described in @diaz2020causal. Implemented estimators include the
 classical substitution (G-computation) estimator, an inverse probability
 weighted (IPW) estimator, an efficient one-step estimator using cross-fitting
 [@pfanzagl1985contributions; @zheng2011cross; @chernozhukov2018double], and a
-cross-validated targeted minimum loss (TML) estimator based on the method of
-universal least favorable submodels [@vdl2011targeted; @zheng2011cross;
-@vdl2016onestep]. `medshift` integrates with the [`sl3` R
-package](https://github.com/tlverse/sl3) [@coyle2020sl3] to allow constructed
-estimators to leverage machine learning and implements its TML estimator via
-the architecture exposed by the [`tmle3` R
-package](https://github.com/tlverse/tmle3).
+cross-validated targeted minimum loss (TML) estimator [@vdl2011targeted;
+@zheng2011cross]. `medshift` integrates with the [`sl3` R
+package](https://github.com/tlverse/sl3) [@coyle-gh-sl3] to allow constructed
+estimators to leverage machine learning for nuisance estimation.
 
 ---
 
@@ -157,14 +154,14 @@ After using the `medshift` R package, please cite the following:
 
 ## License
 
-&copy; 2018-2020 [Nima S. Hejazi](https://nimahejazi.org)
+&copy; 2018-2022 [Nima S. Hejazi](https://nimahejazi.org)
 
 The contents of this repository are distributed under the MIT license. See below
 for details:
 ```
 MIT License
 
-Copyright (c) 2018-2020 Nima S. Hejazi
+Copyright (c) 2018-2022 Nima S. Hejazi
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

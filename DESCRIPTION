@@ -48,6 +48,7 @@ Suggests:
     Rsolnp,
     nnls,
     speedglm,
+    glmnet,
     hal9001,
     xgboost,
     mma

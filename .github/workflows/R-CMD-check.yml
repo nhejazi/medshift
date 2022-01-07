@@ -52,6 +52,8 @@ jobs:
           install.packages(c("remotes", "rcmdcheck", "covr", "sessioninfo"))
           remotes::install_deps(dependencies = TRUE)
           remotes::install_github(c("tlverse/sl3"))
+          remotes::install_github(c("tlverse/tmle3"))
+          remotes::install_github(c("tlverse/hal9001"))
         shell: Rscript {0}
 
       - name: Check package
