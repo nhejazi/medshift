@@ -3,17 +3,17 @@
 
 # R/`medshift`
 
-[![Travis-CI Build
-Status](https://travis-ci.org/nhejazi/medshift.svg?branch=master)](https://travis-ci.org/nhejazi/medshift)
-[![AppVeyor Build
-Status](https://ci.appveyor.com/api/projects/status/github/nhejazi/medshift?branch=master&svg=true)](https://ci.appveyor.com/project/nhejazi/medshift)
+<!-- badges: start -->
+
+[![R-CMD-check](https://github.com/nhejazi/medshift/workflows/R-CMD-check/badge.svg)](https://github.com/nhejazi/medshift/actions)
 [![Coverage
-Status](https://img.shields.io/codecov/c/github/nhejazi/medshift/master.svg)](https://codecov.io/github/nhejazi/medshift?branch=master)
+Status](https://img.shields.io/codecov/c/github/nhejazi/medshift/master.svg)](https://app.codecov.io/github/nhejazi/medshift)
 [![Project Status: Active – The project has reached a stable, usable
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![MIT
 license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
+<!-- badges: end -->
 
 > Causal Mediation Analysis for Stochastic Interventions
 

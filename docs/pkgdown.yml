@@ -3,7 +3,7 @@ pkgdown: 2.0.1
 pkgdown_sha: ~
 articles:
   intro_medshift: intro_medshift.html
-last_built: 2022-01-07T05:33Z
+last_built: 2022-01-07T05:40Z
 urls:
   reference: https://code.nimahejazi.org/medshift/reference
   article: https://code.nimahejazi.org/medshift/articles
