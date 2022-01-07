@@ -29,18 +29,16 @@ estimating a parameter that arises in a decomposition of the population
 intervention causal effect into the (in)direct effects under stochastic
 interventions in the setting of mediation analysis. `medshift` is
 designed as an implementation to accompany the methodology described in
-Díaz and Hejazi (2020). Implemented estimators include the classical
+Dı́az and Hejazi (2020). Implemented estimators include the classical
 substitution (G-computation) estimator, an inverse probability weighted
 (IPW) estimator, an efficient one-step estimator using cross-fitting
 (Pfanzagl and Wefelmeyer 1985; Zheng and van der Laan 2011; Chernozhukov
 et al. 2018), and a cross-validated targeted minimum loss (TML)
-estimator based on the method of universal least favorable submodels
-(van der Laan and Rose 2011; Zheng and van der Laan 2011; van der Laan
-and Gruber 2016). `medshift` integrates with the [`sl3` R
-package](https://github.com/tlverse/sl3) (Coyle et al. 2020) to allow
-constructed estimators to leverage machine learning and implements its
-TML estimator via the architecture exposed by the [`tmle3` R
-package](https://github.com/tlverse/tmle3).
+estimator (van der Laan and Rose 2011; Zheng and van der Laan 2011).
+`medshift` integrates with the [`sl3` R
+package](https://github.com/tlverse/sl3) (Coyle et al. 2022) to allow
+constructed estimators to leverage machine learning for nuisance
+estimation.
 
 -----
 
@@ -97,8 +95,8 @@ os_medshift <- medshift(W = example_data$W, A = example_data$A,
                         delta = 3, estimator = "onestep",
                         estimator_args = list(cv_folds = 3))
 summary(os_medshift)
-#>       lwr_ci    param_est       upr_ci    param_var     eif_mean    estimator 
-#>       0.7401     0.788136     0.836172     0.000601 4.408236e-17      onestep
+#>      lwr_ci   param_est      upr_ci   param_var    eif_mean   estimator 
+#>      0.7401    0.788136    0.836172    0.000601 1.64686e-17     onestep
 ```
 
 For details on how to use data adaptive regression (machine learning)
@@ -156,14 +154,14 @@ After using the `medshift` R package, please cite the following:
 
 ## License
 
-© 2018-2020 [Nima S. Hejazi](https://nimahejazi.org)
+© 2018-2022 [Nima S. Hejazi](https://nimahejazi.org)
 
 The contents of this repository are distributed under the MIT license.
 See below for details:
 
     MIT License
     
-    Copyright (c) 2018-2020 Nima S. Hejazi
+    Copyright (c) 2018-2022 Nima S. Hejazi
     
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -199,20 +197,20 @@ Parameters.” *The Econometrics Journal* 21 (1).
 
 </div>
 
-<div id="ref-coyle2020sl3">
+<div id="ref-coyle-gh-sl3">
 
-Coyle, Jeremy R, Nima S Hejazi, Ivana Malenica, and Oleg Sofrygin. 2020.
-*sl3: Modern Pipelines for Machine Learning and Super Learning*.
-<https://github.com/tlverse/sl3>.
+Coyle, Jeremy R, Nima S Hejazi, Ivana Malenica, Rachael V Phillips, and
+Oleg Sofrygin. 2022. *sl3: Modern Pipelines for Machine Learning and
+Super Learning*. <https://github.com/tlverse/sl3>.
 <https://doi.org/10.5281/zenodo.1342293>.
 
 </div>
 
 <div id="ref-diaz2020causal">
 
-Díaz, Iván, and Nima S Hejazi. 2020. “Causal Mediation Analysis for
+Dı́az, Iván, and Nima S Hejazi. 2020. “Causal Mediation Analysis for
 Stochastic Interventions.” *Journal of the Royal Statistical Society:
-Series B (Statistical Methodology)*. Wiley Online Library.
+Series B (Statistical Methodology)*.
 <https://doi.org/10.1111/rssb.12362>.
 
 </div>
@@ -222,14 +220,6 @@ Series B (Statistical Methodology)*. Wiley Online Library.
 Pfanzagl, J, and W Wefelmeyer. 1985. “Contributions to a General
 Asymptotic Statistical Theory.” *Statistics & Risk Modeling* 3 (3-4):
 379–88.
-
-</div>
-
-<div id="ref-vdl2016onestep">
-
-van der Laan, Mark J, and Susan Gruber. 2016. “One-Step Targeted Minimum
-Loss-Based Estimation Based on Universal Least Favorable One-Dimensional
-Submodels.” *The International Journal of Biostatistics* 12 (1): 351–78.
 
 </div>
 

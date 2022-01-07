@@ -1,10 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://code.nimahejazi.org/medshift/404.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/CONTRIBUTING.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/LICENSE-text.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/LICENSE.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/articles/intro_medshift.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/authors.html</loc>
+  </url>
+  <url>
     <loc>https://code.nimahejazi.org/medshift/index.html</loc>
   </url>
   <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/LF_exptilt_ipsi.html</loc>
+  </url>
+  <url>
     <loc>https://code.nimahejazi.org/medshift/reference/LF_ipsi.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/Param_esteqn_medshift.html</loc>
   </url>
   <url>
     <loc>https://code.nimahejazi.org/medshift/reference/Param_medshift.html</loc>
@@ -25,7 +52,13 @@
     <loc>https://code.nimahejazi.org/medshift/reference/confint.medshift.html</loc>
   </url>
   <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/confint.medshiftx.html</loc>
+  </url>
+  <url>
     <loc>https://code.nimahejazi.org/medshift/reference/cv_eif.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/est_eff.html</loc>
   </url>
   <url>
     <loc>https://code.nimahejazi.org/medshift/reference/est_ipw.html</loc>
@@ -34,7 +67,19 @@
     <loc>https://code.nimahejazi.org/medshift/reference/est_onestep.html</loc>
   </url>
   <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/est_re.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/est_sub.html</loc>
+  </url>
+  <url>
     <loc>https://code.nimahejazi.org/medshift/reference/est_substitution.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/estim_reweighted.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/estim_sub.html</loc>
   </url>
   <url>
     <loc>https://code.nimahejazi.org/medshift/reference/fit_e_mech.html</loc>
@@ -47,6 +92,9 @@
   </url>
   <url>
     <loc>https://code.nimahejazi.org/medshift/reference/fit_phi_mech.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/index.html</loc>
   </url>
   <url>
     <loc>https://code.nimahejazi.org/medshift/reference/make_e_task.html</loc>
@@ -64,6 +112,9 @@
     <loc>https://code.nimahejazi.org/medshift/reference/print.medshift.html</loc>
   </url>
   <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/print.medshiftx.html</loc>
+  </url>
+  <url>
     <loc>https://code.nimahejazi.org/medshift/reference/stochastic_mediation_likelihood.html</loc>
   </url>
   <url>
@@ -71,6 +122,9 @@
   </url>
   <url>
     <loc>https://code.nimahejazi.org/medshift/reference/summary.medshift.html</loc>
+  </url>
+  <url>
+    <loc>https://code.nimahejazi.org/medshift/reference/summary.medshiftx.html</loc>
   </url>
   <url>
     <loc>https://code.nimahejazi.org/medshift/reference/test_de.html</loc>
@@ -82,6 +136,6 @@
     <loc>https://code.nimahejazi.org/medshift/reference/tmle_medshift.html</loc>
   </url>
   <url>
-    <loc>https://code.nimahejazi.org/medshift/articles/intro_medshift.html</loc>
+    <loc>https://code.nimahejazi.org/medshift/reference/tmle_shift.html</loc>
   </url>
 </urlset>

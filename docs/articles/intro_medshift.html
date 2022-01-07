@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">medshift</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.4</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -61,8 +57,8 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/nhejazi/medshift/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/nhejazi/medshift/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -80,124 +76,130 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Causal Mediation Analysis for Stochastic Interventions</h1>
-                        <h4 class="author">
-<a href="https://nimahejazi.org">Nima Hejazi</a> and <a href="https://www.idiaz.xyz/">Iván Díaz</a>
+                        <h4 data-toc-skip class="author">
+<a href="https://nimahejazi.org" class="external-link">Nima Hejazi</a> and <a href="https://www.idiaz.xyz/" class="external-link">Iván Díaz</a>
 </h4>
             
-            <h4 class="date">2020-04-29</h4>
+            <h4 data-toc-skip class="date">2022-01-07</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/nhejazi/medshift/blob/master/vignettes/intro_medshift.Rmd"><code>vignettes/intro_medshift.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/nhejazi/medshift/blob/HEAD/vignettes/intro_medshift.Rmd" class="external-link"><code>vignettes/intro_medshift.Rmd</code></a></small>
       <div class="hidden name"><code>intro_medshift.Rmd</code></div>
 
     </div>
 
     
     
-<div id="background" class="section level1">
-<h1 class="hasAnchor">
-<a href="#background" class="anchor"></a>Background</h1>
-<p>We are interested in assessing the population intervention direct effect and the population intervention indirect effect, based on the effect decomposition of the population intervention effect introduced in <span class="citation">Díaz and Hejazi (2020)</span>.</p>
-<p>To proceed, we’ll use as our running example a simple data set from an observational study of the relationship between BMI and kids behavior, distributed as part of the <a href="https://CRAN.R-project.org/package=mma"><code>mma</code> R package on CRAN</a>. First, let’s load the packages we’ll be using and set a seed; then, load this data set and take a quick look at it</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="co"># preliminaries</span>
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">data.table</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">dplyr</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">sl3</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">medshift</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">mma</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">429153</span>)
+<div class="section level1">
+<h1 id="background">Background<a class="anchor" aria-label="anchor" href="#background"></a>
+</h1>
+<p>We are interested in assessing the population intervention direct effect and the population intervention indirect effect, based on the effect decomposition of the population intervention effect introduced in <span class="citation">Dı́az and Hejazi (2020)</span>.</p>
+<p>To proceed, we’ll use as our running example a simple data set from an observational study of the relationship between BMI and kids behavior, distributed as part of the <a href="https://CRAN.R-project.org/package=mma" class="external-link"><code>mma</code> R package on CRAN</a>. First, let’s load the packages we’ll be using and set a seed; then, load this data set and take a quick look at it</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># preliminaries</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com" class="external-link">data.table</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tlverse.org/sl3" class="external-link">sl3</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/nhejazi/medshift" class="external-link">medshift</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.r-project.org" class="external-link">mma</a></span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">429153</span><span class="op">)</span>
 
 <span class="co"># load and examine data</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="no">weight_behavior</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span>(<span class="no">weight_behavior</span>)</pre></body></html></div>
-<pre><code>## [1] 691  15</code></pre>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">weight_behavior</span>)</pre></body></html></div>
-<pre><code>##        bmi  age sex  race numpeople car gotosch snack tvhours cmpthours
-## 1 18.20665 12.2   F OTHER         5   3       2     1       4         0
-## 2 22.78401 12.8   M OTHER         4   3       2     1       4         2
-## 3 19.60725 12.6   F OTHER         4   2       4     2      NA        NA
-## 4 25.56754 12.1   M OTHER         2   3       2     1       0         2
-## 5 15.07408 12.3   M OTHER         4   1       2     1       2         1
-## 6 22.98338 11.8   M OTHER         4   1       1     1       4         3
-##   cellhours sports exercises sweat overweigh
-## 1         0      2         2     1         0
-## 2         0      1         8     2         0
-## 3        NA   &lt;NA&gt;         4     2         0
-## 4         0      2         9     1         1
-## 5         3      1        12     1         0
-## 6         2      1         1     1         0</code></pre>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">weight_behavior</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">weight_behavior</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">## [1] 691  15</span></code></pre>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">weight_behavior</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">##        bmi  age sex  race numpeople car gotosch snack tvhours cmpthours</span>
+<span class="co">## 1 18.20665 12.2   F OTHER         5   3       2     1       4         0</span>
+<span class="co">## 2 22.78401 12.8   M OTHER         4   3       2     1       4         2</span>
+<span class="co">## 3 19.60725 12.6   F OTHER         4   2       4     2      NA        NA</span>
+<span class="co">## 4 25.56754 12.1   M OTHER         2   3       2     1       0         2</span>
+<span class="co">## 5 15.07408 12.3   M OTHER         4   1       2     1       2         1</span>
+<span class="co">## 6 22.98338 11.8   M OTHER         4   1       1     1       4         3</span>
+<span class="co">##   cellhours sports exercises sweat overweigh</span>
+<span class="co">## 1         0      2         2     1         0</span>
+<span class="co">## 2         0      1         8     2         0</span>
+<span class="co">## 3        NA   &lt;NA&gt;         4     2         0</span>
+<span class="co">## 4         0      2         9     1         1</span>
+<span class="co">## 5         3      1        12     1         0</span>
+<span class="co">## 6         2      1         1     1         0</span></code></pre>
 <p>The documentation for the data set describes it as a “database obtained from the Louisiana State University Health Sciences Center, New Orleans, by Dr. Richard Scribner. He explored the relationship between BMI and kids behavior through a survey at children, teachers and parents in Grenada in 2014. This data set includes 691 observations and 15 variables.”</p>
 <p>Unfortunately, the data set contains a few observations with missing values. As these are unrelated to the object of our analysis, we’ll simply remove these for the time being. Note that in a real data analysis, we might consider strategies to fully make of the observed data, perhaps by imputing missing values. For now, we simply remove the incomplete observations, resulting in a data set with fewer observations but much the same structure as the original:</p>
-<pre><code>## [1] 567  15</code></pre>
-<pre><code>##        bmi  age sex  race numpeople car gotosch snack tvhours cmpthours
-## 1 18.20665 12.2   F OTHER         5   3       2     1       4         0
-## 2 22.78401 12.8   M OTHER         4   3       2     1       4         2
-## 4 25.56754 12.1   M OTHER         2   3       2     1       0         2
-## 5 15.07408 12.3   M OTHER         4   1       2     1       2         1
-## 6 22.98338 11.8   M OTHER         4   1       1     1       4         3
-## 8 19.15658 12.1   F OTHER         3   3       2     1       0         0
-##   cellhours sports exercises sweat overweigh
-## 1         0      1         2     1         0
-## 2         0      0         8     2         0
-## 4         0      1         9     1         1
-## 5         3      0        12     1         0
-## 6         2      0         1     1         0
-## 8         1      0         1     3         0</code></pre>
+<pre><code><span class="co">## [1] 567  15</span></code></pre>
+<pre><code><span class="co">##        bmi  age sex  race numpeople car gotosch snack tvhours cmpthours</span>
+<span class="co">## 1 18.20665 12.2   F OTHER         5   3       2     1       4         0</span>
+<span class="co">## 2 22.78401 12.8   M OTHER         4   3       2     1       4         2</span>
+<span class="co">## 3 25.56754 12.1   M OTHER         2   3       2     1       0         2</span>
+<span class="co">## 4 15.07408 12.3   M OTHER         4   1       2     1       2         1</span>
+<span class="co">## 5 22.98338 11.8   M OTHER         4   1       1     1       4         3</span>
+<span class="co">## 6 19.15658 12.1   F OTHER         3   3       2     1       0         0</span>
+<span class="co">##   cellhours sports exercises sweat overweigh</span>
+<span class="co">## 1         0      1         2     1         0</span>
+<span class="co">## 2         0      0         8     2         0</span>
+<span class="co">## 3         0      1         9     1         1</span>
+<span class="co">## 4         3      0        12     1         0</span>
+<span class="co">## 5         2      0         1     1         0</span>
+<span class="co">## 6         1      0         1     3         0</span></code></pre>
 <p>For the analysis of this observational data set, we focus on the effect of participating in a sports team (<code>sports</code>) on the BMI of children (<code>bmi</code>), taking several related covariates as mediators (<code>snack</code>, <code>exercises</code>, <code>overweigh</code>) and all other collected covariates as potential confounders. Considering an NPSEM, we separate the observed variables from the data set into their corresponding nodes as follows</p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="no">Y</span> <span class="kw">&lt;-</span> <span class="no">weight_behavior_complete</span>$<span class="no">bmi</span>
-<span class="no">A</span> <span class="kw">&lt;-</span> <span class="no">weight_behavior_complete</span>$<span class="no">sports</span>
-<span class="no">Z</span> <span class="kw">&lt;-</span> <span class="no">weight_behavior_complete</span> <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="no">snack</span>, <span class="no">exercises</span>, <span class="no">overweigh</span>)
-<span class="no">W</span> <span class="kw">&lt;-</span> <span class="no">weight_behavior_complete</span> <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="no">age</span>, <span class="no">sex</span>, <span class="no">race</span>, <span class="no">numpeople</span>, <span class="no">car</span>, <span class="no">gotosch</span>, <span class="no">tvhours</span>, <span class="no">cmpthours</span>,
-         <span class="no">cellhours</span>, <span class="no">sweat</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">Y</span> <span class="op">&lt;-</span> <span class="va">weight_behavior_complete</span><span class="op">$</span><span class="va">bmi</span>
+<span class="va">A</span> <span class="op">&lt;-</span> <span class="va">weight_behavior_complete</span><span class="op">$</span><span class="va">sports</span>
+<span class="va">Z</span> <span class="op">&lt;-</span> <span class="va">weight_behavior_complete</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">snack</span>, <span class="va">exercises</span>, <span class="va">overweigh</span><span class="op">)</span>
+<span class="va">W</span> <span class="op">&lt;-</span> <span class="va">weight_behavior_complete</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">sex</span>, <span class="va">race</span>, <span class="va">numpeople</span>, <span class="va">car</span>, <span class="va">gotosch</span>, <span class="va">tvhours</span>, <span class="va">cmpthours</span>,
+         <span class="va">cellhours</span>, <span class="va">sweat</span><span class="op">)</span></code></pre></div>
 <p>Finally, in our analysis, we consider an incremental propensity score intervention (IPSI), as first proposed by <span class="citation">Kennedy (2018)</span>, wherein the <em>odds of participating in a sports team</em> is modulated by some fixed amount (<span class="math inline">\(0 \leq \delta \leq \infty\)</span>) for each individual. Such an intervention may be interpreted as the effect of a school program that motivates children to participate in sports teams. To exemplify our approach, we postulate a motivational intervention that <em>triples the odds</em> of participating in a sports team for each individual:</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="no">delta_shift_ipsi</span> <span class="kw">&lt;-</span> <span class="fl">3</span></pre></body></html></div>
-<p>To easily incorporate ensemble machine learning into the estimation procedure, we rely on the facilities provided in the <a href="https://tlverse.org/sl3"><code>sl3</code> R package</a> <span class="citation">(Coyle et al. 2020)</span>. For a complete guide on using the <code>sl3</code> R package, consider consulting <a href="https://tlverse.org/sl3" class="uri">https://tlverse.org/sl3</a>, or <a href="https://tlverse.org" class="uri">https://tlverse.org</a> (and <a href="https://github.com/tlverse" class="uri">https://github.com/tlverse</a>) for the <code>tlverse</code> ecosystem, of which <code>sl3</code> is a major part. We construct an ensemble learner using a handful of popular machine learning algorithms below</p>
-<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="co"># SL learners used for continuous data (the nuisance parameter M)</span>
-<span class="no">xgb_contin_lrnr</span> <span class="kw">&lt;-</span> <span class="no">Lrnr_xgboost</span>$<span class="fu">new</span>(<span class="kw">nrounds</span> <span class="kw">=</span> <span class="fl">50</span>, <span class="kw">objective</span> <span class="kw">=</span> <span class="st">"reg:linear"</span>)
-<span class="no">enet_contin_lrnr</span> <span class="kw">&lt;-</span> <span class="no">Lrnr_glmnet</span>$<span class="fu">new</span>(<span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.5</span>, <span class="kw">family</span> <span class="kw">=</span> <span class="st">"gaussian"</span>,
-                                    <span class="kw">nfolds</span> <span class="kw">=</span> <span class="fl">3</span>)
-<span class="no">lasso_contin_lrnr</span> <span class="kw">&lt;-</span> <span class="no">Lrnr_glmnet</span>$<span class="fu">new</span>(<span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">family</span> <span class="kw">=</span> <span class="st">"gaussian"</span>,
-                                     <span class="kw">nfolds</span> <span class="kw">=</span> <span class="fl">3</span>)
-<span class="no">fglm_contin_lrnr</span> <span class="kw">&lt;-</span> <span class="no">Lrnr_glm_fast</span>$<span class="fu">new</span>(<span class="kw">family</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">gaussian</a></span>())
-<span class="no">contin_lrnr_lib</span> <span class="kw">&lt;-</span> <span class="no">Stack</span>$<span class="fu">new</span>(<span class="no">enet_contin_lrnr</span>, <span class="no">lasso_contin_lrnr</span>,
-                             <span class="no">fglm_contin_lrnr</span>, <span class="no">xgb_contin_lrnr</span>)
-<span class="no">sl_contin_lrnr</span> <span class="kw">&lt;-</span> <span class="no">Lrnr_sl</span>$<span class="fu">new</span>(<span class="kw">learners</span> <span class="kw">=</span> <span class="no">contin_lrnr_lib</span>,
-                              <span class="kw">metalearner</span> <span class="kw">=</span> <span class="no">Lrnr_nnls</span>$<span class="fu">new</span>())
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">delta_shift_ipsi</span> <span class="op">&lt;-</span> <span class="fl">3</span></code></pre></div>
+<p>To easily incorporate ensemble machine learning into the estimation procedure, we rely on the facilities provided in the <a href="https://tlverse.org/sl3" class="external-link"><code>sl3</code> R package</a> <span class="citation">(<span class="citeproc-not-found" data-reference-id="coyle2020sl3"><strong>???</strong></span>)</span>. For a complete guide on using the <code>sl3</code> R package, consider consulting <a href="https://tlverse.org/sl3" class="external-link uri">https://tlverse.org/sl3</a>, or <a href="https://tlverse.org" class="external-link uri">https://tlverse.org</a> (and <a href="https://github.com/tlverse" class="external-link uri">https://github.com/tlverse</a>) for the <code>tlverse</code> ecosystem, of which <code>sl3</code> is a major part. We construct an ensemble learner using a handful of popular machine learning algorithms below</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># SL learners used for continuous data (the nuisance parameter M)</span>
+<span class="va">xgb_contin_lrnr</span> <span class="op">&lt;-</span> <span class="va"><a href="https://tlverse.org/sl3/reference/Lrnr_xgboost.html" class="external-link">Lrnr_xgboost</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>nrounds <span class="op">=</span> <span class="fl">50</span>, objective <span class="op">=</span> <span class="st">"reg:linear"</span><span class="op">)</span>
+<span class="va">enet_contin_lrnr</span> <span class="op">&lt;-</span> <span class="va"><a href="https://tlverse.org/sl3/reference/Lrnr_glmnet.html" class="external-link">Lrnr_glmnet</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.5</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>,
+                                    nfolds <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>
+<span class="va">lasso_contin_lrnr</span> <span class="op">&lt;-</span> <span class="va"><a href="https://tlverse.org/sl3/reference/Lrnr_glmnet.html" class="external-link">Lrnr_glmnet</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">1</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>,
+                                     nfolds <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>
+<span class="va">fglm_contin_lrnr</span> <span class="op">&lt;-</span> <span class="va"><a href="https://tlverse.org/sl3/reference/Lrnr_glm_fast.html" class="external-link">Lrnr_glm_fast</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+<span class="va">contin_lrnr_lib</span> <span class="op">&lt;-</span> <span class="va"><a href="https://tlverse.org/sl3/reference/Stack.html" class="external-link">Stack</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">enet_contin_lrnr</span>, <span class="va">lasso_contin_lrnr</span>,
+                             <span class="va">fglm_contin_lrnr</span>, <span class="va">xgb_contin_lrnr</span><span class="op">)</span>
+<span class="va">sl_contin_lrnr</span> <span class="op">&lt;-</span> <span class="va"><a href="https://tlverse.org/sl3/reference/Lrnr_sl.html" class="external-link">Lrnr_sl</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>learners <span class="op">=</span> <span class="va">contin_lrnr_lib</span>,
+                              metalearner <span class="op">=</span> <span class="va"><a href="https://tlverse.org/sl3/reference/Lrnr_nnls.html" class="external-link">Lrnr_nnls</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># SL learners used for binary data (nuisance parameters G and E in this case)</span>
-<span class="no">xgb_binary_lrnr</span> <span class="kw">&lt;-</span> <span class="no">Lrnr_xgboost</span>$<span class="fu">new</span>(<span class="kw">nrounds</span> <span class="kw">=</span> <span class="fl">50</span>, <span class="kw">objective</span> <span class="kw">=</span> <span class="st">"reg:logistic"</span>)
-<span class="no">enet_binary_lrnr</span> <span class="kw">&lt;-</span> <span class="no">Lrnr_glmnet</span>$<span class="fu">new</span>(<span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">0.5</span>, <span class="kw">family</span> <span class="kw">=</span> <span class="st">"binomial"</span>,
-                                    <span class="kw">nfolds</span> <span class="kw">=</span> <span class="fl">3</span>)
-<span class="no">lasso_binary_lrnr</span> <span class="kw">&lt;-</span> <span class="no">Lrnr_glmnet</span>$<span class="fu">new</span>(<span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">family</span> <span class="kw">=</span> <span class="st">"binomial"</span>,
-                                     <span class="kw">nfolds</span> <span class="kw">=</span> <span class="fl">3</span>)
-<span class="no">fglm_binary_lrnr</span> <span class="kw">&lt;-</span> <span class="no">Lrnr_glm_fast</span>$<span class="fu">new</span>(<span class="kw">family</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">binomial</a></span>())
-<span class="no">binary_lrnr_lib</span> <span class="kw">&lt;-</span> <span class="no">Stack</span>$<span class="fu">new</span>(<span class="no">enet_binary_lrnr</span>, <span class="no">lasso_binary_lrnr</span>,
-                             <span class="no">fglm_binary_lrnr</span>, <span class="no">xgb_binary_lrnr</span>)
-<span class="no">logistic_metalearner</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://tlverse.org/sl3/reference/Lrnr_base.html">make_learner</a></span>(<span class="no">Lrnr_solnp</span>,
-                                     <span class="no">metalearner_logistic_binomial</span>,
-                                     <span class="no">loss_loglik_binomial</span>)
-<span class="no">sl_binary_lrnr</span> <span class="kw">&lt;-</span> <span class="no">Lrnr_sl</span>$<span class="fu">new</span>(<span class="kw">learners</span> <span class="kw">=</span> <span class="no">binary_lrnr_lib</span>,
-                              <span class="kw">metalearner</span> <span class="kw">=</span> <span class="no">logistic_metalearner</span>)</pre></body></html></div>
-<div id="decomposing-the-population-intervention-effect" class="section level2">
-<h2 class="hasAnchor">
-<a href="#decomposing-the-population-intervention-effect" class="anchor"></a>Decomposing the population intervention effect</h2>
+<span class="va">xgb_binary_lrnr</span> <span class="op">&lt;-</span> <span class="va"><a href="https://tlverse.org/sl3/reference/Lrnr_xgboost.html" class="external-link">Lrnr_xgboost</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>nrounds <span class="op">=</span> <span class="fl">50</span>, objective <span class="op">=</span> <span class="st">"reg:logistic"</span><span class="op">)</span>
+<span class="va">enet_binary_lrnr</span> <span class="op">&lt;-</span> <span class="va"><a href="https://tlverse.org/sl3/reference/Lrnr_glmnet.html" class="external-link">Lrnr_glmnet</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.5</span>, family <span class="op">=</span> <span class="st">"binomial"</span>,
+                                    nfolds <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>
+<span class="va">lasso_binary_lrnr</span> <span class="op">&lt;-</span> <span class="va"><a href="https://tlverse.org/sl3/reference/Lrnr_glmnet.html" class="external-link">Lrnr_glmnet</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">1</span>, family <span class="op">=</span> <span class="st">"binomial"</span>,
+                                     nfolds <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>
+<span class="va">fglm_binary_lrnr</span> <span class="op">&lt;-</span> <span class="va"><a href="https://tlverse.org/sl3/reference/Lrnr_glm_fast.html" class="external-link">Lrnr_glm_fast</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+<span class="va">binary_lrnr_lib</span> <span class="op">&lt;-</span> <span class="va"><a href="https://tlverse.org/sl3/reference/Stack.html" class="external-link">Stack</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">enet_binary_lrnr</span>, <span class="va">lasso_binary_lrnr</span>,
+                             <span class="va">fglm_binary_lrnr</span>, <span class="va">xgb_binary_lrnr</span><span class="op">)</span>
+<span class="va">logistic_metalearner</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tlverse.org/sl3/reference/Lrnr_base.html" class="external-link">make_learner</a></span><span class="op">(</span><span class="va">Lrnr_solnp</span>,
+                                     <span class="va">metalearner_logistic_binomial</span>,
+                                     <span class="va">loss_loglik_binomial</span><span class="op">)</span>
+<span class="va">sl_binary_lrnr</span> <span class="op">&lt;-</span> <span class="va"><a href="https://tlverse.org/sl3/reference/Lrnr_sl.html" class="external-link">Lrnr_sl</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>learners <span class="op">=</span> <span class="va">binary_lrnr_lib</span>,
+                              metalearner <span class="op">=</span> <span class="va">logistic_metalearner</span><span class="op">)</span></code></pre></div>
+<div class="section level2">
+<h2 id="decomposing-the-population-intervention-effect">Decomposing the population intervention effect<a class="anchor" aria-label="anchor" href="#decomposing-the-population-intervention-effect"></a>
+</h2>
 <p>We may decompose the population intervention effect (PIE) in terms of a <em>population intervention direct effect</em> (PIDE) and a <em>population intervention indirect effect</em> (PIIE): <span class="math display">\[\begin{equation*}
-  \overbrace{\mathbb{E}\{Y(A_\delta, Z(A_\delta)) -
+  \overbrace{\mathbb{E}\{Y(A_{\delta}, Z(A_{\delta})) -
     Y(A_\delta, Z)\}}^{\text{PIIE}} +
     \overbrace{\mathbb{E}\{Y(A_\delta, Z) - Y(A, Z)\}}^{\text{PIDE}}.
 \end{equation*}\]</span></p>
 <p>This decomposition of the PIE as the sum of the population intervention direct and indirect effects has an interpretation analogous to the corresponding standard decomposition of the average treatment effect. In the sequel, we will compute each of the components of the direct and indirect effects above using appropriate estimators as follows</p>
 <ul>
 <li>For <span class="math inline">\(\mathbb{E}\{Y(A, Z)\}\)</span>, the sample mean <span class="math inline">\(\frac{1}{n}\sum_{i=1}^n Y_i\)</span> is sufficient;</li>
-<li>for <span class="math inline">\(\mathbb{E}\{Y(A_{\delta}, Z)\}\)</span>, an efficient one-step estimator for the effect of a joint intervention altering the exposure mechanism but not the mediation mechanism, as proposed in <span class="citation">Díaz and Hejazi (2020)</span>; and,</li>
-<li>for <span class="math inline">\(\mathbb{E}\{Y(A_{\delta}, Z_{A_{\delta}})\}\)</span>, an efficient one-step estimator for the effect of a joint intervention altering both the exposure and mediation mechanisms, as proposed in <span class="citation">Kennedy (2018)</span> and implemented in the <a href="https://github.com/ehkennedy/npcausal"><code>npcausal</code> R package</a>.</li>
+<li>for <span class="math inline">\(\mathbb{E}\{Y(A_{\delta}, Z)\}\)</span>, an efficient one-step estimator for the effect of a joint intervention altering the exposure mechanism but not the mediation mechanism, as proposed in <span class="citation">Dı́az and Hejazi (2020)</span>; and,</li>
+<li>for <span class="math inline">\(\mathbb{E}\{Y(A_{\delta}, Z_{A_{\delta}})\}\)</span>, an efficient one-step estimator for the effect of a joint intervention altering both the exposure and mediation mechanisms, as proposed in <span class="citation">Kennedy (2018)</span> and implemented in the <a href="https://github.com/ehkennedy/npcausal" class="external-link"><code>npcausal</code> R package</a>.</li>
 </ul>
 </div>
-<div id="estimating-the-effect-decomposition-term" class="section level2">
-<h2 class="hasAnchor">
-<a href="#estimating-the-effect-decomposition-term" class="anchor"></a>Estimating the effect decomposition term</h2>
-<p>As given in <span class="citation">Díaz and Hejazi (2020)</span>, the statistical functional identifying the decomposition term that appears in both the PIDE and PIIE <span class="math inline">\(\mathbb{E}\{Y(A_{\delta}, Z)\}\)</span>, which corresponds to altering the exposure mechanism while keeping the mediation mechanism fixed, is <span class="math display">\[\begin{equation*}
+<div class="section level2">
+<h2 id="estimating-the-effect-decomposition-term">Estimating the effect decomposition term<a class="anchor" aria-label="anchor" href="#estimating-the-effect-decomposition-term"></a>
+</h2>
+<p>As given in <span class="citation">Dı́az and Hejazi (2020)</span>, the statistical functional identifying the decomposition term that appears in both the PIDE and PIIE <span class="math inline">\(\mathbb{E}\{Y(A_{\delta}, Z)\}\)</span>, which corresponds to altering the exposure mechanism while keeping the mediation mechanism fixed, is <span class="math display">\[\begin{equation*}
   \theta_0(\delta) = \int m_0(a, z, w) g_{0,\delta}(a \mid w) p_0(z, w)
     d\nu(a, z, w),
 \end{equation*}\]</span> for which a one-step estimator is available. The corresponding <em>efficient influence function</em> (EIF) with respect to the nonparametric model <span class="math inline">\(\mathcal{M}\)</span> is <span class="math inline">\(D_{\eta,\delta}(o) = D^Y_{\eta,\delta}(o) + D^A_{\eta,\delta}(o) + D^{Z,W}_{\eta,\delta}(o) - \theta(\delta)\)</span>. The one-step estimator may be computed using the EIF estimating equation, making use of cross-fitting <span class="citation">(Zheng and van der Laan 2011; Chernozhukov et al. 2018)</span> to circumvent any need for entropy conditions (i.e., Donsker class restrictions). The resultant estimator is <span class="math display">\[\begin{equation*}
@@ -206,71 +208,105 @@
   \delta}(O_i) + D^A_{\hat{\eta}_{j(i)}, \delta}(O_i) +
   D^{Z,W}_{\hat{\eta}_{j(i)}, \delta}(O_i) \right\},
 \end{equation*}\]</span> which is implemented in the <code>medshift</code> R package. We make use of that implementation to estimate <span class="math inline">\(\mathbb{E}\{Y(A_{\delta}, Z)\}\)</span> via its one-step estimator <span class="math inline">\(\hat{\theta}(\delta)\)</span> below</p>
-<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="co"># let's compute the parameter where A (but not Z) are shifted</span>
-<span class="no">theta_eff</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/medshift.html">medshift</a></span>(<span class="kw">W</span> <span class="kw">=</span> <span class="no">W</span>, <span class="kw">A</span> <span class="kw">=</span> <span class="no">A</span>, <span class="kw">Z</span> <span class="kw">=</span> <span class="no">Z</span>, <span class="kw">Y</span> <span class="kw">=</span> <span class="no">Y</span>,
-                      <span class="kw">delta</span> <span class="kw">=</span> <span class="no">delta_shift_ipsi</span>,
-                      <span class="kw">g_learners</span> <span class="kw">=</span> <span class="no">sl_binary_lrnr</span>,
-                      <span class="kw">e_learners</span> <span class="kw">=</span> <span class="no">sl_binary_lrnr</span>,
-                      <span class="kw">m_learners</span> <span class="kw">=</span> <span class="no">sl_contin_lrnr</span>,
-                      <span class="kw">phi_learners</span> <span class="kw">=</span> <span class="no">Lrnr_hal9001</span>$<span class="fu">new</span>(),
-                      <span class="kw">estimator</span> <span class="kw">=</span> <span class="st">"onestep"</span>,
-                      <span class="kw">estimator_args</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">cv_folds</span> <span class="kw">=</span> <span class="fl">3</span>))
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">theta_eff</span>)</pre></body></html></div>
-<pre><code>##        lwr_ci     param_est        upr_ci     param_var      eif_mean 
-##     18.765503     19.119824     19.474145      0.032681 -2.570542e-16 
-##     estimator 
-##       onestep</code></pre>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># let's compute the parameter where A (but not Z) are shifted</span>
+<span class="va">theta_eff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/medshift.html">medshift</a></span><span class="op">(</span>W <span class="op">=</span> <span class="va">W</span>, A <span class="op">=</span> <span class="va">A</span>, Z <span class="op">=</span> <span class="va">Z</span>, Y <span class="op">=</span> <span class="va">Y</span>,
+                      delta <span class="op">=</span> <span class="va">delta_shift_ipsi</span>,
+                      g_learners <span class="op">=</span> <span class="va">sl_binary_lrnr</span>,
+                      e_learners <span class="op">=</span> <span class="va">sl_binary_lrnr</span>,
+                      m_learners <span class="op">=</span> <span class="va">sl_contin_lrnr</span>,
+                      phi_learners <span class="op">=</span> <span class="va"><a href="https://tlverse.org/sl3/reference/Lrnr_hal9001.html" class="external-link">Lrnr_hal9001</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>,
+                      estimator <span class="op">=</span> <span class="st">"onestep"</span>,
+                      estimator_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>cv_folds <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">## [00:34:12] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:34:12] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:34:12] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:34:13] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:34:13] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:34:14] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:34:14] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:34:15] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:34:15] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:34:15] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:34:16] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:35:28] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:35:29] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:35:29] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:35:30] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:35:30] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:35:30] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:35:31] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:35:31] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:35:32] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:35:32] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:35:32] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:36:31] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:36:31] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:36:32] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:36:32] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:36:32] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:36:33] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:36:33] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:36:34] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:36:34] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:36:35] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span>
+<span class="co">## [00:36:35] WARNING: amalgamation/../src/objective/regression_obj.cu:188: reg:linear is now deprecated in favor of reg:squarederror.</span></code></pre>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">theta_eff</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">##        lwr_ci     param_est        upr_ci     param_var      eif_mean </span>
+<span class="co">##     18.776009      19.12898     19.481951      0.032433 -1.557271e-15 </span>
+<span class="co">##     estimator </span>
+<span class="co">##       onestep</span></code></pre>
 </div>
-<div id="estimating-the-direct-effect" class="section level2">
-<h2 class="hasAnchor">
-<a href="#estimating-the-direct-effect" class="anchor"></a>Estimating the direct effect</h2>
+<div class="section level2">
+<h2 id="estimating-the-direct-effect">Estimating the direct effect<a class="anchor" aria-label="anchor" href="#estimating-the-direct-effect"></a>
+</h2>
 <p>Recall that, based on the decomposition outlined previously, the population intervention direct effect may be denoted <span class="math inline">\(\beta_{\text{PIDE}}(\delta) = \theta_0(\delta) - \mathbb{E}Y\)</span>. Thus, an estimator of the PIDE, <span class="math inline">\(\hat{\beta}_{\text{PIDE}}(\delta)\)</span> may be expressed as a composition of estimators of its constituent parameters: <span class="math display">\[\begin{equation*}
   \hat{\beta}_{\text{PIDE}}({\delta}) = \hat{\theta}(\delta) -
   \frac{1}{n} \sum_{i = 1}^n Y_i.
 \end{equation*}\]</span></p>
 <p>Based on the above, we may construct an estimator of the PIDE using quantities already computed. The convenience function below applies the simple delta method required in the case of a linear contrast between the two constituent parameters:</p>
-<div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="co"># convenience function to compute inference via delta method: EY1 - EY0</span>
-<span class="no">linear_contrast</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">params</span>, <span class="no">eifs</span>, <span class="no">ci_level</span> <span class="kw">=</span> <span class="fl">0.95</span>) {
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># convenience function to compute inference via delta method: EY1 - EY0</span>
+<span class="va">linear_contrast</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">params</span>, <span class="va">eifs</span>, <span class="va">ci_level</span> <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span> <span class="op">{</span>
   <span class="co"># bounds for confidence interval</span>
-  <span class="no">ci_norm_bounds</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(-<span class="fl">1</span>, <span class="fl">1</span>) * <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(<span class="kw pkg">stats</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">qnorm</a></span>(<span class="kw">p</span> <span class="kw">=</span> (<span class="fl">1</span> - <span class="no">ci_level</span>) / <span class="fl">2</span>))
-  <span class="no">param_est</span> <span class="kw">&lt;-</span> <span class="no">params</span><span class="kw">[[</span><span class="fl">1</span>]] - <span class="no">params</span><span class="kw">[[</span><span class="fl">2</span>]]
-  <span class="no">eif</span> <span class="kw">&lt;-</span> <span class="no">eifs</span><span class="kw">[[</span><span class="fl">1</span>]] - <span class="no">eifs</span><span class="kw">[[</span><span class="fl">2</span>]]
-  <span class="no">se_eif</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/cor.html">var</a></span>(<span class="no">eif</span>) / <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">eif</span>))
-  <span class="no">param_ci</span> <span class="kw">&lt;-</span> <span class="no">param_est</span> + <span class="no">ci_norm_bounds</span> * <span class="no">se_eif</span>
+  <span class="va">ci_norm_bounds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">qnorm</a></span><span class="op">(</span>p <span class="op">=</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">ci_level</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span>
+  <span class="va">param_est</span> <span class="op">&lt;-</span> <span class="va">params</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">-</span> <span class="va">params</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>
+  <span class="va">eif</span> <span class="op">&lt;-</span> <span class="va">eifs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">-</span> <span class="va">eifs</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>
+  <span class="va">se_eif</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">eif</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">eif</span><span class="op">)</span><span class="op">)</span>
+  <span class="va">param_ci</span> <span class="op">&lt;-</span> <span class="va">param_est</span> <span class="op">+</span> <span class="va">ci_norm_bounds</span> <span class="op">*</span> <span class="va">se_eif</span>
   <span class="co"># parameter and inference</span>
-  <span class="no">out</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">param_ci</span>[<span class="fl">1</span>], <span class="no">param_est</span>, <span class="no">param_ci</span>[<span class="fl">2</span>])
-  <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">out</span>) <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"lwr_ci"</span>, <span class="st">"param_est"</span>, <span class="st">"upr_ci"</span>)
-  <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="no">out</span>)
-}</pre></body></html></div>
+  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">param_ci</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">param_est</span>, <span class="va">param_ci</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lwr_ci"</span>, <span class="st">"param_est"</span>, <span class="st">"upr_ci"</span><span class="op">)</span>
+  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span>
+<span class="op">}</span></code></pre></div>
 <p>With the above convenience function in hand, we’ll construct or extract the necessary components from existing objects and simply apply the function:</p>
-<div class="sourceCode" id="cb13"><html><body><pre class="r"><span class="co"># parameter estimates and EIFs for components of direct effect</span>
-<span class="no">EY</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="no">Y</span>)
-<span class="no">eif_EY</span> <span class="kw">&lt;-</span> <span class="no">Y</span> - <span class="no">EY</span>
-<span class="no">params_de</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">theta_eff</span>$<span class="no">theta</span>, <span class="no">EY</span>)
-<span class="no">eifs_de</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">theta_eff</span>$<span class="no">eif</span>, <span class="no">eif_EY</span>)
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># parameter estimates and EIFs for components of direct effect</span>
+<span class="va">EY</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">Y</span><span class="op">)</span>
+<span class="va">eif_EY</span> <span class="op">&lt;-</span> <span class="va">Y</span> <span class="op">-</span> <span class="va">EY</span>
+<span class="va">params_de</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">theta_eff</span><span class="op">$</span><span class="va">theta</span>, <span class="va">EY</span><span class="op">)</span>
+<span class="va">eifs_de</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">theta_eff</span><span class="op">$</span><span class="va">eif</span>, <span class="va">eif_EY</span><span class="op">)</span>
 
 <span class="co"># direct effect = EY - estimated quantity</span>
-<span class="no">de_est</span> <span class="kw">&lt;-</span> <span class="fu">linear_contrast</span>(<span class="no">params_de</span>, <span class="no">eifs_de</span>)
-<span class="no">de_est</span></pre></body></html></div>
-<pre><code>##       lwr_ci    param_est       upr_ci 
-## -0.496085065 -0.007284226  0.481516613</code></pre>
-<p>As given above, we have for our estimate of the direct effect <span class="math inline">\(\hat{\beta}_{\text{PIDE}}({\delta}) =\)</span> -0.007.</p>
+<span class="va">de_est</span> <span class="op">&lt;-</span> <span class="fu">linear_contrast</span><span class="op">(</span><span class="va">params_de</span>, <span class="va">eifs_de</span><span class="op">)</span>
+<span class="va">de_est</span></code></pre></div>
+<pre><code><span class="co">##       lwr_ci    param_est       upr_ci </span>
+<span class="co">## -0.485608233  0.001871922  0.489352076</span></code></pre>
+<p>As given above, we have for our estimate of the direct effect <span class="math inline">\(\hat{\beta}_{\text{PIDE}}({\delta}) =\)</span> 0.002.</p>
 </div>
-<div id="references" class="section level2 unnumbered">
-<h2 class="hasAnchor">
-<a href="#references" class="anchor"></a>References</h2>
+<div class="section level2 unnumbered">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
 <div id="refs" class="references">
 <div id="ref-chernozhukov2018double">
-<p>Chernozhukov, Victor, Denis Chetverikov, Mert Demirer, Esther Duflo, Christian Hansen, Whitney Newey, and James Robins. 2018. “Double/Debiased Machine Learning for Treatment and Structural Parameters.” <em>The Econometrics Journal</em> 21 (1). <a href="https://doi.org/10.1111/ectj.12097" class="uri">https://doi.org/10.1111/ectj.12097</a>.</p>
-</div>
-<div id="ref-coyle2020sl3">
-<p>Coyle, Jeremy R, Nima S Hejazi, Ivana Malenica, and Oleg Sofrygin. 2020. <em>sl3: Modern Pipelines for Machine Learning and Super Learning</em>. <a href="https://github.com/tlverse/sl3" class="uri">https://github.com/tlverse/sl3</a>. <a href="https://doi.org/10.5281/zenodo.1342293" class="uri">https://doi.org/10.5281/zenodo.1342293</a>.</p>
+<p>Chernozhukov, Victor, Denis Chetverikov, Mert Demirer, Esther Duflo, Christian Hansen, Whitney Newey, and James Robins. 2018. “Double/Debiased Machine Learning for Treatment and Structural Parameters.” <em>The Econometrics Journal</em> 21 (1). <a href="https://doi.org/10.1111/ectj.12097" class="external-link">https://doi.org/10.1111/ectj.12097</a>.</p>
 </div>
 <div id="ref-diaz2020causal">
-<p>Díaz, Iván, and Nima S Hejazi. 2020. “Causal Mediation Analysis for Stochastic Interventions.” <em>Journal of the Royal Statistical Society: Series B (Statistical Methodology)</em>. Wiley Online Library. <a href="https://doi.org/10.1111/rssb.12362" class="uri">https://doi.org/10.1111/rssb.12362</a>.</p>
+<p>Dı́az, Iván, and Nima S Hejazi. 2020. “Causal Mediation Analysis for Stochastic Interventions.” <em>Journal of the Royal Statistical Society: Series B (Statistical Methodology)</em>. <a href="https://doi.org/10.1111/rssb.12362" class="external-link">https://doi.org/10.1111/rssb.12362</a>.</p>
 </div>
 <div id="ref-kennedy2017nonparametric">
-<p>Kennedy, Edward H. 2018. “Nonparametric Causal Effects Based on Incremental Propensity Score Interventions.” <em>Journal of the American Statistical Association</em>. Taylor &amp; Francis.</p>
+<p>Kennedy, Edward H. 2018. “Nonparametric Causal Effects Based on Incremental Propensity Score Interventions.” <em>Journal of the American Statistical Association</em>.</p>
 </div>
 <div id="ref-zheng2011cross">
 <p>Zheng, Wenjing, and Mark J van der Laan. 2011. “Cross-Validated Targeted Minimum-Loss-Based Estimation.” In <em>Targeted Learning</em>, 459–74. Springer.</p>
@@ -291,11 +327,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Nima Hejazi, Iván Díaz.</p>
+  <p></p>
+<p>Developed by Nima Hejazi, Iván Díaz.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -303,6 +341,8 @@
 
   
 
+
+  
 
   </body>
 </html>
