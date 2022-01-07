@@ -1,0 +1,36 @@
+Package: intmedlite
+Title: Stochastic Causal Mediation Analysis Under Intermediate Confounding
+Version: 0.0.1
+Authors@R: c(
+    person("Nima", "Hejazi", email = "nh@nimahejazi.org",
+           role = c("aut", "cre", "cph"),
+           comment = c(ORCID = "0000-0002-7127-2789")),
+    person("Iván", "Díaz", email = "ild2005@med.cornell.edu",
+           role = "aut",
+           comment = c(ORCID = "0000-0001-9056-2047"))
+  )
+Description: Prototype for nonparametric causal mediation analysis with
+    stochastic interventions under intermediate confounding.
+Depends: R (>= 3.2.0)
+Imports:
+    stats,
+    methods,
+    tibble,
+    stringr,
+    assertthat,
+    data.table,
+    origami,
+    sl3
+Suggests:
+    testthat,
+    knitr,
+    rmarkdown,
+    Rsolnp,
+    nnls,
+    hal9001
+Remotes:
+    github::tlverse/sl3@master
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.0

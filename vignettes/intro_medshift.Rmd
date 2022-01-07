@@ -134,7 +134,7 @@ We may decompose the population intervention effect (PIE) in terms of a
 _population intervention direct effect_ (PIDE) and a _population
 intervention indirect effect_ (PIIE):
 \begin{equation*}
-  \overbrace{\mathbb{E}\{Y(A_\delta, Z(A_\delta)) -
+  \overbrace{\mathbb{E}\{Y(A_{\delta}, Z(A_{\delta})) -
     Y(A_\delta, Z)\}}^{\text{PIIE}} +
     \overbrace{\mathbb{E}\{Y(A_\delta, Z) - Y(A, Z)\}}^{\text{PIDE}}.
 \end{equation*}
