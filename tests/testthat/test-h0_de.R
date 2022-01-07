@@ -8,22 +8,6 @@ set.seed(7128816)
 alpha_level <- 0.05
 
 ################################################################################
-# setup learners for the nuisance parameters
-################################################################################
-
-# instantiate some learners
-mean_lrnr <- Lrnr_mean$new()
-fglm_contin_lrnr <- Lrnr_glm_fast$new()
-fglm_binary_lrnr <- Lrnr_glm_fast$new(family = binomial())
-hal_contin_lrnr <- Lrnr_hal9001$new(
-  fit_type = "glmnet", n_folds = 5
-)
-hal_binary_lrnr <- Lrnr_hal9001$new(
-  fit_type = "glmnet", n_folds = 5,
-  family = "binomial"
-)
-
-################################################################################
 # setup data and simulate to test with estimators
 ################################################################################
 make_simulated_data <- function(n_obs = 1000, # no. observations
@@ -76,20 +60,25 @@ w_names <- colnames(data)[str_detect(colnames(data), "W")]
 ###############################################################################
 # test of hypothesis testing procedure
 ###############################################################################
+ranger_lrnr <- Lrnr_ranger$new(
+  min.node.size = 5000, oob.error = FALSE, num.trees = 1000,
+  sample.fraction = 0.7
+)
+
 de_test <- test_de(
   W = data[, ..w_names], A = data$A, Z = data[, ..z_names], Y = data$Y,
   ids = data$ids, delta_grid = seq(from = 0.5, to = 5, by = 0.9),
   mult_type = "rademacher",
   ci_level = (1 - alpha_level),
-  g_learners = hal_binary_lrnr,
-  e_learners = hal_binary_lrnr,
-  m_learners = hal_contin_lrnr,
-  phi_learners = hal_contin_lrnr,
+  g_learners = ranger_lrnr,
+  e_learners = ranger_lrnr,
+  m_learners = ranger_lrnr,
+  phi_learners = ranger_lrnr,
   cv_folds = 5
 )
 
-test_that("Uniform test of no direct effect rejects H0 with fixed p-value", {
-  expect_equal(de_test$pval_de, 0.804, tol = 1e-3)
+test_that("Uniform test of no direct effect rejects H0", {
+  expect_gte(de_test$pval_de, alpha_level)
 })
 
 test_that("Simultaneous confidence band uniformly covers zero under H0", {
