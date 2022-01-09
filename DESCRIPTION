@@ -51,6 +51,7 @@ Suggests:
     glmnet,
     hal9001,
     xgboost,
+    ranger,
     mma
 Remotes:
     github::tlverse/sl3@master,
