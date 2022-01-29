@@ -97,8 +97,7 @@ summary.medshift <- function(object,
 #'
 #' @export
 print.medshift <- function(x, ...) {
-  # inference is currently limited to the one-step efficient estimator
-  # TODO: allow use for TML estimators once impelemented
+  # inference is currently limited to the one-step estimator
   if (x$type == "onestep") {
     print(x[c("theta", "var", "type")])
   } else {
@@ -139,7 +138,7 @@ bound_precision <- function(vals) {
 #' @importFrom assertthat assert_that
 #'
 #' @keywords internal
-bound_propensity <- function(vals, bounds = c(0.01, 0.99)) {
+bound_propensity <- function(vals, bounds = c(0.005, 0.995) {
   assertthat::assert_that(!(max(vals) >= 1 | min(vals) <= 0))
   vals[vals < bounds[1]] <- bounds[1]
   vals[vals > bounds[2]] <- bounds[2]
