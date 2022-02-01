@@ -138,7 +138,7 @@ bound_precision <- function(vals) {
 #' @importFrom assertthat assert_that
 #'
 #' @keywords internal
-bound_propensity <- function(vals, bounds = c(0.005, 0.995) {
+bound_propensity <- function(vals, bounds = c(0.005, 0.995)) {
   assertthat::assert_that(!(max(vals) >= 1 | min(vals) <= 0))
   vals[vals < bounds[1]] <- bounds[1]
   vals[vals > bounds[2]] <- bounds[2]
