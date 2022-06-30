@@ -1,6 +1,6 @@
 Package: intmedlite
 Title: Stochastic Causal Mediation Analysis Under Intermediate Confounding
-Version: 0.0.1
+Version: 0.0.2
 Authors@R: c(
     person("Nima", "Hejazi", email = "nh@nimahejazi.org",
            role = c("aut", "cre", "cph"),
@@ -20,16 +20,17 @@ Imports:
     assertthat,
     data.table,
     origami,
-    sl3
+    sl3 (<= 1.4.2)
 Suggests:
     testthat,
     knitr,
     rmarkdown,
     Rsolnp,
     nnls,
-    hal9001
+    hal9001 (<= 0.2.7)
 Remotes:
-    github::tlverse/sl3@master
+    github::tlverse/sl3@v1.4.2,
+    github::tlverse/hal9001@v0.2.7
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
