@@ -33,64 +33,76 @@ fit_estimators <- function(data, delta, cv_folds = 5) {
 
   # compute TML and one-step estimators
   ## 1) all nuisance functions correctly specified
-  est_allc <- estimators(data = data,
-                         delta = delta,
-                         g_stack = sl,
-                         e_stack = sl,
-                         m_stack = sl,
-                         b_stack = sl,
-                         d_stack = sl,
-                         cv_folds = cv_folds)
+  est_allc <- intmedlite::estimators(
+    data = data,
+    delta = delta,
+    g_stack = sl,
+    e_stack = sl,
+    m_stack = sl,
+    b_stack = sl,
+    d_stack = sl,
+    cv_folds = cv_folds
+  )
 
   ## 2) g misspecified
-  est_misg <- estimators(data = data,
-                         delta = delta,
-                         g_stack = mean_lrnr,
-                         e_stack = sl,
-                         m_stack = sl,
-                         b_stack = sl,
-                         d_stack = sl,
-                         cv_folds = cv_folds)
+  est_misg <- intmedlite::estimators(
+    data = data,
+    delta = delta,
+    g_stack = mean_lrnr,
+    e_stack = sl,
+    m_stack = sl,
+    b_stack = sl,
+    d_stack = sl,
+    cv_folds = cv_folds
+  )
 
   ## 3) e misspecified
-  est_mise <- estimators(data = data,
-                         delta = delta,
-                         g_stack = sl,
-                         e_stack = mean_lrnr,
-                         m_stack = sl,
-                         b_stack = sl,
-                         d_stack = sl,
-                         cv_folds = cv_folds)
+  est_mise <- intmedlite::estimators(
+    data = data,
+    delta = delta,
+    g_stack = sl,
+    e_stack = mean_lrnr,
+    m_stack = sl,
+    b_stack = sl,
+    d_stack = sl,
+    cv_folds = cv_folds
+  )
 
   ## 4) m misspecified
-  est_mism <- estimators(data = data,
-                         delta = delta,
-                         g_stack = sl,
-                         e_stack = sl,
-                         m_stack = mean_lrnr,
-                         b_stack = sl,
-                         d_stack = sl,
-                         cv_folds = cv_folds)
+  est_mism <- intmedlite::estimators(
+    data = data,
+    delta = delta,
+    g_stack = sl,
+    e_stack = sl,
+    m_stack = mean_lrnr,
+    b_stack = sl,
+    d_stack = sl,
+    cv_folds = cv_folds
+  )
 
   ## 5) b misspecified
-  est_misb <- estimators(data = data,
-                         delta = delta,
-                         g_stack = sl,
-                         e_stack = sl,
-                         m_stack = sl,
-                         b_stack = mean_lrnr,
-                         d_stack = sl,
-                         cv_folds = cv_folds)
+  est_misb <- intmedlite::estimators(
+    data = data,
+    delta = delta,
+    g_stack = sl,
+    e_stack = sl,
+    m_stack = sl,
+    b_stack = mean_lrnr,
+    d_stack = sl,
+    cv_folds = cv_folds
+  )
 
   ## 6) d misspecified
-  est_misd <- estimators(data = data,
-                         delta = delta,
-                         g_stack = sl,
-                         e_stack = sl,
-                         m_stack = sl,
-                         b_stack = sl,
-                         d_stack = mean_lrnr,
-                         cv_folds = cv_folds)
+  est_misd <- intmedlite::estimators(
+    data = data,
+    delta = delta,
+    g_stack = sl,
+    e_stack = sl,
+    m_stack = sl,
+    b_stack = sl,
+    d_stack = mean_lrnr,
+    cv_folds = cv_folds
+  )
 
   # bundle estimators in list
   estimates <- list(allc = est_allc, misg = est_misg, mise = est_mise,
