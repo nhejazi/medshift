@@ -28,7 +28,7 @@ source(here("src", "fit_estim.R"))
 set.seed(11249)
 ipsi_delta <- 2
 cv_folds <- 5L
-n_obs <- 400
+n_obs <- 5000
 n_sim <- 3
 
 # perform simulation across sample sizes
@@ -126,20 +126,21 @@ n_sim <- 3
 
 
     # run estimators from sl3-based re-implementation
+    glmnet_learner <- Lrnr_glmnet$new()
     est_nh <- fit_estimators(
       data = data_sim, delta = ipsi_delta, cv_folds = cv_folds
     )
     est_nh <- setDT(est_nh)
 
 
-    # TODO: organize results across corresponding implementations
+    # organize results across corresponding implementations
     est_combined <- bind_rows(est_id, est_nh, .id = "impl") %>%
       mutate(impl = case_when(impl == 1 ~ "id", impl == 2 ~ "nh"))
 
     est_diff_summary <- est_combined %>%
       group_by(sim_type, parameter, estimator) %>%
       summarize(diff(estimate), diff(ses))
-    est_diff_summary
+    print(setDT(est_diff_summary))
 
     # output simulation results
     #return(est_out)

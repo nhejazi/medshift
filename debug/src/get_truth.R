@@ -1,8 +1,8 @@
 library(here)
 library(tidyverse)
 library(data.table)
-source(here("R", "dgp_funs.R"))
-source(here("R", "01_setup_data.R"))
+source(here("src", "dgp_funs.R"))
+source(here("src", "setup_data.R"))
 
 # compute truth based on DGP components
 get_sim_truth <- function(n_obs = 1e7, delta) {

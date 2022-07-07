@@ -27,7 +27,7 @@ fit_estimators <- function(data, delta, cv_folds = 5) {
                                        loss_loglik_binomial)
 
   # set nuisance regression learners based on ID's successful simulations
-  sl <- Lrnr_sl$new(learners = list(myglmnet_lrnr, myglm_lrnr, hal_lrnr),
+  sl <- Lrnr_sl$new(learners = list(myglmnet_lrnr, myglm_lrnr, mean_lrnr),
                     metalearner = Lrnr_nnls$new())
                     #metalearner = logistic_metalearner)
 
