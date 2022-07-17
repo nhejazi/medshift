@@ -4,7 +4,7 @@
 \alias{fit_nuisance}
 \title{Fit Nuisance Parameters}
 \usage{
-fit_nuisance(data, g_stack, e_stack, m_stack, b_stack, d_stack, cv_folds = 5)
+fit_nuisance(data, g_stack, e_stack, m_stack, b_stack, d_stack, cv_folds = 5L)
 }
 \arguments{
 \item{data}{...}

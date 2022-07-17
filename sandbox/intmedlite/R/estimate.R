@@ -20,7 +20,7 @@ estimators <- function(data,
                        m_stack,
                        b_stack,
                        d_stack,
-                       cv_folds = 5,
+                       cv_folds = 5L,
                        tiltmod_tol = 10) {
   ## extract data
   data <- data.table::as.data.table(data)
@@ -38,12 +38,16 @@ estimators <- function(data,
   names_w <- stringr::str_subset(colnames(data), "W")
 
   ## instantiate HAL and GLM for pseudo-outcome regressions
-  hal_learner <- Lrnr_hal9001$new(max_degree = NULL,
-                                  n_folds = 5L,
+  hal_learner <- Lrnr_hal9001$new(max_degree = 4L,
+                                  n_folds = 10L,
                                   fit_type = "glmnet",
+                                  family = "gaussian",
+                                  cv_select = TRUE,
+                                  reduce_basis = 0.01,
+                                  return_lasso = FALSE,
                                   type.measure = "mse",
                                   standardize = FALSE,
-                                  family = "gaussian",
+                                  lambda.min.ratio = 1e-4,
                                   nlambda = 1000L,
                                   yolo = FALSE)
 
@@ -175,8 +179,7 @@ estimators <- function(data,
       )
 
       # safely fit pseudo-outcome regression
-      #v_fit <- hal_learner$train(v_task)
-      v_fit <- glmnet_learner$train(v_task)
+      v_fit <- hal_learner$train(v_task)
 
       # counterfactual tasks
       v_task_L1 <- sl3_Task$new(
@@ -222,8 +225,7 @@ estimators <- function(data,
       )
 
       # safely fit pseudo-outcome regression
-      #s_fit <- hal_learner$train(s_task)
-      s_fit <- glmnet_learner$train(s_task)
+      s_fit <- hal_learner$train(s_task)
 
       # counterfactual tasks
       s_task_L1 <- sl3_Task$new(
@@ -269,8 +271,7 @@ estimators <- function(data,
       )
 
       # safely fit pseudo-outcome regression
-      #ubar_fit <- hal_learner$train(ubar_task)
-      ubar_fit <- glmnet_learner$train(ubar_task)
+      ubar_fit <- hal_learner$train(ubar_task)
 
       # counterfactual tasks
       ubar_task_A1 <- sl3_Task$new(

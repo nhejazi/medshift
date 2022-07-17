@@ -15,7 +15,7 @@ fit_nuisance <- function(data,
                          m_stack,
                          b_stack,
                          d_stack,
-                         cv_folds = 5) {
+                         cv_folds = 5L) {
   ## make fold structure
   folds <- origami::make_folds(data,
     fold_fun = origami::folds_vfold,

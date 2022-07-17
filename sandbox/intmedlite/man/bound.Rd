@@ -4,7 +4,7 @@
 \alias{bound}
 \title{Bound Predicted Probability}
 \usage{
-bound(x, p = 1e-04)
+bound(x, p = 0.001)
 }
 \arguments{
 \item{x}{...}

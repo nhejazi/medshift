@@ -12,8 +12,8 @@ estimators(
   m_stack,
   b_stack,
   d_stack,
-  cv_folds = 5,
-  tiltmod_tol = 100
+  cv_folds = 5L,
+  tiltmod_tol = 10
 )
 }
 \arguments{

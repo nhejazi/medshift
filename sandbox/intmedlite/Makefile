@@ -8,7 +8,7 @@ test:
 	Rscript -e "devtools::test()"
 
 doc:
-	Rscript -e "devtools::document()"
+	Rscript -e "renv::activate(here::here('..')); devtools::document()"
 
 build:
 	Rscript -e "devtools::build()"

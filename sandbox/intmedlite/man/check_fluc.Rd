@@ -4,7 +4,7 @@
 \alias{check_fluc}
 \title{Check TMLE Fluctuation Model}
 \usage{
-check_fluc(tilt_mod, tilt_tol = 100)
+check_fluc(tilt_mod, tilt_tol = 10)
 }
 \arguments{
 \item{tilt_mod}{...}
