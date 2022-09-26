@@ -1,6 +1,6 @@
 Package: medshift
-Title: Causal mediation analysis for stochastic interventions
-Version: 0.1.4
+Title: Causal mediation analysis with stochastic and interventional effects
+Version: 0.2.0
 Authors@R: c(
     person("Nima", "Hejazi", email = "nh@nimahejazi.org",
            role = c("aut", "cre", "cph"),
@@ -16,16 +16,23 @@ Authors@R: c(
            comment = c(ORCID = "0000-0002-9874-6649"))
   )
 Maintainer: Nima Hejazi <nh@nimahejazi.org>
-Description: Estimators of a parameter arising in the decomposition of the
-    population intervention (in)direct effect of stochastic interventions in
-    causal mediation analysis, including efficient one-step, targeted minimum
-    loss (TML), re-weighting (IPW), and substitution estimators. The parameter
-    estimated constitutes a part of each of the population intervention
-    (in)direct effects. These estimators may be used in assessing population
-    intervention (in)direct effects under stochastic treatment regimes,
-    including incremental propensity score interventions and modified treatment
-    policies. The methodology was first discussed by I Díaz and NS Hejazi
-    (2020) <doi:10.1111/rssb.12362>.
+Description: Estimators of causal direct and indirect effects arising from
+    decompositions of the of the total population intervention effect are
+    implemented. The stochastic (in)direct effects are formulated based on
+    stochastic interventions (e.g., incremental propensity score interventions)
+    applied to the exposure and mediators and preclude the presence of
+    intermediate confounders affected by exposure; these were described in Díaz
+    and Hejazi (2020) <doi:10.1111/rssb.12362>. Classical estimators of these
+    quantities are implemented, including parametric G-computation and inverse
+    probability weighting (IPW), as are asymptotically efficient, debiased
+    estimators capable of incorporating machine learning in the estimation of
+    nuisance functionals, including both one-step and targeted minimum loss
+    (TML) estimators. In settings where intermediate confounders are present,
+    the stochastic-interventional effects are more appropriate, which operate
+    by applying stochastic interventions to exposure, intermediate confounders,
+    and mediators; these were described by Hejazi, Rudolph, van der Laan, and
+    Díaz (2022) <doi:10.1093/biostatistics/kxac002>. For these complex causal
+    effects, only efficient one-step and TML estimators are made available.
 Depends: R (>= 3.2.0)
 Imports:
     R6,
@@ -37,8 +44,9 @@ Imports:
     tibble,
     data.table,
     assertthat,
-    origami,
-    sl3,
+    origami (>= 1.0.3),
+    sl3 (>= 1.4.3),
+    hal9001 (>= 0.4.1),
     tmle3
 Suggests:
     testthat,
@@ -49,12 +57,12 @@ Suggests:
     nnls,
     speedglm,
     glmnet,
-    hal9001,
     xgboost,
     ranger,
     mma
 Remotes:
-    github::tlverse/sl3@master,
+    github::tlverse/hal9001,
+    github::tlverse/sl3@devel,
     github::tlverse/tmle3@master
 License: MIT + file LICENSE
 URL: https://github.com/nhejazi/medshift
@@ -62,5 +70,5 @@ BugReports: https://github.com/nhejazi/medshift/issues
 Encoding: UTF-8
 LazyData: true
 VignetteBuilder: knitr
-RoxygenNote: 7.1.0
-Roxygen: list(markdown = TRUE, old_usage = TRUE, r6 = FALSE)
+RoxygenNote: 7.2.1
+Roxygen: list(markdown = TRUE, r6 = FALSE)

@@ -4,8 +4,17 @@
 \alias{est_onestep}
 \title{Efficient One-Step Estimator}
 \usage{
-est_onestep(data, delta, g_learners, e_learners, m_learners, phi_learners,
-  w_names, z_names, cv_folds = 10)
+est_onestep(
+  data,
+  delta,
+  g_learners,
+  e_learners,
+  m_learners,
+  phi_learners,
+  w_names,
+  z_names,
+  cv_folds = 10
+)
 }
 \arguments{
 \item{data}{A \code{data.table} containing the observed data, with columns

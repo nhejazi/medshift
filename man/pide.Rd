@@ -4,8 +4,17 @@
 \alias{pide}
 \title{One-step or TML estimation of the population intervention direct effect}
 \usage{
-pide(W, A, Z, Y, ids = seq(1, length(Y)), delta, estimator = c("onestep",
-  "tmle"), ci_level = 0.95, ...)
+pide(
+  W,
+  A,
+  Z,
+  Y,
+  ids = seq(1, length(Y)),
+  delta,
+  estimator = c("onestep", "tmle"),
+  ci_level = 0.95,
+  ...
+)
 }
 \arguments{
 \item{W}{A \code{matrix}, \code{data.frame}, or similar corresponding to a

@@ -5,10 +5,22 @@
 \title{Hypothesis test of direct effect with mediated stochastic interventions
 using the multiplier bootstrap}
 \usage{
-test_de(W, A, Z, Y, ids = seq(1, length(Y)), delta_grid = seq(from = 0.5,
-  to = 5, by = 0.9), mult_type = c("rademacher", "gaussian"),
-  ci_level = 0.95, g_learners, e_learners, m_learners, phi_learners,
-  cv_folds = 10, n_mult = 10000)
+test_de(
+  W,
+  A,
+  Z,
+  Y,
+  ids = seq(1, length(Y)),
+  delta_grid = seq(from = 0.5, to = 5, by = 0.9),
+  mult_type = c("rademacher", "gaussian"),
+  ci_level = 0.95,
+  g_learners,
+  e_learners,
+  m_learners,
+  phi_learners,
+  cv_folds = 10,
+  n_mult = 10000
+)
 }
 \arguments{
 \item{W}{A \code{matrix}, \code{data.frame}, or similar corresponding to a

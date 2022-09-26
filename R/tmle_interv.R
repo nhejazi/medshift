@@ -1,11 +1,3 @@
-#' Incremental Propensity Score Intervention
-#'
-#' @param g ...
-#' @param delta ...
-gdelta1 <- function(g, delta) {
-  delta * g / (delta * g + 1 - g)
-}
-
 #' Check TMLE Fluctuation Model
 #'
 #' @param tilt_mod ...
@@ -27,18 +19,3 @@ check_fluc <- function(tilt_mod, tilt_tol = 10) {
   return(tilt_mod)
 }
 
-#' Bound Predicted Probability
-#'
-#' @param x ...
-#' @param p ...
-bound <- function(x, p = 0.005) {
-  pmax(pmin(x, 1 - p), p)
-}
-
-#' Truncate Predictions
-#'
-#' @param x ...
-#' @param p ...
-truncate <- function(x, p = 0.01) {
-  pmin(pmax(x, p), 1 - p)
-}

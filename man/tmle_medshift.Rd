@@ -5,8 +5,15 @@
 \title{TML Estimator for the Counterfactual Mean of a Joint Stochastic Intervention
 Defining the Population Intervention (In)direct Effects}
 \usage{
-tmle_medshift(shift_type = "ipsi", delta, e_learners, phi_learners,
-  max_iter = 10000, step_size = 1e-06, ...)
+tmle_medshift(
+  shift_type = "ipsi",
+  delta,
+  e_learners,
+  phi_learners,
+  max_iter = 10000,
+  step_size = 1e-06,
+  ...
+)
 }
 \arguments{
 \item{shift_type}{A \code{character} defining the type of shift to be

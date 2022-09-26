@@ -2,16 +2,16 @@
 % Please edit documentation in R/utils.R
 \name{bound_propensity}
 \alias{bound_propensity}
-\title{Bounding Propensity Scores}
+\title{Bounding propensity scores}
 \usage{
-bound_propensity(vals, bounds = c(0.01, 0.99))
+bound_propensity(vals, bounds = c(0.001, 0.999))
 }
 \arguments{
-\item{vals}{A \code{numeric} vector of values in the closed unit interval.}
+\item{vals}{A \code{numeric} vector of values in the interval \link{0, 1}.}
 
 \item{bounds}{A \code{numeric} vector containing two values, the first being
 the minimum allowable value and the second being the maximum allowable for
-values appearing in the vector \code{vals}.}
+values appearing in the vector \code{vals} (the previous argument).}
 }
 \description{
 Bounds estimated propensity score values to be within a specified range.
