@@ -150,28 +150,82 @@ bound_propensity <- function(vals, bounds = c(0.001, 0.999)) {
 
 ###############################################################################
 
-#' Scale values to the unit interval
+#' Map values to the unit interval
 #'
 #' @param vals A \code{numeric} vector of values to be scaled into the closed
 #'  interval [0, 1].
 #'
 #' @keywords internal
 scale_to_unit <- function(vals) {
-  vals_scaled <- (vals - min(vals)) / (max(vals) - min(vals))
+  # rescale to unit interval
+  max_vals <- max(vals)
+  min_vals <- min(vals)
+  vals_scaled <- (vals - min_vals) / (max_vals - min_vals)
+
+  # store original min/max as attributes
+  attr(vals_scaled, "max") <- max_vals
+  attr(vals_scaled, "min") <- min_vals
   return(vals_scaled)
 }
 
 ###############################################################################
 
-#' Scale values from the unit interval to their original scale
+#' Map values from the unit interval to their original scale
 #'
-#' @param scaled_vals A \code{numeric} vector of values scaled to lie in the
-#'  closed interval [0, 1] by use of \code{\link{scale_to_unit}}.
-#' @param max_orig The maximum of the values on the original scale.
-#' @param min_orig The minimum of the values on the original scale.
+#' @param vals_unit A \code{numeric} vector of values scaled to fall in the
+#'  closed unit interval [0, 1] by use of \code{\link{scale_to_unit}}.
+#'
+#' @importFrom assertthat assert_that
 #'
 #' @keywords internal
-scale_from_unit <- function(scaled_vals, max_orig, min_orig) {
-  vals_orig <- (scaled_vals * (max_orig - min_orig)) + min_orig
-  return(vals_orig)
+scale_from_unit <- function(vals_unit) {
+  # check that input falls in the unit interval
+  assertthat::assert_that(min(vals_unit) == 0)
+  assertthat::assert_that(max(vals_unit) == 1)
+
+  # rescale back to the original interval
+  max_orig <- attr(vals_unit, "max")
+  min_orig <- attr(vals_unit, "min")
+  vals_rescaled <- (vals_unit * (max_orig - min_orig)) + min_orig
+  return(vals_rescaled)
+}
+
+###############################################################################
+
+#' Check TMLE Fluctuation Model
+#'
+#' @param tilt_mod ...
+#' @param tilt_tol ...
+#'
+#' @importFrom stats coef
+check_fluc <- function(tilt_mod, tilt_tol = 10) {
+  # number of clever covariates
+  n_coefs <- length(stats::coef(tilt_mod))
+
+  # set NA coefficients to zero
+  tilt_mod[["coefficients"]][is.na(stats::coef(tilt_mod))] <- rep(0, n_coefs)
+
+  # check sanity of remaining coefficients
+  if (!tilt_mod[["converged"]] | abs(max(stats::coef(tilt_mod))) > tilt_tol) {
+    tilt_mod[["coefficients"]] <- rep(0, n_coefs)
+  }
+  # output cleaned up fluctuation model
+  return(tilt_mod)
+}
+
+###############################################################################
+
+#' Mapping for Incremental Propensity Score Interventions
+#'
+#' @param g_est A \code{numeric} vector of estimated propensity scores, ie, the
+#'  conditional probability of receiving treatment (A = 1) given covariates W.
+#' @param delta A \code{numeric} value indicating the magnitude of shift in the
+#'  treatment that defines the counterfactual quantity of interest. In the case
+#'  of binary treatments, this defines the incremental propensity score shift,
+#'  which acts as a multiplier of the odds with which an observational unit
+#'  receives treatment (EH Kennedy, 2018; <doi:10.1080/01621459.2017.1422737>).
+#'  When the treatment is quantitative, the defines the degree of shift for a
+#'  modified treatment policy but non-binary treatments are not  yet supported.
+ipsi_delta <- function(g_est, delta) {
+  delta * g_est / (delta * g_est + 1 - g_est)
 }

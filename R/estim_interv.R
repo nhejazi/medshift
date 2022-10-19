@@ -334,7 +334,7 @@ estimators <- function(data,
   }
 
   # compute IPSI shifts
-  g1delta <- gdelta1(g1, delta)
+  g1delta <- ipsi_delta(g1, delta)
   gdelta <- A * g1delta + (1 - A) * (1 - g1delta)
 
   # compute clever covariates
@@ -419,7 +419,7 @@ estimators <- function(data,
 
     g <- A * g1 + (1 - A) * (1 - g1)
     b <- L * b1A + (1 - L) * (1 - b1A)
-    g1delta <- gdelta1(g1, delta)
+    g1delta <- ipsi_delta(g1, delta)
     gdelta <- A * g1delta + (1 - A) * (1 - g1delta)
 
     HD <- b / d * (1 - gdelta / e)
