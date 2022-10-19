@@ -314,8 +314,7 @@ fit_m_mech <- function(data, valid_data = NULL,
 #'
 #' @importFrom data.table data.table as.data.table
 #' @importFrom sl3 sl3_Task
-fit_phi_mech <- function(train_data, valid_data, learners, m_out,
-                         w_names) {
+fit_phi_mech <- function(train_data, valid_data, learners, m_out, w_names) {
   # regression on pseudo-outcome for this nuisance parameter
   # NOTE: first, learn the regression model using the training data
   m_pred_train_A1 <- m_out$m_est_training$m_pred_A1

@@ -90,12 +90,7 @@ medshift <- function(W,
                      e_learners = sl3::Lrnr_glm$new(),
                      m_learners = sl3::Lrnr_glm$new(),
                      phi_learners = sl3::Lrnr_glm$new(),
-                     estimator = c(
-                       "onestep",
-                       "tmle",
-                       "substitution",
-                       "reweighted"
-                     ),
+                     estimator = c( "onestep", "tmle", "sub", "ipw"),
                      estimator_args = list(
                        cv_folds = 10,
                        max_iter = 1e4,
@@ -123,46 +118,87 @@ medshift <- function(W,
   )
   data.table::setnames(data, c("Y", z_names, "A", w_names, "ids"))
 
-  if (estimator == "substitution") {
+  if (is.null(L)) {
     # SUBSTITUTION ESTIMATOR
-    sub_est_args <- list(
-      data = data, delta = delta,
-      g_learners = g_learners, m_learners = m_learners,
-      w_names = w_names, z_names = z_names
-    )
-    est_out <- do.call(est_substitution, sub_est_args)
-  } else if (estimator == "reweighted") {
-    # INVERSE PROBABILITY RE-WEIGHTED ESTIMATOR
-    ipw_est_args <- list(
-      data = data, delta = delta,
-      g_learners = g_learners, e_learners = e_learners,
-      w_names = w_names, z_names = z_names
-    )
-    est_out <- do.call(est_ipw, ipw_est_args)
-  } else if (estimator == "onestep") {
+    if (estimator == "sub") {
+      sub_est_args <- list(
+        data = data, delta = delta,
+        g_learners = g_learners, m_learners = m_learners,
+        w_names = w_names, z_names = z_names
+      )
+      # TODO: should add inference based on the bootstrap
+      est_out <- do.call(stoch_est_sub, sub_est_args)
+
+    # INVERSE PROBABILITY WEIGHTED ESTIMATOR
+    } else if (estimator == "ipw") {
+      ipw_est_args <- list(
+        data = data, delta = delta,
+        g_learners = g_learners, e_learners = e_learners,
+        w_names = w_names, z_names = z_names
+      )
+      # TODO: should add inference based on IPW estimating function
+      est_out <- do.call(stoch_est_ipw, ipw_est_args)
+
     # CROSS-FITTED ONE-STEP ESTIMATOR
-    os_est_args <- list(
-      data = data, delta = delta,
-      g_learners = g_learners, e_learners = e_learners,
-      m_learners = m_learners, phi_learners = phi_learners,
-      w_names = w_names, z_names = z_names,
-      cv_folds = estimator_args[["cv_folds"]]
-    )
-    est_out <- do.call(est_onestep, os_est_args)
-  } else if (estimator == "tmle") {
+    } else if (estimator == "onestep") {
+      os_est_args <- list(
+        data = data, delta = delta,
+        g_learners = g_learners, e_learners = e_learners,
+        m_learners = m_learners, phi_learners = phi_learners,
+        w_names = w_names, z_names = z_names,
+        cv_folds = estimator_args[["cv_folds"]]
+      )
+      est_out <- do.call(stoch_est_onestep, os_est_args)
+
     # CROSS-VALIDATED TARGETED MINIMUM LOSS ESTIMATOR
-    node_list <- list(W = w_names, A = "A", Z = z_names, Y = "Y", id = "ids")
-    learner_list <- list(Y = m_learners, A = g_learners)
-    tmle_spec <- tmle_medshift(
-      delta = delta,
-      e_learners = e_learners,
-      phi_learners = phi_learners,
-      max_iter = estimator_args[["max_iter"]],
-      step_size = estimator_args[["step_size"]]
-    )
-    est_out <- tmle3::tmle3(tmle_spec, data, node_list, learner_list)
+    } else if (estimator == "tmle") {
+      node_list <- list(W = w_names, A = "A", Z = z_names, Y = "Y", id = "ids")
+      learner_list <- list(Y = m_learners, A = g_learners)
+      tmle_spec <- tmle_medshift(
+        delta = delta,
+        e_learners = e_learners,
+        phi_learners = phi_learners,
+        max_iter = estimator_args[["max_iter"]],
+        step_size = estimator_args[["step_size"]]
+      )
+      est_out <- tmle3::tmle3(tmle_spec, data, node_list, learner_list)
+    }
+  } else {
+    # SUBSTITUTION ESTIMATOR
+    if (estimator == "sub") {
+      stop("Parametric substitution estimator not yet implemented for
+           stochastic-interventional (in)direct effects")
+
+    # INVERSE PROBABILITY WEIGHTED ESTIMATOR
+    } else if (estimator == "ipw") {
+      stop("Inverse probability weighted estimator not yet implemented for
+           stochastic-interventional (in)direct effects")
+
+    # CROSS-FITTED ONE-STEP ESTIMATOR
+    } else if (estimator == "onestep") {
+      os_est_args <- list(
+        data = data, delta = delta,
+        g_learners = g_learners, e_learners = e_learners,
+        m_learners = m_learners, phi_learners = phi_learners,
+        w_names = w_names, z_names = z_names,
+        cv_folds = estimator_args[["cv_folds"]]
+      )
+      est_out <- do.call(interv_est_onestep, os_est_args)
+
+    # CROSS-VALIDATED TARGETED MINIMUM LOSS ESTIMATOR
+    } else if (estimator == "tmle") {
+      tml_est_args <- list(
+        data = data, delta = delta,
+        g_learners = g_learners, e_learners = e_learners,
+        m_learners = m_learners, phi_learners = phi_learners,
+        w_names = w_names, z_names = z_names,
+        cv_folds = estimator_args[["cv_folds"]]
+      )
+      est_out <- do.call(interv_est_tml, os_est_args)
+    }
   }
 
+  # TODO: best to extract tmle3 components for compatibility across outputs
   # lazily create output as ad-hoc S3 class, except for tmle3 output
   if (estimator != "tmle") {
     class(est_out) <- "medshift"

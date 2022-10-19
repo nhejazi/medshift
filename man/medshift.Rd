@@ -2,11 +2,13 @@
 % Please edit documentation in R/medshift.R
 \name{medshift}
 \alias{medshift}
-\title{Nonparametric estimation of the population intervention (in)direct effects}
+\title{Nonparametric estimation of the stochastic and stochastic-interventional
+(in)direct effects}
 \usage{
 medshift(
   W,
   A,
+  L = NULL,
   Z,
   Y,
   ids = seq_along(Y),
@@ -15,71 +17,97 @@ medshift(
   e_learners = sl3::Lrnr_glm$new(),
   m_learners = sl3::Lrnr_glm$new(),
   phi_learners = sl3::Lrnr_glm$new(),
-  estimator = c("onestep", "tmle", "substitution", "reweighted"),
+  estimator = c("onestep", "tmle", "sub", "ipw"),
   estimator_args = list(cv_folds = 10, max_iter = 10000, step_size = 1e-06)
 )
 }
 \arguments{
-\item{W}{A \code{matrix}, \code{data.frame}, or similar corresponding to a
-set of baseline covariates.}
+\item{W}{A \code{matrix}, \code{data.frame}, or similar rectangular data
+object of covariates, corresponding to measured baseline confounders.}
 
 \item{A}{A \code{numeric} vector corresponding to a treatment variable. The
-parameter of interest is defined as a location shift of this quantity.}
+causal parameter is defined by an intervention that shifts this quantity
+through an (incremental) exponential tilt or a modified treatment policy.}
+
+\item{L}{A \code{numeric} vector corresponding to an intermediate confounder
+affected by treatment (on the causal pathway between the treatment A, the
+mediators Z, and outcome Y. When set to \code{NULL} (default), stochastic
+(in)direct effects are estimated; when specified, stochastic-interventional
+effects are estimated instead, as the former are unidentifiable.}
 
 \item{Z}{A \code{numeric} vector, \code{matrix}, \code{data.frame}, or
-similar corresponding to a set of mediators (on the causal pathway between
-the intervention A and the outcome Y).}
+similar rectanguilar data object corresponding to a set of mediators that
+sit on the causal pathway between the treatment A and the outcome Y.}
 
 \item{Y}{A \code{numeric} vector corresponding to an outcome variable.}
 
 \item{ids}{A \code{numeric} vector of observation-level IDs, allowing for
 observational units to be related through a hierarchical structure. The
-default is to assume all units are IID. When repeated IDs are included,
-both the cross-validation procedures used for estimation and inferential
-procedures respect these IDs.}
+default is to assume all units are independent. When repeated measures are
+included, both the cross-validation scheme for nuisance paramter estimation
+and inferential procedures are accordingly adjusted.}
 
-\item{delta}{A \code{numeric} value indicating the degree of shift in the
-intervention to be used in defining the causal quantity of interest. In the
-case of binary interventions, this takes the form of an incremental
-propensity score shift, acting as a multiplier of the odds with which a
-unit receives the intervention (EH Kennedy, 2018, JASA;
-\url{doi:10.1080/01621459.2017.1422737}).}
+\item{delta}{A \code{numeric} value indicating the magnitude of shift in the
+treatment that defines the counterfactual quantity of interest. In the case
+of binary treatments, this defines the incremental propensity score shift,
+which acts as a multiplier of the odds with which an observational unit
+receives treatment (EH Kennedy, 2018; \url{doi:10.1080/01621459.2017.1422737}).
+When the treatment is quantitative, the defines the degree of shift for a
+modified treatment policy but non-binary treatments are not  yet supported.}
 
 \item{g_learners}{A \code{\link[sl3]{Stack}} (or other learner class that
 inherits from \code{\link[sl3]{Lrnr_base}}), containing a single or set of
-instantiated learners from \pkg{sl3}, to be used in fitting the propensity
-score, i.e., g = P(A | W).}
+instantiated learners from \pkg{sl3}, used to fit a propensity score model.}
 
 \item{e_learners}{A \code{\link[sl3]{Stack}} (or other learner class that
 inherits from \code{\link[sl3]{Lrnr_base}}), containing a single or set of
-instantiated learners from \pkg{sl3}, to be used in fitting a propensity
-score that conditions on the mediators, i.e., e = P(A | Z, W).}
+instantiated learners from \pkg{sl3}, used to fit a reparametrized model
+for the mediator(s) that is equivalent to a propensity score conditioning
+on the mediators.}
 
 \item{m_learners}{A \code{\link[sl3]{Stack}} (or other learner class that
 inherits from \code{\link[sl3]{Lrnr_base}}), containing a single or set of
-instantiated learners from \pkg{sl3}, to be used in fitting the outcome
-regression, i.e., m(A, Z, W).}
+instantiated learners from \pkg{sl3}, used to fit an outcome regression.}
 
 \item{phi_learners}{A \code{\link[sl3]{Stack}} (or other learner class that
 inherits from \code{\link[sl3]{Lrnr_base}}), containing a single or set of
-instantiated learners from \pkg{sl3}, to be used in a regression of a
-pseudo-outcome on the baseline covariates, i.e.,
-phi(W) = E[m(A = 1, Z, W) - m(A = 0, Z, W) | W).}
+instantiated learners from \pkg{sl3}, used to fit a nuisance regression of
+a "derived" pseudo-outcome (contrast of outcome regressions under different
+treatment conditions), conditional on baseline covariates. This is of the
+following form phi(W) = E[m(A = 1, Z, W) - m(A = 0, Z, W) | W). This is
+irrelevant for the stochastic-interventional effects (when intermediate
+confounding is present) and, so, is ignored when L is not \code{NULL}.}
 
-\item{estimator}{The desired estimator of the natural direct effect to be
-computed. Currently, choices are limited to a substitution estimator, a
-re-weighted estimator, a one-step estimator, and a targeted minimum loss
-estimator.}
+\item{estimator}{The desired estimator of the direct or indirect effect to
+For the stochastic (in)direct effects, parametric substitution and inverse
+probability weighted estimators, alongside both efficient one-step and TML
+estimators, are available. For the stochastic-interventional (in)direct
+effects, only the latter two, which are compatible with machine learning
+estimation of nuisance functionals and incorporate cross-fitting to do so,
+are available. The one-step estimator is the default in all cases.}
 
 \item{estimator_args}{A \code{list} of extra arguments to be passed (via
-\code{...}) to the function call for the specified estimator. The default
-is so chosen as to allow the number of folds used in computing the one-step
+\code{...}) to the internal function for the desired estimator. The default
+is chosen so as to allow the number of folds used in computing the one-step
 estimator to be easily tweaked. Refer to the documentation for functions
-\code{\link{est_onestep}}, \code{\link{est_ipw}}, and
-\code{\link{est_substitution}} for details on what other arguments may be
-specified through this mechanism. For the option \code{"tmle"}, there is
-heavy reliance on the architecture provided by \pkg{tmle3}.}
+\code{\link{est_onestep}}, \code{\link{est_ipw}}, and \code{\link{est_sub}}
+for details on what other arguments may be specified.}
+
+\item{b_learners}{A \code{\link[sl3]{Stack}} (or other learner class that
+inherits from \code{\link[sl3]{Lrnr_base}}), containing a single or set of
+instantiated learners from \pkg{sl3}, used to fit a propensity score model
+for the intermediate confounder, adjusting for the baseline covariates and
+the treatment both. This is irrelevant for stochastic (in)direct effects,
+and so is ignored when L is left to its default of \code{NULL}.}
+
+\item{d_learners}{A \code{\link[sl3]{Stack}} (or other learner class that
+inherits from \code{\link[sl3]{Lrnr_base}}), containing a single or set of
+instantiated learners from \pkg{sl3}, used to fit a propensity score model
+for the intermediate confounder, adjusting for the baseline covariates, the
+treatment, and the mediators. This is irrelevant for stochastic (in)direct
+effects, and so is ignored when L is left to its default of \code{NULL}.}
 }
 \description{
-Nonparametric estimation of the population intervention (in)direct effects
+Nonparametric estimation of the stochastic and stochastic-interventional
+(in)direct effects
 }

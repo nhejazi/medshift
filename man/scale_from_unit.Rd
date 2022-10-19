@@ -2,19 +2,15 @@
 % Please edit documentation in R/utils.R
 \name{scale_from_unit}
 \alias{scale_from_unit}
-\title{Scale values from the unit interval to their original scale}
+\title{Map values from the unit interval to their original scale}
 \usage{
-scale_from_unit(scaled_vals, max_orig, min_orig)
+scale_from_unit(vals_unit)
 }
 \arguments{
-\item{scaled_vals}{A \code{numeric} vector of values scaled to lie in the
-closed interval \link{0, 1} by use of \code{\link{scale_to_unit}}.}
-
-\item{max_orig}{The maximum of the values on the original scale.}
-
-\item{min_orig}{The minimum of the values on the original scale.}
+\item{vals_unit}{A \code{numeric} vector of values scaled to fall in the
+closed unit interval \link{0, 1} by use of \code{\link{scale_to_unit}}.}
 }
 \description{
-Scale values from the unit interval to their original scale
+Map values from the unit interval to their original scale
 }
 \keyword{internal}
