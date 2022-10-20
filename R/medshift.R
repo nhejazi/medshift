@@ -95,7 +95,8 @@ medshift <- function(W,
                        cv_folds = 10,
                        max_iter = 1e4,
                        step_size = 1e-6
-                     )) {
+                     )
+                    ) {
   # set defaults
   estimator <- match.arg(estimator)
   estimator_args <- unlist(estimator_args, recursive = FALSE)
@@ -103,30 +104,30 @@ medshift <- function(W,
   # NOTE: no static interventions -- need a valid IPSI stochastic intervention
   assertthat::assert_that(delta > 0 && delta < Inf)
 
-  #browser()
+  browser()
   # construct input data structure
+  w_names <- paste("W", seq_len(ncol(as.matrix(W))), sep = "_")
+  z_names <- paste("Z", seq_len(ncol(as.matrix(Z))), sep = "_")
   if (is.null(L)) {
     data <- data.table::as.data.table(cbind(Y, Z, A, W, ids))
+    data.table::setnames(data, c("Y", z_names, "A", w_names, "ids"))
   } else {
     data <- data.table::as.data.table(cbind(Y, Z, L, A, W, ids))
+    data.table::setnames(data, c("Y", z_names, "L", "A", w_names, "ids"))
   }
-  w_names <- paste("W", seq_len(dim(data.table::as.data.table(W))[2]),
-    sep = "_"
-  )
-  z_names <- paste("Z", seq_len(dim(data.table::as.data.table(Z))[2]),
-    sep = "_"
-  )
-  data.table::setnames(data, c("Y", z_names, "A", w_names, "ids"))
 
+  # NOTE: in this case (without L), we provide several estimators for only the
+  #       mediation decomposition term that defines stochastic mediation direct
+  #       and indirect effects
   if (is.null(L)) {
-    # SUBSTITUTION ESTIMATOR
+    # PARAMETRIC SUBSTITUTION ESTIMATOR
     if (estimator == "sub") {
       sub_est_args <- list(
         data = data, delta = delta,
         g_learners = g_learners, m_learners = m_learners,
         w_names = w_names, z_names = z_names
       )
-      # TODO: should add inference based on the bootstrap
+      # TODO: add inference based on the bootstrap
       est_out <- do.call(stoch_est_sub, sub_est_args)
 
     # INVERSE PROBABILITY WEIGHTED ESTIMATOR
@@ -136,7 +137,7 @@ medshift <- function(W,
         g_learners = g_learners, e_learners = e_learners,
         w_names = w_names, z_names = z_names
       )
-      # TODO: should add inference based on IPW estimating function
+      # TODO: add inference based on IPW estimating function
       est_out <- do.call(stoch_est_ipw, ipw_est_args)
 
     # CROSS-FITTED ONE-STEP ESTIMATOR
@@ -161,17 +162,29 @@ medshift <- function(W,
         max_iter = estimator_args[["max_iter"]],
         step_size = estimator_args[["step_size"]]
       )
-      est_out <- tmle3::tmle3(tmle_spec, data, node_list, learner_list)
+      tml_est <- tmle3::tmle3(tmle_spec, data, node_list, learner_list)
+
+      # reorganize tmle3 output for compatibility across estimator types
+      est_out <- list(
+        theta = tml_est$estimates[[1]]$psi,
+        var = var(as.numeric(tml_est$estimates[[1]]$IC)) / data[, .N],
+        eif = as.numeric(tml_est$estimates[[1]]$IC),
+        type = "tmle"
+      ) 
     }
+
+  # NOTE: the next bit of branching logic  covers the stochastic-interventional
+  #       effects, for which we provide efficient estimators of the direct and
+  #       indirect effects
   } else {
-    # SUBSTITUTION ESTIMATOR
+    # PARAMETRIC SUBSTITUTION ESTIMATOR
     if (estimator == "sub") {
-      stop("Parametric substitution estimator not yet implemented for
-           stochastic-interventional (in)direct effects")
+      stop("Parametric substitution estimator not yet implemented for the
+      stochastic-interventional (in)direct effects")
 
     # INVERSE PROBABILITY WEIGHTED ESTIMATOR
     } else if (estimator == "ipw") {
-      stop("Inverse probability weighted estimator not yet implemented for
+      stop("Inverse probability weighted estimator not yet implemented for the
            stochastic-interventional (in)direct effects")
 
     # CROSS-FITTED ONE-STEP ESTIMATOR
@@ -198,10 +211,7 @@ medshift <- function(W,
     }
   }
 
-  # TODO: best to extract tmle3 components for compatibility across outputs
   # lazily create output as ad-hoc S3 class, except for tmle3 output
-  if (estimator != "tmle") {
-    class(est_out) <- "medshift"
-  }
+  class(est_out) <- "medshift"
   return(est_out)
 }

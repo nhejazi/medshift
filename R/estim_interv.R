@@ -2,8 +2,6 @@ utils::globalVariables(c("..w_names", "..z_names"))
 
 #' Compute One-step and TML estimators
 #'
-#' @import data.table origami sl3 stats stringr tibble
-#'
 #' @param data ...
 #' @param delta ...
 #' @param g_stack ...
@@ -13,6 +11,8 @@ utils::globalVariables(c("..w_names", "..z_names"))
 #' @param d_stack ...
 #' @param cv_folds ...
 #' @param tiltmod_tol ...
+#'
+#' @import data.table origami sl3 stats stringr tibble
 estimators <- function(data,
                        delta,
                        g_stack,
@@ -22,34 +22,7 @@ estimators <- function(data,
                        d_stack,
                        cv_folds = 5L,
                        tiltmod_tol = 10) {
-  ## extract data
-  data <- data.table::as.data.table(data)
-  w_names <- stringr::str_detect(names(data), "W")
-  z_names <- stringr::str_detect(names(data), "Z")
-  Y <- data[["Y"]]
-  Z <- data[, ..z_names]
-  L <- data[["L"]]
-  A <- data[["A"]]
-  W <- data[, ..w_names]
-  n_obs <- nrow(data)
 
-  ## get names of data components
-  names_z <- stringr::str_subset(colnames(data), "Z")
-  names_w <- stringr::str_subset(colnames(data), "W")
-
-  ## instantiate HAL and GLM for pseudo-outcome regressions
-  hal_learner <- Lrnr_hal9001$new(max_degree = 4L,
-                                  n_folds = 10L,
-                                  fit_type = "glmnet",
-                                  family = "gaussian",
-                                  cv_select = TRUE,
-                                  reduce_basis = 0.01,
-                                  return_lasso = FALSE,
-                                  type.measure = "mse",
-                                  standardize = FALSE,
-                                  lambda.min.ratio = 1e-4,
-                                  nlambda = 1000L,
-                                  yolo = FALSE)
 
   ## fit nuisance function estimators
   nuisance_fits <- fit_nuisance(data, g_stack, e_stack, m_stack,
