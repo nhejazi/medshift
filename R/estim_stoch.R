@@ -46,8 +46,8 @@ stoch_est_ipw <- function(data,
     data = data, learners = e_learners,
     z_names = z_names, w_names = w_names
   )
-  e_pred <- data$A * e_out$e_est$e_pred_A1 +
-    (1 - data$A) * e_out$e_est$e_pred_A0
+  e_pred <- data$A * e_out$e_est$e_pred_natural_A1 +
+    (1 - data$A) * e_out$e_est$e_pred_natural_A0
 
   # stabilize weights (dividing by sample average) and compute IPW estimate
   mean_weights <- mean(g_shifted / e_pred)

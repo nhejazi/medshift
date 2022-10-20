@@ -104,7 +104,6 @@ medshift <- function(W,
   # NOTE: no static interventions -- need a valid IPSI stochastic intervention
   assertthat::assert_that(delta > 0 && delta < Inf)
 
-  browser()
   # construct input data structure
   w_names <- paste("W", seq_len(ncol(as.matrix(W))), sep = "_")
   z_names <- paste("Z", seq_len(ncol(as.matrix(Z))), sep = "_")
@@ -116,6 +115,7 @@ medshift <- function(W,
     data.table::setnames(data, c("Y", z_names, "L", "A", w_names, "ids"))
   }
 
+  browser()
   # NOTE: in this case (without L), we provide several estimators for only the
   #       mediation decomposition term that defines stochastic mediation direct
   #       and indirect effects
@@ -173,7 +173,7 @@ medshift <- function(W,
       ) 
     }
 
-  # NOTE: the next bit of branching logic  covers the stochastic-interventional
+  # NOTE: the next branch of this logic covers the stochastic-interventional
   #       effects, for which we provide efficient estimators of the direct and
   #       indirect effects
   } else {

@@ -53,34 +53,28 @@ fit_g_mech <- function(data, valid_data = NULL, delta, learners, w_names) {
     outcome = "A",
     id = "ids"
   )
-  g_pred_A1 <- g_fit_stack$predict(g_task_pred)
 
-  # compute A = 0 case by symmetry
-  g_pred_A0 <- 1 - g_pred_A1
+  # get predictions for "natural" (observed) propensity score
+  g_pred_natural_A1 <- g_fit_stack$predict(g_task_pred) %>%
+    bound_precision() %>%
+    bound_propensity()
+  g_pred_natural_A0 <- 1 - g_pred_natural_A1 %>%
+    bound_precision() %>%
+    bound_propensity()
 
-  # directly computed the shifted propensity score
-  g_pred_shifted_A1 <- ipsi_delta(g_pred_A1, delta)
-
-  # compute shifted propensity score for A = 0 by symmetry
-  g_pred_shifted_A0 <- 1 - g_pred_shifted_A1
-
-  # bounding to numerical precision
-  g_pred_A1 <- bound_precision(g_pred_A1)
-  g_pred_A0 <- bound_precision(g_pred_A0)
-  g_pred_shifted_A1 <- bound_precision(g_pred_shifted_A1)
-  g_pred_shifted_A0 <- bound_precision(g_pred_shifted_A0)
-
-  # bounding for potential positivity issues
-  g_pred_A1 <- bound_propensity(g_pred_A1)
-  g_pred_A0 <- bound_propensity(g_pred_A0)
-  g_pred_shifted_A1 <- bound_propensity(g_pred_shifted_A1)
-  g_pred_shifted_A0 <- bound_propensity(g_pred_shifted_A0)
+  # directly computed the shifted propensity score (by symmetry for A = 0)
+  g_pred_shifted_A1 <- ipsi_delta(g_pred_natural_A1, delta) %>%
+    bound_precision() %>%
+    bound_propensity()
+  g_pred_shifted_A0 <- (1 - g_pred_shifted_A1) %>%
+    bound_precision() %>%
+    bound_propensity()
 
   # output
   out <- list(
     g_est = data.table::data.table(cbind(
-      g_pred_A1 = g_pred_A1,
-      g_pred_A0 = g_pred_A0,
+      g_pred_natural_A1 = g_pred_natural_A1,
+      g_pred_natural_A0 = g_pred_natural_A0,
       g_pred_shifted_A1 = g_pred_shifted_A1,
       g_pred_shifted_A0 = g_pred_shifted_A0
     )),
@@ -137,7 +131,7 @@ fit_e_mech <- function(data, valid_data = NULL, learners, z_names, w_names) {
     data_pred <- data.table::copy(valid_data)
   }
 
-  # create task for estimating propensity score P(A = 1 | W)
+  # create task for estimating propensity score P(A = 1 | Z, W)
   e_task_pred <- sl3::sl3_Task$new(
     data = data_pred,
     covariates = c(z_names, w_names),
@@ -145,25 +139,19 @@ fit_e_mech <- function(data, valid_data = NULL, learners, z_names, w_names) {
     id = "ids"
   )
 
-  # predict from trained model on counterfactual data
-  e_pred_A1 <- e_fit_stack$predict(e_task_pred)
-
-  # get values of nuisance parameter E for A = 0 by symmetry with A = 1 case
-  e_pred_A0 <- 1 - e_pred_A1
-
-  # bounding to numerical precision
-  e_pred_A1 <- bound_precision(e_pred_A1)
-  e_pred_A0 <- bound_precision(e_pred_A0)
-
-  # bounding for potential positivity issues
-  e_pred_A1 <- bound_propensity(e_pred_A1)
-  e_pred_A0 <- bound_propensity(e_pred_A0)
+  # predict from trained model on counterfactual data (by symmetry for A = 0)
+  e_pred_natural_A1 <- e_fit_stack$predict(e_task_pred) %>%
+    bound_precision() %>%
+    bound_propensity()
+  e_pred_natural_A0 <- (1 - e_pred_natural_A1) %>%
+    bound_precision() %>%
+    bound_propensity()
 
   # output
   out <- list(
     e_est = data.table::data.table(cbind(
-      e_pred_A1 = e_pred_A1,
-      e_pred_A0 = e_pred_A0
+      e_pred_natural_A1 = e_pred_natural_A1,
+      e_pred_natural_A0 = e_pred_natural_A0
     )),
     e_fit = e_fit_stack
   )
@@ -216,32 +204,53 @@ fit_b_mech <- function(data, valid_data = NULL, learners, w_names) {
   }
 
   # create task for estimating intermediate confounding score P(L = 1 | A, W)
-  b_task_pred <- sl3::sl3_Task$new(
+  b_Anat_task <- sl3::sl3_Task$new(
     data = data_pred,
     covariates = c("A", w_names),
     outcome = "L",
+    outcome_type = "binomial",
+    id = "ids"
+  )
+
+  # predict from trained model on observed data (by symmetry for L = 0)
+  b_pred_L1_Anat <- b_fit_stack$predict(b_Anat_task) %>%
+    bound_precision() %>%
+    bound_propensity()
+  b_pred_L0_Anat <- (1 - b_pred_L1_Anat) %>%
+    bound_precision() %>%
+    bound_propensity()
+  
+  # create tasks with counterfactual data for {do(A = 1), do(A = 0)}
+  b_Ais0_task <- sl3::sl3_Task$new(
+    data = data_pred[, A := 0],
+    covariates = c("A", w_names),
+    outcome = "L",
+    outcome_type = "binomial",
+    id = "ids"
+  )
+  b_Ais1_task <- sl3::sl3_Task$new(
+    data = data_pred[, A := 1],
+    covariates = c("A", w_names),
+    outcome = "L",
+    outcome_type = "binomial",
     id = "ids"
   )
 
   # predict from trained model on counterfactual data
-  b_pred_L1 <- b_fit_stack$predict(b_task_pred)
-
-  # get values of nuisance parameter for L = 0 by symmetry with L = 1 case
-  b_pred_L0 <- 1 - b_pred_L1
-
-  # bounding to numerical precision
-  b_pred_L1 <- bound_precision(b_pred_L1)
-  b_pred_L0 <- bound_precision(b_pred_L0)
-
-  # bounding for potential positivity issues
-  b_pred_L1 <- bound_propensity(b_pred_L1)
-  b_pred_L0 <- bound_propensity(b_pred_L0)
+  b_pred_L1_Ais0 <- b_fit_stack$predict(b_Ais0_task) %>%
+    bound_precision() %>%
+    bound_propensity()
+  b_pred_L1_Ais1 <- b_fit_stack$predict(b_Ais1_task) %>%
+    bound_precision() %>%
+    bound_propensity()
 
   # output
   out <- list(
     b_est = data.table::data.table(cbind(
-      b_pred_L1 = b_pred_L1,
-      b_pred_L0 = b_pred_L0
+      b_pred_L1_Anat = b_pred_L1_Anat,
+      b_pred_L0_Anat = b_pred_L0_Anat,
+      b_pred_L1_Ais0 = b_pred_L1_Ais0,
+      b_pred_L1_Ais1 = b_pred_L1_Ais1
     )),
     b_fit = b_fit_stack
   )
@@ -297,32 +306,53 @@ fit_d_mech <- function(data, valid_data = NULL, learners, z_names, w_names) {
   }
 
   # create task for estimating intermediate confounding score P(L = 1 | A, W)
-  d_task_pred <- sl3::sl3_Task$new(
+  d_Anat_task <- sl3::sl3_Task$new(
     data = data_pred,
     covariates = c(z_names, "A", w_names),
     outcome = "L",
+    outcome_type = "binomial",
+    id = "ids"
+  )
+
+  # predict from trained model on observed data (for L = 0 by symmetry)
+  d_pred_L1_Anat <- d_fit_stack$predict(d_Anat_task) %>%
+    bound_precision() %>%
+    bound_propensity()
+  d_pred_L0_Anat <- (1 - d_pred_L1_Anat) %>%
+    bound_precision() %>%
+    bound_propensity()
+
+  # create tasks with counterfactual data for {do(A = 1), do(A = 0)}
+  d_Ais0_task <- sl3::sl3_Task$new(
+    data = data.table::copy(data_pred)[, A := 0],
+    covariates = c(z_names, "A", w_names),
+    outcome = "L",
+    outcome_type = "binomial",
+    id = "ids"
+  )
+  d_Ais1_task <- sl3::sl3_Task$new(
+    data = data.table::copy(data_pred)[, A := 1],
+    covariates = c(z_names, "A", w_names),
+    outcome = "L",
+    outcome_type = "binomial",
     id = "ids"
   )
 
   # predict from trained model on counterfactual data
-  d_pred_L1 <- d_fit_stack$predict(d_task_pred)
-
-  # get values of nuisance parameter for L = 0 by symmetry with L = 1 case
-  d_pred_L0 <- 1 - d_pred_L1
-
-  # bounding to numerical precision
-  d_pred_L1 <- bound_precision(d_pred_L1)
-  d_pred_L0 <- bound_precision(d_pred_L0)
-
-  # bounding for potential positivity issues
-  d_pred_L1 <- bound_propensity(d_pred_L1)
-  d_pred_L0 <- bound_propensity(d_pred_L0)
+  d_pred_L1_Ais0 <- d_fit_stack$predict(d_Ais0_task) %>%
+    bound_precision() %>%
+    bound_propensity()
+  d_pred_L1_Ais1 <- d_fit_stack$predict(d_Ais1_task) %>%
+    bound_precision() %>%
+    bound_propensity()
 
   # output
   out <- list(
     d_est = data.table::data.table(cbind(
-      d_pred_L1 = d_pred_L1,
-      d_pred_L0 = d_pred_L0
+      d_pred_L1_Anat = d_pred_L1_Anat,
+      d_pred_L0_Anat = d_pred_L0_Anat,
+      d_pred_L1_Ais0 = d_pred_L1_Ais0,
+      d_pred_L1_Ais1 = d_pred_L1_Ais1
     )),
     d_fit = d_fit_stack
   )
@@ -369,81 +399,140 @@ fit_m_mech <- function(data, valid_data = NULL, learners, z_names, w_names) {
     id = "ids"
   )
 
-  # fit and predict
+  # fit and predict (training predictions if valid_data = NULL, else full-data)
   m_fit_stack <- learners$train(m_task)
 
   # use full data for counterfactual prediction if no validation data provided
   if (is.null(valid_data)) {
-    # copy full data
-    data_A1 <- data.table::copy(data)
-    data_A0 <- data.table::copy(data)
+    # copy full-data
+    data_Ais1 <- data.table::copy(data)[, A := 1]
+    data_Ais0 <- data.table::copy(data)[, A := 0]
   } else {
-    # copy only validation data
-    data_A1 <- data.table::copy(valid_data)
-    data_A0 <- data.table::copy(valid_data)
-
-    # NOTE: to fit nuisance regression phi, need estimates on training set to
-    # construct the relevant pseudo-outcome, i.e., m(Z,A=1,W) - m(Z,A=0,W)
-    data_train_A1 <- data.table::copy(data)
-    data_train_A1[, A := 1]
-    m_task_train_A1 <- sl3::sl3_Task$new(
-      data = data_train_A1,
+    # copy validation data
+    data_Ais1 <- data.table::copy(valid_data)[, A := 1]
+    data_Ais0 <- data.table::copy(valid_data)[, A := 0]
+  
+    # NOTE: downstream fitting of nuisance regression requires estimates on the
+    #       training set for the pseudo-outcome, i.e., m(Z,A=1,W) - m(Z,A=0,W)
+    m_Ais1_task_training <- sl3::sl3_Task$new(
+      data = data.table::copy(data)[, A := 1],
       covariates = covars_names,
       outcome = "Y",
       id = "ids"
     )
-    m_pred_train_A1 <- m_fit_stack$predict(m_task_train_A1)
+    m_pred_Ais1_training <- m_fit_stack$predict(m_Ais1_task_training)
 
-    # repeat for A = 0 case
-    data_train_A0 <- data.table::copy(data)
-    data_train_A0[, A := 0]
-    m_task_train_A0 <- sl3::sl3_Task$new(
-      data = data_train_A0,
+    # repeat for counterfactual do(A = 0)
+    m_Ais0_task_training <- sl3::sl3_Task$new(
+      data = data.table::copy(data)[, A := 0],
       covariates = covars_names,
       outcome = "Y",
       id = "ids"
     )
-    m_pred_train_A0 <- m_fit_stack$predict(m_task_train_A0)
+    m_pred_Ais0_training <- m_fit_stack$predict(m_Ais0_task_training)
   }
 
-  # copy data and set intervention A = 1
-  data_A1[, A := 1]
-  m_task_A1 <- sl3::sl3_Task$new(
-    data = data_A1,
-    covariates = covars_names,
-    outcome = "Y",
-    id = "ids"
-  )
-  m_pred_A1 <- m_fit_stack$predict(m_task_A1)
+  # NOTE: the following are either validation-set counterfactual predictions
+  #       OR full-data counterfactual predictions (when valid_data = NULL)
+  # create task for counterfactual data under do(A = 1)
+  if ("L" %in% colnames(data)) {
+    # create counterfactual data and predict under {do(A = 1), do(L = 0)}
+    m_Ais1_Lis0_task <- sl3::sl3_Task$new(
+      data = data.table::copy(data_Ais1)[, L := 0],
+      covariates = covars_names,
+      outcome = "Y",
+      id = "ids"
+    )
+    m_pred_Ais1_Lis0 <- m_fit_stack$predict(m_Ais1_Lis0_task)
 
-  # copy data and set intervention A = 0
-  data_A0[, A := 0]
-  m_task_A0 <- sl3::sl3_Task$new(
-    data = data_A0,
-    covariates = covars_names,
-    outcome = "Y",
-    id = "ids"
-  )
-  m_pred_A0 <- m_fit_stack$predict(m_task_A0)
+    # create counterfactual data and predict under {do(A = 1), do(L = 1)}
+    m_Ais1_Lis1_task <- sl3::sl3_Task$new(
+      data = data.table::copy(data_Ais1)[, L := 1],
+      covariates = covars_names,
+      outcome = "Y",
+      id = "ids"
+    )
+    m_pred_Ais1_Lis1 <- m_fit_stack$predict(m_Ais1_Lis1_task)
+
+    # create counterfactual data and predict under {do(A = 0), do(L = 0)}
+    m_Ais0_Lis0_task <- sl3::sl3_Task$new(
+      data = data.table::copy(data_Ais0)[, L := 0],
+      covariates = covars_names,
+      outcome = "Y",
+      id = "ids"
+    )
+    m_pred_Ais0_Lis0 <- m_fit_stack$predict(m_Ais0_Lis0_task)
+
+    # create counterfactual data and predict under {do(A = 0), do(L = 1)}
+    m_Ais0_Lis1_task <- sl3::sl3_Task$new(
+      data = data.table::copy(data_Ais0)[, L := 1],
+      covariates = covars_names,
+      outcome = "Y",
+      id = "ids"
+    )
+    m_pred_Ais0_Lis1 <- m_fit_stack$predict(m_Ais0_Lis1_task)
+
+    # created predictions marginalized over counterfactual L for ease of output
+    m_pred_Ais1 <- data_Ais1$L * m_pred_Ais1_Lis1 + (1 - data_Ais1$L) *
+      m_pred_Ais1_Lis0
+    m_pred_Ais0 <- data_Ais0$L * m_pred_Ais0_Lis1 + (1 - data_Ais0$L) *
+      m_pred_Ais0_Lis0
+  } else {
+    # create task for counterfactual data under do(A = 1)
+    m_Ais1_task <- sl3::sl3_Task$new(
+      data = data_Ais1,
+      covariates = covars_names,
+      outcome = "Y",
+      id = "ids"
+    )
+    m_pred_Ais1 <- m_fit_stack$predict(m_Ais1_task)
+
+    # create task for counterfactual data under do(A = 0)
+    m_Ais0_task <- sl3::sl3_Task$new(
+      data = data_Ais0,
+      covariates = covars_names,
+      outcome = "Y",
+      id = "ids"
+    )
+    m_pred_Ais0 <- m_fit_stack$predict(m_Ais0_task)
+  }
 
   # output
   out <- list(
     m_est = data.table::data.table(cbind(
-      m_pred_A1 = m_pred_A1,
-      m_pred_A0 = m_pred_A0
-    )),
-    m_est_training = data.table::data.table(cbind(
-      m_pred_A1 =
-        if (!is.null(valid_data)) {
-          m_pred_train_A1
+      m_pred_Ais1 =
+        if ("L" %in% colnames(data)) {
+          cbind(
+            m_pred_Ais1_Lis0,
+            m_pred_Ais1_Lis1
+          )
         } else {
-          rep(NA, nrow(data))
+          m_pred_Ais1
         },
-      m_pred_A0 =
-        if (!is.null(valid_data)) {
-          m_pred_train_A0
+      m_pred_Ais0 =
+        if ("L" %in% colnames(data)) {
+          cbind(
+            m_pred_Ais0_Lis0,
+            m_pred_Ais0_Lis1
+          )
         } else {
-          rep(NA, nrow(data))
+          m_pred_Ais0
+        }
+    )),
+    # NOTE: these are only for the downstream construction of pseudo-outcome
+    #       for "nested" nuisance functional
+    m_est_pseudo = data.table::data.table(cbind(
+      m_pred_Ais1 =
+        if (!is.null(valid_data)) {
+          m_pred_Ais1_training
+        } else {
+          m_pred_Ais1
+        },
+      m_pred_Ais0 =
+        if (!is.null(valid_data)) {
+          m_pred_Ais0_training
+        } else {
+          m_pred_Ais0
         }
     )),
     m_fit_sl = m_fit_stack
@@ -456,7 +545,7 @@ fit_m_mech <- function(data, valid_data = NULL, learners, z_names, w_names) {
 #' Fit pseudo-outcome nuisance parameter for difference of outcome regressions
 #'
 #' @param train_data A \code{data.table} containing the observed data, with
-#'  columns in the order specified by the NPSEM (Y, Z, L A, W), with column
+#'  columns in the order specified by the NPSEM (Y, Z, A, W), with column
 #'  names set appropriately based on the input data. Such a structure is merely
 #'  a convenience utility to passing data around to the various core estimation
 #'  routines and is automatically generated by \code{\link{medshift}}.
@@ -479,18 +568,18 @@ fit_m_mech <- function(data, valid_data = NULL, learners, z_names, w_names) {
 fit_phi_mech <- function(train_data, valid_data, learners, m_out, w_names) {
   # regression on pseudo-outcome for this nuisance parameter
   # NOTE: first, learn the regression model using the training data
-  m_pred_train_A1 <- m_out$m_est_training$m_pred_A1
-  m_pred_train_A0 <- m_out$m_est_training$m_pred_A0
-  m_pred_train_diff <- m_pred_train_A1 - m_pred_train_A0
+  m_pred_Ais1_training <- m_out$m_est_pseudo$m_pred_Ais1
+  m_pred_Ais0_training <- m_out$m_est_pseudo$m_pred_Ais0
+  m_pred_diff_training <- m_pred_Ais1_training - m_pred_Ais0_training
 
   # construct data structure for use with task objects
-  phi_train_data <- data.table::data.table(
-    m_diff = m_pred_train_diff,
+  phi_data_training <- data.table::data.table(
+    m_diff = m_pred_diff_training,
     train_data[, ..w_names],
     ids = train_data[["ids"]]
   )
-  phi_train_task <- sl3::sl3_Task$new(
-    data = phi_train_data,
+  phi_task_training <- sl3::sl3_Task$new(
+    data = phi_data_training,
     covariates = w_names,
     outcome = "m_diff",
     outcome_type = "continuous",
@@ -498,22 +587,22 @@ fit_phi_mech <- function(train_data, valid_data, learners, m_out, w_names) {
   )
 
   # fit stack of learners to learn the regression model for phi
-  phi_fit <- learners$train(phi_train_task)
+  phi_fit_training <- learners$train(phi_task_training)
 
   # NOW, predict on the validation data
   # NOTE: first, as before, must construct the pseudo-outcome
-  m_pred_valid_A1 <- m_out$m_est$m_pred_A1
-  m_pred_valid_A0 <- m_out$m_est$m_pred_A0
-  m_pred_valid_diff <- m_pred_valid_A1 - m_pred_valid_A0
+  m_pred_Ais1_validation <- m_out$m_est$m_pred_Ais1
+  m_pred_Ais0_validation <- m_out$m_est$m_pred_Ais0
+  m_pred_diff_validation <- m_pred_Ais1_validation - m_pred_Ais0_validation
 
   # construct data structure for use with task objects
-  phi_valid_data <- data.table::data.table(
-    m_diff = m_pred_valid_diff,
+  phi_data_validation <- data.table::data.table(
+    m_diff = m_pred_diff_validation,
     valid_data[, ..w_names],
     ids = valid_data[["ids"]]
   )
-  phi_valid_task <- sl3::sl3_Task$new(
-    data = phi_valid_data,
+  phi_task_validation <- sl3::sl3_Task$new(
+    data = phi_data_validation,
     covariates = w_names,
     outcome = "m_diff",
     outcome_type = "continuous",
@@ -521,6 +610,6 @@ fit_phi_mech <- function(train_data, valid_data, learners, m_out, w_names) {
   )
 
   # predict and return for validation set only
-  phi_est <- phi_fit$predict(phi_valid_task)
-  return(phi_est)
+  phi_est_validation <- phi_fit_training$predict(phi_task_validation)
+  return(phi_est_validation)
 }

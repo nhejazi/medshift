@@ -100,22 +100,22 @@ stoch_cv_eif <- function(fold,
     D_ZW <- Dzw_groupwise$dzw_cntrl + Dzw_groupwise$dzw_treat
 
     # compute component Da from nuisance parameters
-    g_pred_A1 <- g_out[[delta_iter]]$g_est$g_pred_A1
-    g_pred_A0 <- g_out[[delta_iter]]$g_est$g_pred_A0
+    g_pred_A1 <- g_out[[delta_iter]]$g_est$g_pred_natural_A1
+    g_pred_A0 <- g_out[[delta_iter]]$g_est$g_pred_natural_A0
     Da_numerator <- delta[delta_iter] * phi_est * (valid_data$A - g_pred_A1)
     Da_denominator <- (delta[delta_iter] * g_pred_A1 + g_pred_A0)^2
     D_A <- Da_numerator / Da_denominator
 
     # compute component Dy from nuisance parameters
-    m_pred_obs <- valid_data$A * m_out$m_est$m_pred_A1 + (1 - valid_data$A) *
-      m_out$m_est$m_pred_A0
+    m_pred_obs <- valid_data$A * m_out$m_est$m_pred_Ais1 + (1 - valid_data$A) *
+      m_out$m_est$m_pred_Ais0
 
     # stabilize weights (dividing by sample average) and compute IPW estimate
     g_shifted <- valid_data$A * g_out[[delta_iter]]$g_est$g_pred_shifted_A1 +
       (1 - valid_data$A) * g_out[[delta_iter]]$g_est$g_pred_shifted_A0
 
-    e_pred <- valid_data$A * e_out$e_est$e_pred_A1 + (1 - valid_data$A) *
-      e_out$e_est$e_pred_A0
+    e_pred <- valid_data$A * e_out$e_est$e_pred_natural_A1 +
+      (1 - valid_data$A) * e_out$e_est$e_pred_natural_A0
     mean_weights <- mean(g_shifted / e_pred)
 
     # compute component of EIF associated to Y
@@ -149,12 +149,12 @@ compute_Dzw <- function(g_out, m_out) {
   g_shifted_A0 <- g_out$g_est$g_pred_shifted_A0
 
   # get m components from output for that nuisance parameter
-  m_pred_A1 <- m_out$m_est$m_pred_A1
-  m_pred_A0 <- m_out$m_est$m_pred_A0
+  m_pred_Ais1 <- m_out$m_est$m_pred_Ais1
+  m_pred_Ais0 <- m_out$m_est$m_pred_Ais0
 
   # compute component Dzw from nuisance parameters
-  Dzw_A1 <- g_shifted_A1 * m_pred_A1
-  Dzw_A0 <- g_shifted_A0 * m_pred_A0
+  Dzw_A1 <- g_shifted_A1 * m_pred_Ais1
+  Dzw_A0 <- g_shifted_A0 * m_pred_Ais0
 
   # output as simple list
   return(list(
@@ -175,7 +175,6 @@ interv_cv_eif <- function(fold,
                           m_learners,
                           w_names,
                           z_names) {
-
   # make training and validation data
   train_data <- origami::training(data)
   valid_data <- origami::validation(data)
@@ -186,19 +185,20 @@ interv_cv_eif <- function(fold,
     learners = g_learners, w_names = w_names
   )
 
-  ## 2) fit clever propensity score, conditional on mediators
+  ## 2) fit reparameterized propensity score, conditional on mediators
   e_out <- fit_e_mech(
     data = train_data, valid_data = valid_data, learners = e_learners,
     z_names = z_names, w_names = w_names
   )
 
-  ## 3) fit intermediate confounding mechanism
+  ## 3) fit intermediate confounding mechanism without mediators
   b_out <- fit_b_mech(
     data = train_data, valid_data = valid_data, learners = b_learners,
     w_names = w_names
   )
 
-  ## 4) fit clever intermediate confounding mechanism, conditional on mediators
+  ## 4) fit reparameterized intermediate confounding mechanism,
+  #     conditional on mediators
   d_out <- fit_d_mech(
     data = train_data, valid_data = valid_data, learners = d_learners,
     z_names = z_names, w_names = w_names
@@ -209,7 +209,6 @@ interv_cv_eif <- function(fold,
     data = train_data, valid_data = valid_data, learners = m_learners,
     z_names = z_names, w_names = w_names
   )
-
 
   # TODO:
 }
