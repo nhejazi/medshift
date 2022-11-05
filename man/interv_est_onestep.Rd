@@ -12,6 +12,8 @@ interv_est_onestep(
   b_learners,
   d_learners,
   m_learners,
+  w_names,
+  z_names,
   cv_folds = 5L
 )
 }

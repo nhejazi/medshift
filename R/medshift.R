@@ -88,6 +88,8 @@ medshift <- function(W,
                      delta,
                      g_learners = sl3::Lrnr_glm$new(),
                      e_learners = sl3::Lrnr_glm$new(),
+                     b_learners = sl3::Lrnr_glm$new(),
+                     d_learners = sl3::Lrnr_glm$new(),
                      m_learners = sl3::Lrnr_glm$new(),
                      phi_learners = sl3::Lrnr_glm$new(),
                      estimator = c( "onestep", "tmle", "sub", "ipw"),
@@ -115,7 +117,6 @@ medshift <- function(W,
     data.table::setnames(data, c("Y", z_names, "L", "A", w_names, "ids"))
   }
 
-  browser()
   # NOTE: in this case (without L), we provide several estimators for only the
   #       mediation decomposition term that defines stochastic mediation direct
   #       and indirect effects
@@ -173,9 +174,9 @@ medshift <- function(W,
       ) 
     }
 
-  # NOTE: the next branch of this logic covers the stochastic-interventional
-  #       effects, for which we provide efficient estimators of the direct and
-  #       indirect effects
+  browser()
+  # NOTE: next branch handles the stochastic-interventional effects, for which
+  #       we provide efficient estimators of the direct and indirect effects
   } else {
     # PARAMETRIC SUBSTITUTION ESTIMATOR
     if (estimator == "sub") {
@@ -192,7 +193,8 @@ medshift <- function(W,
       os_est_args <- list(
         data = data, delta = delta,
         g_learners = g_learners, e_learners = e_learners,
-        m_learners = m_learners, phi_learners = phi_learners,
+        b_learners = b_learners, d_learner = d_learners,
+        m_learners = m_learners,
         w_names = w_names, z_names = z_names,
         cv_folds = estimator_args[["cv_folds"]]
       )
@@ -200,14 +202,15 @@ medshift <- function(W,
 
     # CROSS-VALIDATED TARGETED MINIMUM LOSS ESTIMATOR
     } else if (estimator == "tmle") {
-      tml_est_args <- list(
+      tmle_est_args <- list(
         data = data, delta = delta,
         g_learners = g_learners, e_learners = e_learners,
-        m_learners = m_learners, phi_learners = phi_learners,
+        b_learners = b_learners, d_learner = d_learners,
+        m_learners = m_learners,
         w_names = w_names, z_names = z_names,
         cv_folds = estimator_args[["cv_folds"]]
       )
-      est_out <- do.call(interv_est_tml, os_est_args)
+      est_out <- do.call(interv_est_tmle, tmle_est_args)
     }
   }
 

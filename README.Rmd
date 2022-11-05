@@ -95,13 +95,25 @@ example_data <- make_simple_mediation_data()
 
 # compute one-step estimate for an incremental propensity score intervention
 # that triples (delta = 3) the individual-specific odds of receiving treatment
-os_medshift <- medshift(
+os_stoch_medshift <- medshift(
   W = example_data$W, A = example_data$A,
   Z = example_data$Z, Y = example_data$Y,
-  delta = 3, estimator = "reweighted",
+  delta = 3, estimator = "onestep",
   estimator_args = list(cv_folds = 3)
 )
-summary(os_medshift)
+summary(os_stoch_medshift)
+
+
+
+os_interv_medshift <- medshift(
+  W = example_data$W, A = example_data$A,
+  L = rbinom(example_data[, .N], 1, 0.6),
+  Z = example_data$Z, Y = example_data$Y,
+  delta = 3, estimator = "onestep",
+  estimator_args = list(cv_folds = 3)
+)
+summary(os_interv_medshift)
+
 ```
 
 For details on how to use data adaptive regression (machine learning) techniques

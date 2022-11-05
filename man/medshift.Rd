@@ -15,6 +15,8 @@ medshift(
   delta,
   g_learners = sl3::Lrnr_glm$new(),
   e_learners = sl3::Lrnr_glm$new(),
+  b_learners = sl3::Lrnr_glm$new(),
+  d_learners = sl3::Lrnr_glm$new(),
   m_learners = sl3::Lrnr_glm$new(),
   phi_learners = sl3::Lrnr_glm$new(),
   estimator = c("onestep", "tmle", "sub", "ipw"),
@@ -65,6 +67,20 @@ instantiated learners from \pkg{sl3}, used to fit a reparametrized model
 for the mediator(s) that is equivalent to a propensity score conditioning
 on the mediators.}
 
+\item{b_learners}{A \code{\link[sl3]{Stack}} (or other learner class that
+inherits from \code{\link[sl3]{Lrnr_base}}), containing a single or set of
+instantiated learners from \pkg{sl3}, used to fit a propensity score model
+for the intermediate confounder, adjusting for the baseline covariates and
+the treatment both. This is irrelevant for stochastic (in)direct effects,
+and so is ignored when L is left to its default of \code{NULL}.}
+
+\item{d_learners}{A \code{\link[sl3]{Stack}} (or other learner class that
+inherits from \code{\link[sl3]{Lrnr_base}}), containing a single or set of
+instantiated learners from \pkg{sl3}, used to fit a propensity score model
+for the intermediate confounder, adjusting for the baseline covariates, the
+treatment, and the mediators. This is irrelevant for stochastic (in)direct
+effects, and so is ignored when L is left to its default of \code{NULL}.}
+
 \item{m_learners}{A \code{\link[sl3]{Stack}} (or other learner class that
 inherits from \code{\link[sl3]{Lrnr_base}}), containing a single or set of
 instantiated learners from \pkg{sl3}, used to fit an outcome regression.}
@@ -92,20 +108,6 @@ is chosen so as to allow the number of folds used in computing the one-step
 estimator to be easily tweaked. Refer to the documentation for functions
 \code{\link{est_onestep}}, \code{\link{est_ipw}}, and \code{\link{est_sub}}
 for details on what other arguments may be specified.}
-
-\item{b_learners}{A \code{\link[sl3]{Stack}} (or other learner class that
-inherits from \code{\link[sl3]{Lrnr_base}}), containing a single or set of
-instantiated learners from \pkg{sl3}, used to fit a propensity score model
-for the intermediate confounder, adjusting for the baseline covariates and
-the treatment both. This is irrelevant for stochastic (in)direct effects,
-and so is ignored when L is left to its default of \code{NULL}.}
-
-\item{d_learners}{A \code{\link[sl3]{Stack}} (or other learner class that
-inherits from \code{\link[sl3]{Lrnr_base}}), containing a single or set of
-instantiated learners from \pkg{sl3}, used to fit a propensity score model
-for the intermediate confounder, adjusting for the baseline covariates, the
-treatment, and the mediators. This is irrelevant for stochastic (in)direct
-effects, and so is ignored when L is left to its default of \code{NULL}.}
 }
 \description{
 Nonparametric estimation of the stochastic and stochastic-interventional
