@@ -99,7 +99,7 @@ os_stoch_medshift <- medshift(
   W = example_data$W, A = example_data$A,
   Z = example_data$Z, Y = example_data$Y,
   delta = 3, estimator = "onestep",
-  estimator_args = list(cv_folds = 3)
+  estimator_args = list(cv_folds = 5L)
 )
 summary(os_stoch_medshift)
 
@@ -110,7 +110,7 @@ os_interv_medshift <- medshift(
   L = rbinom(example_data[, .N], 1, 0.6),
   Z = example_data$Z, Y = example_data$Y,
   delta = 3, estimator = "onestep",
-  estimator_args = list(cv_folds = 3)
+  estimator_args = list(cv_folds = 5L)
 )
 summary(os_interv_medshift)
 

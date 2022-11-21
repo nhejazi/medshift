@@ -107,8 +107,8 @@ stoch_cv_eif <- function(fold,
     D_A <- Da_numerator / Da_denominator
 
     # compute component Dy from nuisance parameters
-    m_pred_obs <- valid_data$A * m_out$m_est$m_pred_Ais1 + (1 - valid_data$A) *
-      m_out$m_est$m_pred_Ais0
+    m_pred_obs <- valid_data$A * m_out$m_est$m_pred_Ais1 +
+      (1 - valid_data$A) * m_out$m_est$m_pred_Ais0
 
     # stabilize weights (dividing by sample average) and compute IPW estimate
     g_shifted <- valid_data$A * g_out[[delta_iter]]$g_est$g_pred_shifted_A1 +
@@ -229,77 +229,91 @@ interv_cv_eif <- function(fold,
   train_data <- origami::training(data)
   valid_data <- origami::validation(data)
 
-  ## 1) fit propensity score with incremental propensity score intervention
+  ## 1) fit propensity score w/ IPSI p(A | W) and p(A_delta | W)
   g_out <- fit_g_mech(
     data = train_data, valid_data = valid_data, delta = delta,
     learners = g_learners, w_names = w_names
   )
 
-  ## 2) fit reparameterized propensity score, conditional on mediators
+  ## 2) fit reparameterized propensity score cond. on mediators p(A | Z, W)
   e_out <- fit_e_mech(
     data = train_data, valid_data = valid_data, learners = e_learners,
     z_names = z_names, w_names = w_names
   )
 
-  ## 3) fit intermediate confounding mechanism without mediators
+  ## 3) fit intermediate confounding mech. w/o mediators p(L | A, W)
   b_out <- fit_b_mech(
     data = train_data, valid_data = valid_data, learners = b_learners,
     w_names = w_names
   )
 
-  ## 4) fit reparameterized intermediate confounding mechanism,
-  #     conditional on mediators
+  ## 4) fit intermediate confounding mech. cond. on mediators p(L | Z, A, W)
   d_out <- fit_d_mech(
     data = train_data, valid_data = valid_data, learners = d_learners,
     z_names = z_names, w_names = w_names
   )
 
-  ## 5) fit outcome regression
+  ## 5) fit standard outcome regression E[Y | Z, L, A, W]
   m_out <- fit_m_mech(
     data = train_data, valid_data = valid_data, learners = m_learners,
     z_names = z_names, w_names = w_names
   )
 
+  ## compute "natural" estimates wrt observed A and L
+  g_pred_Anat <- valid_data$A * g_out$g_est$g_pred_natural_A1 +
+    (1 - valid_data$A) * g_out$g_est$g_pred_natural_A0
+  e_pred_Anat <- valid_data$A * e_out$e_est$e_pred_natural_A1 +
+    (1 - valid_data$A) * e_out$e_est$e_pred_natural_A0
+  b_pred_Lnat <- valid_data$L * b_out$b_est$b_pred_L1_Anat +
+    (1 - valid_data$L) * b_out$b_est$b_pred_L0_Anat
+  d_pred_Lnat <- valid_data$L * d_out$d_pred_L1_Anat +
+    (1 - valid_data$L) * d_out$d_pred_L0_Anat
 
+  ## similarly compute "natural" estimates for outcome regression but across
+  ## "binary slices" (i.e., 2x2 table) of observed A and L
+  m_pred_Anat_Lis1 <- valid_data$A * m_out$m_est$m_pred_Ais1_Lis1 +
+    (1 - valid_data$A) * m_out$m_est$m_pred_Ais0_Lis1
+  m_pred_Anat_Lis0 <- valid_data$A * m_out$m_est$m_pred_Ais1_Lis0 +
+    (1 - valid_data$A) * m_out$m_est$m_pred_Ais0_Lis0
+  m_pred_Anat_Lnat <- valid_data$L * m_pred_Anat_Lis1 +
+    (1 - valid_data$L) * m_pred_Anat_Lis0
+
+  ## compute "derived" nuisance estimates
+  u_pred_Anat <- m_pred_Anat_Lis1 * b_out$b_est$b_pred_L1_Anat +
+    m_pred_Anat_Lis0 * b_out$b_est$b_pred_L0_Anat
+  u_pred_Ais1 <- m_out$m_est$m_pred_Ais1_Lis1 * b_out$b_est$b_pred_L1_Ais1 +
+    m_out$m_est$m_pred_Ais1_Lis0 * (1 - b_out$b_est$b_pred_L1_Ais1)
+  u_pred_Ais0 <- m_out$m_est$m_pred_Ais0_Lis1 * b_out$b_est$b_pred_L1_Ais0 +
+    m_out$m_est$m_pred_Ais0_Lis0 * (1 - b_out$b_est$b_pred_L1_Ais0)
+  v_pred <- m_pred_Anat_Lnat * b_out$b_est$b_pred_L1_Anat /
+    d_out$d_est$d_pred_L1_Anat
+  s_pred <- m_pred_Anat_Lnat * b_out$b_est$b_pred_L1_Anat /
+    d_out$d_est$d_pred_L1_Anat * g_out$g_est$g_pred_natural_A1 /
+    e_out$e_est$e_pred_natural_A1
+
+  # NOTE: the logic below attempts to get validation predictions for several
+  #       derived nuisances by assuming these to have been estimated on the
+  #       training data, but this implementation doesn't keep such estimates.
+  #       rather than implementing an algorithm w/ multiple cross-validation
+  #       loops, we will instead use nested CV as begun below, though this is
+  #       very likely less "stable" than the training-validation split reuse.
   browser()
 
+  # TODO: reimplement nuisance estimation below using nested CV instead of
+  #       training-validation resplits
+  nested_resplit_folds <- origami::make_folds(
+    valid_data,
+    fold_fun = origami::folds_vfold,
+    V = 2L
+  )
 
-  # TODO:
-  ## truncate predictions
-  g1 <- truncate(nuisance_fits$cv_preds$g_preds[reorder_by_val_idx])
-  e1 <- truncate(nuisance_fits$cv_preds$e_preds[reorder_by_val_idx])
-  b1A <- nuisance_fits$cv_preds$b_preds[reorder_by_val_idx]
-  d1A <- truncate(nuisance_fits$cv_preds$d_preds[reorder_by_val_idx])
-
-  ## compute "natural" estimates
-  g <- unname(unlist(A * g1 + (1 - A) * (1 - g1)))
-  e <- unname(unlist(A * e1 + (1 - A) * (1 - e1)))
-  b <- unname(unlist(L * b1A + (1 - L) * (1 - b1A)))
-  d <- unname(unlist(L * d1A + (1 - L) * (1 - d1A)))
-  m <- nuisance_fits$cv_preds$m_preds[reorder_by_val_idx]
-
-
-
-
-
-  m1A <- unname(unlist(A * bdm_cv_cf_preds$m11 +
-    (1 - A) * bdm_cv_cf_preds$m10))
-  m0A <- unname(unlist(A * bdm_cv_cf_preds$m01 +
-    (1 - A) * bdm_cv_cf_preds$m00))
-
-  uA <- unname(unlist(m1A * b1A + m0A * (1 - b1A)))
-  u1 <- with(bdm_cv_cf_preds, m11 * b11 + m01 * (1 - b11))
-  u0 <- with(bdm_cv_cf_preds, m10 * b10 + m00 * (1 - b10))
-
-  vout <- m * b / d
-  sout <- m * b / d * g / e
-
-  if (sd(vout) < .Machine$double.eps * 10) {
-    v1 <- v0 <- rep(mean(vout), length(vout))
+  if (stats::sd(v_pred) < .Machine$double.eps * 10) {
+    v_pred_Lis1 <- v_pred_Lis0 <- rep(mean(v_pred), length(v_pred))
   } else {
-    # make data for estimating v
-    v_data <- data.table::as.data.table(list(W, A, L, vout))
-    data.table::setnames(v_data, c(names_w, "A", "L", "vout"))
+    # make data for estimating v under contrasts of L
+    v_data <- data.table::copy(valid_data)
+    v_data[, v_est := v_pred]
+
 
     # cross-validated counterfactual predictions
     v_cv_cf_preds <- lapply(seq_along(val_idx), function(fold_idx) {

@@ -94,7 +94,7 @@ medshift <- function(W,
                      phi_learners = sl3::Lrnr_glm$new(),
                      estimator = c( "onestep", "tmle", "sub", "ipw"),
                      estimator_args = list(
-                       cv_folds = 10,
+                       cv_folds = 10L,
                        max_iter = 1e4,
                        step_size = 1e-6
                      )
@@ -103,7 +103,7 @@ medshift <- function(W,
   estimator <- match.arg(estimator)
   estimator_args <- unlist(estimator_args, recursive = FALSE)
 
-  # NOTE: no static interventions -- need a valid IPSI stochastic intervention
+  # NOTE: no static interventions: need valid stochastic IPSI
   assertthat::assert_that(delta > 0 && delta < Inf)
 
   # construct input data structure
@@ -118,8 +118,7 @@ medshift <- function(W,
   }
 
   # NOTE: in this case (without L), we provide several estimators for only the
-  #       mediation decomposition term that defines stochastic mediation direct
-  #       and indirect effects
+  #       decomposition term defining the stochastic direct/indirect effects
   if (is.null(L)) {
     # PARAMETRIC SUBSTITUTION ESTIMATOR
     if (estimator == "sub") {
@@ -171,22 +170,21 @@ medshift <- function(W,
         var = var(as.numeric(tml_est$estimates[[1]]$IC)) / data[, .N],
         eif = as.numeric(tml_est$estimates[[1]]$IC),
         type = "tmle"
-      ) 
+      )
     }
 
-  browser()
-  # NOTE: next branch handles the stochastic-interventional effects, for which
-  #       we provide efficient estimators of the direct and indirect effects
+  # NOTE: next branch handles stochastic-interventional effects, for which
+  #       we provide only efficient estimators of direct/indirect effects
   } else {
     # PARAMETRIC SUBSTITUTION ESTIMATOR
     if (estimator == "sub") {
-      stop("Parametric substitution estimator not yet implemented for the
-      stochastic-interventional (in)direct effects")
+      stop("Parametric substitution estimator not available for
+            stochastic-interventional direct/indirect effects")
 
     # INVERSE PROBABILITY WEIGHTED ESTIMATOR
     } else if (estimator == "ipw") {
-      stop("Inverse probability weighted estimator not yet implemented for the
-           stochastic-interventional (in)direct effects")
+      stop("Inverse probability weighted estimator not available for
+            stochastic-interventional direct/indirect effects")
 
     # CROSS-FITTED ONE-STEP ESTIMATOR
     } else if (estimator == "onestep") {
@@ -215,6 +213,7 @@ medshift <- function(W,
   }
 
   # lazily create output as ad-hoc S3 class, except for tmle3 output
+  browser()
   class(est_out) <- "medshift"
   return(est_out)
 }

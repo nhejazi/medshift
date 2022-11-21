@@ -71,9 +71,9 @@ interv_est_onestep <- function(data,
 
 }
 
+###############################################################################
 
-
-#' Compute Cross-Validated TML estimator
+#' Compute Cross-Validated Targeted Minimum Loss-based Estimator (CV-TMLE)
 #'
 #' @param data ...
 #' @param delta ...

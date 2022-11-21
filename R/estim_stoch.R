@@ -171,7 +171,7 @@ stoch_est_onestep <- function(data,
                               phi_learners,
                               w_names,
                               z_names,
-                              cv_folds = 10) {
+                              cv_folds = 10L) {
   # use origami to perform CV-SL, fitting/evaluating EIF components per fold
   eif_component_names <- c("Dy", "Da", "Dzw")
 

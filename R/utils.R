@@ -118,13 +118,10 @@ print.medshift <- function(x, ...) {
 #'  are truncated to \code{tol} while those greater than (1 - \code{tol}) are
 #'  truncated to (1 - \code{tol}).
 #'
-#' @importFrom assertthat assert_that
-#'
 #' @keywords internal
 bound_precision <- function(vals, tol = 1e-6) {
-  vals[vals < tol] <- tol
-  vals[vals > 1 - tol] <- 1 - tol
-  return(vals)
+  vals_bounded <- pmax(pmin(vals, 1 - tol), tol)
+  return(vals_bounded)
 }
 
 ###############################################################################
@@ -143,9 +140,8 @@ bound_precision <- function(vals, tol = 1e-6) {
 #' @keywords internal
 bound_propensity <- function(vals, bounds = c(0.001, 0.999)) {
   assertthat::assert_that(!(max(vals) > 1 || min(vals) < 0))
-  vals[vals < bounds[1]] <- bounds[1]
-  vals[vals > bounds[2]] <- bounds[2]
-  return(vals)
+  vals_bounded <- pmax(pmin(vals, bounds[2]), bounds[1])
+  return(vals_bounded)
 }
 
 ###############################################################################
@@ -172,21 +168,21 @@ scale_to_unit <- function(vals) {
 
 #' Map values from the unit interval to their original scale
 #'
-#' @param vals_unit A \code{numeric} vector of values scaled to fall in the
+#' @param vals_in_unit A \code{numeric} vector of values scaled to fall in the
 #'  closed unit interval [0, 1] by use of \code{\link{scale_to_unit}}.
 #'
 #' @importFrom assertthat assert_that
 #'
 #' @keywords internal
-scale_from_unit <- function(vals_unit) {
+scale_from_unit <- function(vals_in_unit) {
   # check that input falls in the unit interval
-  assertthat::assert_that(min(vals_unit) == 0)
-  assertthat::assert_that(max(vals_unit) == 1)
+  assertthat::assert_that(min(vals_in_unit) == 0)
+  assertthat::assert_that(max(vals_in_unit) == 1)
 
   # rescale back to the original interval
-  max_orig <- attr(vals_unit, "max")
-  min_orig <- attr(vals_unit, "min")
-  vals_rescaled <- (vals_unit * (max_orig - min_orig)) + min_orig
+  max_orig <- attr(vals_in_unit, "max")
+  min_orig <- attr(vals_in_unit, "min")
+  vals_rescaled <- (vals_in_unit * (max_orig - min_orig)) + min_orig
   return(vals_rescaled)
 }
 
