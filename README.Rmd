@@ -101,19 +101,7 @@ os_stoch_medshift <- medshift(
   delta = 3, estimator = "onestep",
   estimator_args = list(cv_folds = 5L)
 )
-summary(os_stoch_medshift)
-
-
-
-os_interv_medshift <- medshift(
-  W = example_data$W, A = example_data$A,
-  L = rbinom(example_data[, .N], 1, 0.6),
-  Z = example_data$Z, Y = example_data$Y,
-  delta = 3, estimator = "onestep",
-  estimator_args = list(cv_folds = 5L)
-)
-summary(os_interv_medshift)
-
+os_stoch_medshift
 ```
 
 For details on how to use data adaptive regression (machine learning) techniques

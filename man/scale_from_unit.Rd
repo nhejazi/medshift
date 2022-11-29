@@ -4,11 +4,11 @@
 \alias{scale_from_unit}
 \title{Map values from the unit interval to their original scale}
 \usage{
-scale_from_unit(vals_unit)
+scale_from_unit(vals_in_unit)
 }
 \arguments{
-\item{vals_unit}{A \code{numeric} vector of values scaled to fall in the
-closed unit interval \link{0, 1} by use of \code{\link{scale_to_unit}}.}
+\item{vals_in_unit}{A \code{numeric} vector of values scaled to fall in the
+closed unit interval by use of \code{\link{scale_to_unit}}.}
 }
 \description{
 Map values from the unit interval to their original scale

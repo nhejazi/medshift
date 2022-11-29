@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{ipsi_delta}
 \alias{ipsi_delta}
-\title{Mapping for Incremental Propensity Score Interventions}
+\title{Incremental Propensity Score Intervention}
 \usage{
 ipsi_delta(g_est, delta)
 }
@@ -19,5 +19,5 @@ When the treatment is quantitative, the defines the degree of shift for a
 modified treatment policy but non-binary treatments are not  yet supported.}
 }
 \description{
-Mapping for Incremental Propensity Score Interventions
+Incremental Propensity Score Intervention
 }

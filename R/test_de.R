@@ -110,7 +110,7 @@ test_de <- function(W,
   mult_boot_mat <- do.call(cbind, mult_boot)
 
   # estimate via one-step for other half of direct effect
-  theta_est <- est_onestep(
+  theta_est <- stoch_est_onestep(
     data = data_in,
     delta = delta_grid,
     g_learners = g_learners,

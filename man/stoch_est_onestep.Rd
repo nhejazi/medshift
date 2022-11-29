@@ -13,7 +13,7 @@ stoch_est_onestep(
   phi_learners,
   w_names,
   z_names,
-  cv_folds = 10
+  cv_folds = 10L
 )
 }
 \arguments{
@@ -69,3 +69,4 @@ greater than or equal to 2; the default is to create 10 folds.}
 \description{
 Efficient One-Step Estimator
 }
+\keyword{internal}

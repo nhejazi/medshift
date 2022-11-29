@@ -1,3 +1,5 @@
+utils::globalVariables(c(".N", "est"))
+
 #' Nonparametric estimation of the stochastic and stochastic-interventional
 #' (in)direct effects
 #'
@@ -26,7 +28,8 @@
 #'  which acts as a multiplier of the odds with which an observational unit
 #'  receives treatment (EH Kennedy, 2018; <doi:10.1080/01621459.2017.1422737>).
 #'  When the treatment is quantitative, the defines the degree of shift for a
-#'  modified treatment policy but non-binary treatments are not  yet supported.
+#'  modified treatment policy but support for continuous-valued treatments is
+#'  not yet implemented.
 #' @param g_learners A \code{\link[sl3]{Stack}} (or other learner class that
 #'  inherits from \code{\link[sl3]{Lrnr_base}}), containing a single or set of
 #'  instantiated learners from \pkg{sl3}, used to fit a propensity score model.
@@ -69,14 +72,16 @@
 #'  \code{...}) to the internal function for the desired estimator. The default
 #'  is chosen so as to allow the number of folds used in computing the one-step
 #'  estimator to be easily tweaked. Refer to the documentation for functions
-#'  \code{\link{est_onestep}}, \code{\link{est_ipw}}, and \code{\link{est_sub}}
-#'  for details on what other arguments may be specified.
+#'  \code{\link{stoch_est_onestep}}, \code{\link{stoch_est_ipw}}, and
+#'  \code{\link{stoch_est_sub}} for details on other arguments to specify.
+#' @param ci_level A \code{numeric} indicating the confidence interval level.
 #'
+#' @importFrom assertthat assert_that
+#' @importFrom dplyr mutate relocate
 #' @importFrom data.table as.data.table setnames
 #' @importFrom origami make_folds cross_validate
-#' @importFrom sl3 Lrnr_glm
+#' @importFrom sl3 Lrnr_glm_fast
 #' @importFrom tmle3 tmle3
-#' @importFrom assertthat assert_that
 #'
 #' @export
 medshift <- function(W,
@@ -86,18 +91,19 @@ medshift <- function(W,
                      Y,
                      ids = seq_along(Y),
                      delta,
-                     g_learners = sl3::Lrnr_glm$new(),
-                     e_learners = sl3::Lrnr_glm$new(),
-                     b_learners = sl3::Lrnr_glm$new(),
-                     d_learners = sl3::Lrnr_glm$new(),
-                     m_learners = sl3::Lrnr_glm$new(),
-                     phi_learners = sl3::Lrnr_glm$new(),
+                     g_learners = sl3::Lrnr_glm_fast$new(),
+                     e_learners = sl3::Lrnr_glm_fast$new(),
+                     b_learners = sl3::Lrnr_glm_fast$new(),
+                     d_learners = sl3::Lrnr_glm_fast$new(),
+                     m_learners = sl3::Lrnr_glm_fast$new(),
+                     phi_learners = sl3::Lrnr_glm_fast$new(),
                      estimator = c( "onestep", "tmle", "sub", "ipw"),
                      estimator_args = list(
                        cv_folds = 10L,
                        max_iter = 1e4,
                        step_size = 1e-6
-                     )
+                     ),
+                     ci_level = 0.95
                     ) {
   # set defaults
   estimator <- match.arg(estimator)
@@ -124,7 +130,8 @@ medshift <- function(W,
     if (estimator == "sub") {
       sub_est_args <- list(
         data = data, delta = delta,
-        g_learners = g_learners, m_learners = m_learners,
+        g_learners = g_learners,
+        m_learners = m_learners,
         w_names = w_names, z_names = z_names
       )
       # TODO: add inference based on the bootstrap
@@ -153,7 +160,9 @@ medshift <- function(W,
 
     # CROSS-VALIDATED TARGETED MINIMUM LOSS ESTIMATOR
     } else if (estimator == "tmle") {
-      node_list <- list(W = w_names, A = "A", Z = z_names, Y = "Y", id = "ids")
+      node_list <- list(
+        W = w_names, A = "A", Z = z_names, Y = "Y", id = "ids"
+      )
       learner_list <- list(Y = m_learners, A = g_learners)
       tmle_spec <- tmle_medshift(
         delta = delta,
@@ -165,12 +174,16 @@ medshift <- function(W,
       tml_est <- tmle3::tmle3(tmle_spec, data, node_list, learner_list)
 
       # reorganize tmle3 output for compatibility across estimator types
-      est_out <- list(
-        theta = tml_est$estimates[[1]]$psi,
-        var = var(as.numeric(tml_est$estimates[[1]]$IC)) / data[, .N],
-        eif = as.numeric(tml_est$estimates[[1]]$IC),
-        type = "tmle"
-      )
+      est_out <- tibble::as_tibble(list(
+        param = "decomp",
+        est = tml_est$estimates[[1]]$psi,
+        stderr = sqrt(
+          stats::var(as.numeric(tml_est$estimates[[1]]$IC)) / data[, .N]
+        )
+      ))
+      attr(est_out, "type") <- "tmle"
+      attr(est_out, "param") <- "stochastic"
+      attr(est_out, "eif") <- as.numeric(tml_est$estimates[[1]]$IC)
     }
 
   # NOTE: next branch handles stochastic-interventional effects, for which
@@ -200,6 +213,7 @@ medshift <- function(W,
 
     # CROSS-VALIDATED TARGETED MINIMUM LOSS ESTIMATOR
     } else if (estimator == "tmle") {
+      # set TMLE arguments and compute estimates
       tmle_est_args <- list(
         data = data, delta = delta,
         g_learners = g_learners, e_learners = e_learners,
@@ -212,8 +226,26 @@ medshift <- function(W,
     }
   }
 
-  # lazily create output as ad-hoc S3 class, except for tmle3 output
-  browser()
-  class(est_out) <- "medshift"
+  # compute inference for estimates -- first, need Wald-style multiplier
+  wald_mult <- abs(stats::qnorm(p = (1 - ci_level) / 2))
+
+  # inference for stochastic direct/indirect effects
+  if (attr(est_out, "param") == "stochastic") {
+    est_out <- est_out %>%
+      dplyr::mutate(
+        ci_lwr = est - wald_mult * stderr,
+        ci_upr = est + wald_mult * stderr
+      ) %>%
+      dplyr::relocate("param", "ci_lwr", "est", "ci_upr", "stderr")
+
+  # inference for stochastic-interventional direct/indirect effects
+  } else if (attr(est_out, "param") == "stochastic_interventional") {
+    est_out <- est_out %>%
+      dplyr::mutate(
+        ci_lwr = est - wald_mult * stderr,
+        ci_upr = est + wald_mult * stderr
+      ) %>%
+      dplyr::relocate("param", "ci_lwr", "est", "ci_upr", "stderr")
+  }
   return(est_out)
 }
